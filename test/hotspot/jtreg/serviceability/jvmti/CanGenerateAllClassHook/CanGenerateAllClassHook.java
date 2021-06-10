@@ -29,6 +29,7 @@
  *          at ONLOAD and LIVE phases
  * @requires vm.jvmti
  * @requires vm.cds
+ * @requires vm.flagless
  * @library /test/lib
  * @compile CanGenerateAllClassHook.java
  * @run main/othervm/native CanGenerateAllClassHook
