@@ -2403,8 +2403,8 @@ void InstanceKlass::metaspace_pointers_do(MetaspaceClosure* it) {
 void InstanceKlass::remove_unshareable_info() {
 
   if (!can_be_verified_at_dumptime()) {
-    // Set the old class bit.
-    set_is_shared_old_klass();
+    // Clear the _verified_at_dump_time bit.
+    clear_verified_at_dump_time();
   }
 
   Klass::remove_unshareable_info();
