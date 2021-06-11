@@ -25,6 +25,7 @@
  * @test
  * @bug 8076318
  * @summary split verifier needs to add class resolution tracing
+ * @requires vm.flagless
  * @modules java.base/jdk.internal.misc
  * @library /test/lib
  * @run driver TraceClassRes
