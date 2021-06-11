@@ -25,6 +25,7 @@
  * @test
  * @bug 8199137
  * @summary VerifyStringTableAtExit should not crash
+ * @requires vm.flagless
  * @library /test/lib
  * @modules java.base/jdk.internal.misc
  * @run driver StringTableVerifyTest
