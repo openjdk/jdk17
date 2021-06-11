@@ -32,7 +32,7 @@ import jdk.test.lib.process.ProcessTools;
  *          atexit handler fails as expected without crashing.
  *
  * @library /test/lib
- * @run main/othervm/native TestAtExit
+ * @run main/native TestAtExit
  */
 
 public class TestAtExit {
