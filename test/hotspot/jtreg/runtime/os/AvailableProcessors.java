@@ -88,6 +88,7 @@ public class AvailableProcessors {
                                    ProcessTools.getCommandLine(pb));
                 OutputAnalyzer output = ProcessTools.executeProcess(pb);
                 output.shouldContain(SUCCESS_STRING);
+                output.shouldHaveExitValue(0);
             }
         }
     }

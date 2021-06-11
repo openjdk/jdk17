@@ -48,5 +48,6 @@ public class TestUseCpuAllocPath {
 
         OutputAnalyzer output = new OutputAnalyzer(pb.start());
         output.shouldContain(SUCCESS_STRING);
+        output.shouldHaveExitValue(0);
     }
 }
