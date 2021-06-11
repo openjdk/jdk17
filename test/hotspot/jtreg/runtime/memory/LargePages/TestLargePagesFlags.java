@@ -28,7 +28,7 @@
  * @library /test/lib
  * @modules java.base/jdk.internal.misc
  *          java.management
- * @run main TestLargePagesFlags
+ * @run driver TestLargePagesFlags
  */
 
 import jdk.test.lib.process.OutputAnalyzer;
