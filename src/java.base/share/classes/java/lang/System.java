@@ -61,7 +61,6 @@ import java.util.Properties;
 import java.util.PropertyPermission;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.function.Supplier;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -391,7 +390,7 @@ public final class System {
             // security manager not allowed
             if (sm != null) {
                 throw new UnsupportedOperationException(
-                    "Runtime configured to disallow security manager");
+                    "The Security Manager API is deprecated and will be removed in a future release");
             }
         }
     }
@@ -2213,8 +2212,8 @@ public final class System {
         if (needWarning) {
             System.err.printf("""
                     WARNING: A Security Manager has been enabled on the command line
-                    WARNING: java.lang.SecurityManager is deprecated and will be removed in a future release
-                    WARNING: -Djava.security.manager%s will have no effect when java.lang.SecurityManager is removed
+                    WARNING: The Security Manager API is deprecated and will be removed in a future release
+                    WARNING: -Djava.security.manager%s will have no effect when the API is removed
                     """, smProp.isEmpty() ? "" : ("=" + smProp));
         }
 
