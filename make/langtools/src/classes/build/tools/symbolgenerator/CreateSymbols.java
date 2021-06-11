@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2006, 2018, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2006, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -308,11 +308,16 @@ public class CreateSymbols {
             "Ljdk/internal/javac/PreviewFeature;";
     private static final String PREVIEW_FEATURE_ANNOTATION_INTERNAL =
             "Ljdk/internal/PreviewFeature+Annotation;";
+    private static final String VALUE_BASED_ANNOTATION =
+            "Ljdk/internal/ValueBased;";
+    private static final String VALUE_BASED_ANNOTATION_INTERNAL =
+            "Ljdk/internal/ValueBased+Annotation;";
     public static final Set<String> HARDCODED_ANNOTATIONS = new HashSet<>(
             List.of("Ljdk/Profile+Annotation;",
                     "Lsun/Proprietary+Annotation;",
                     PREVIEW_FEATURE_ANNOTATION_OLD,
-                    PREVIEW_FEATURE_ANNOTATION_NEW));
+                    PREVIEW_FEATURE_ANNOTATION_NEW,
+                    VALUE_BASED_ANNOTATION));
 
     private void stripNonExistentAnnotations(LoadDescriptions data) {
         Set<String> allClasses = data.classes.name2Class.keySet();
@@ -1178,6 +1183,12 @@ public class CreateSymbols {
             values = new HashMap<>(values);
             Boolean essentialAPI = (Boolean) values.remove("essentialAPI");
             values.put("reflective", essentialAPI != null && !essentialAPI);
+        }
+
+        if (VALUE_BASED_ANNOTATION.equals(annotationType)) {
+            //the non-public ValueBased annotation will not be available in ct.sym,
+            //replace with purely synthetic javac-internal annotation:
+            annotationType = VALUE_BASED_ANNOTATION_INTERNAL;
         }
 
         return new Annotation(null,

@@ -23,7 +23,7 @@
 
 /*
  * @test
- * @bug 8266036
+ * @bug 8266036 8258421
  * @summary Verify no error is reported for extended ForkJoinPool with --release 8.
  * @modules jdk.compiler
  * @build NonPublicAnnotations
