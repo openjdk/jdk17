@@ -59,6 +59,7 @@ public class ReserveMemory {
           "test");
 
     OutputAnalyzer output = new OutputAnalyzer(pb.start());
+    output.shouldNotHaveExitValue(0);
     if (Platform.isWindows()) {
       output.shouldContain("EXCEPTION_ACCESS_VIOLATION");
     } else if (Platform.isOSX()) {
