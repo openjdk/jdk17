@@ -1657,8 +1657,8 @@ void LinearScan::sort_intervals_after_allocation() {
 void LinearScan::allocate_registers() {
   TIME_LINEAR_SCAN(timer_allocate_registers);
 
-  Interval* precolored_cpu_intervals = Interval::end(), *not_precolored_cpu_intervals = Interval::end();
-  Interval* precolored_fpu_intervals = Interval::end(), *not_precolored_fpu_intervals = Interval::end();
+  Interval* precolored_cpu_intervals, *not_precolored_cpu_intervals;
+  Interval* precolored_fpu_intervals, *not_precolored_fpu_intervals;
 
   // collect cpu intervals
   create_unhandled_lists(&precolored_cpu_intervals, &not_precolored_cpu_intervals,
@@ -1670,6 +1670,16 @@ void LinearScan::allocate_registers() {
   // this fpu interval collection cannot be moved down below with the allocation section as
   // the cpu_lsw.walk() changes interval positions.
 
+  if (!has_fpu_registers()) {
+#ifdef ASSERT
+    assert(not_precolored_fpu_intervals == Interval::end(), "missed an uncolored fpu interval");
+#else
+    if (not_precolored_fpu_intervals != Interval::end()) {
+      BAILOUT("missed an uncolored fpu interval");
+    }
+#endif
+  }
+
   // allocate cpu registers
   LinearScanWalker cpu_lsw(this, precolored_cpu_intervals, not_precolored_cpu_intervals);
   cpu_lsw.walk();
@@ -1680,14 +1690,6 @@ void LinearScan::allocate_registers() {
     LinearScanWalker fpu_lsw(this, precolored_fpu_intervals, not_precolored_fpu_intervals);
     fpu_lsw.walk();
     fpu_lsw.finish_allocation();
-  } else {
-#ifdef ASSERT
-    assert(not_precolored_fpu_intervals == Interval::end(), "missed an uncolored fpu interval");
-#else
-    if (not_precolored_fpu_intervals != Interval::end()) {
-      BAILOUT("missed an uncolored fpu interval");
-    }
-#endif
   }
 }
 
