@@ -87,8 +87,8 @@ public class AvailableProcessors {
                 System.out.println("Final command line: " +
                                    ProcessTools.getCommandLine(pb));
                 OutputAnalyzer output = ProcessTools.executeProcess(pb);
-                output.shouldContain(SUCCESS_STRING);
                 output.shouldHaveExitValue(0);
+                output.shouldContain(SUCCESS_STRING);
             }
         }
     }

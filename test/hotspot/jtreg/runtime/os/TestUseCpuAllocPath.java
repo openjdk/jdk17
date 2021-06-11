@@ -47,7 +47,7 @@ public class TestUseCpuAllocPath {
                                                   "-version");
 
         OutputAnalyzer output = new OutputAnalyzer(pb.start());
-        output.shouldContain(SUCCESS_STRING);
         output.shouldHaveExitValue(0);
+        output.shouldContain(SUCCESS_STRING);
     }
 }
