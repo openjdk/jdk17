@@ -26,6 +26,7 @@
  * @bug 8195100
  * @summary a short lived Symbol should be cleaned up
  * @requires vm.debug
+ * @requires vm.flagless
  * @library /test/lib
  * @modules java.base/jdk.internal.misc
  *          java.management
