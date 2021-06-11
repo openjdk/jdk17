@@ -328,13 +328,7 @@ public final class System {
     private static native void setErr0(PrintStream err);
 
     // Remember original System.err. setSecurityManager() warning goes here
-    private static PrintStream oldErrStream = null;
-
-    private static class CallerHolder {
-        // Remember callers of setSecurityManager() here so that warning
-        // is only printed once for each different caller
-        final static Map<String, Boolean> callersOfSSM = new WeakHashMap<>();
-    }
+    private static volatile @Stable PrintStream originalErrStream = null;
 
     private static URL codeSource(Class<?> clazz) {
         PrivilegedAction<ProtectionDomain> pa = clazz::getProtectionDomain;
@@ -386,15 +380,12 @@ public final class System {
         if (allowSecurityManager()) {
             var caller = Reflection.getCallerClass();
             String signature = caller.getName() + " (" + codeSource(caller) + ")";
-            if (!CallerHolder.callersOfSSM.containsKey(signature)) {
-                oldErrStream.printf("""
-                        WARNING: A terminally deprecated method in java.lang.System has been called
-                        WARNING: java.lang.System::setSecurityManager has been called by %s
-                        WARNING: Please consider reporting this to the maintainers of %s
-                        WARNING: java.lang.System::setSecurityManager will be removed in a future release
-                        """, signature, caller.getName());
-                CallerHolder.callersOfSSM.put(signature, true);
-            }
+            originalErrStream.printf("""
+                    WARNING: A terminally deprecated method in java.lang.System has been called
+                    WARNING: java.lang.System::setSecurityManager has been called by %s
+                    WARNING: Please consider reporting this to the maintainers of %s
+                    WARNING: java.lang.System::setSecurityManager will be removed in a future release
+                    """, signature, caller.getName());
             implSetSecurityManager(sm);
         } else {
             // security manager not allowed
@@ -2177,6 +2168,7 @@ public final class System {
         Unsafe.getUnsafe().ensureClassInitialized(StringConcatFactory.class);
 
         String smProp = System.getProperty("java.security.manager");
+        boolean needWarning = false;
         if (smProp != null) {
             switch (smProp) {
                 case "disallow":
@@ -2189,11 +2181,7 @@ public final class System {
                 case "default":
                     implSetSecurityManager(new SecurityManager());
                     allowSecurityManager = MAYBE;
-                    System.err.printf("""
-                            WARNING: The Security Manager has been enabled on the command line (-Djava.security.manager%1$s)
-                            WARNING: The Security Manager is deprecated and will be removed in a future release
-                            WARNING: -Djava.security.manager%1$s will have no effect when the Security Manager is removed
-                            """, smProp.isEmpty() ? "" : ("=" + smProp));
+                    needWarning = true;
                     break;
                 default:
                     try {
@@ -2212,11 +2200,7 @@ public final class System {
                         ctor.setAccessible(true);
                         SecurityManager sm = (SecurityManager) ctor.newInstance();
                         implSetSecurityManager(sm);
-                        System.err.printf("""
-                                WARNING: A Security Manager implementation has been enabled on the command line
-                                WARNING: java.lang.SecurityManager is deprecated and will be removed in a future release
-                                WARNING: -Djava.security.manager=%s will have no effect when java.lang.SecurityManager is removed
-                                """, smProp);
+                        needWarning = true;
                     } catch (Exception e) {
                         throw new InternalError("Could not create SecurityManager", e);
                     }
@@ -2226,7 +2210,15 @@ public final class System {
             allowSecurityManager = MAYBE;
         }
 
-        oldErrStream = System.err;
+        if (needWarning) {
+            System.err.printf("""
+                    WARNING: A Security Manager has been enabled on the command line
+                    WARNING: java.lang.SecurityManager is deprecated and will be removed in a future release
+                    WARNING: -Djava.security.manager%s will have no effect when java.lang.SecurityManager is removed
+                    """, smProp.isEmpty() ? "" : ("=" + smProp));
+        }
+
+        originalErrStream = System.err;
 
         // initializing the system class loader
         VM.initLevel(3);

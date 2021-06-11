@@ -42,34 +42,38 @@ public class SecurityManagerWarnings {
                     .shouldHaveExitValue(0)
                     .shouldContain("SM is enabled: false")
                     .shouldNotContain("-Djava.security.manager")
-                    .shouldContain("java.lang.System::setSecurityManager will be removed in a future release")
-                    .shouldNotMatch("(?s)setSecurityManager will be removed.*setSecurityManager will be removed"); // only one "will be removed" warning
+                    .shouldContain("java.lang.System::setSecurityManager will be removed in a future release");
+
             run("allow")
                     .shouldHaveExitValue(0)
                     .shouldContain("SM is enabled: false")
                     .shouldNotContain("-Djava.security.manager")
-                    .shouldContain("java.lang.System::setSecurityManager will be removed in a future release")
-                    .shouldNotMatch("(?s)setSecurityManager will be removed.*setSecurityManager will be removed"); // only one "will be removed" warning
+                    .shouldContain("java.lang.System::setSecurityManager will be removed in a future release");
+
             run("disallow")
                     .shouldNotHaveExitValue(0)
                     .shouldContain("SM is enabled: false")
                     .shouldNotContain("-Djava.security.manager")
                     .shouldContain("UnsupportedOperationException");
+
             run("SecurityManagerWarnings$MySM")
                     .shouldHaveExitValue(0)
                     .shouldContain("SM is enabled: true")
-                    .shouldContain("-Djava.security.manager")
-                    .shouldContain("java.lang.System::setSecurityManager will be removed in a future release")
-                    .shouldNotMatch("(?s)setSecurityManager will be removed.*setSecurityManager will be removed"); // only one "will be removed" warning
+                    .shouldContain("-Djava.security.manager=SecurityManagerWarnings$MySM will have no effect")
+                    .shouldContain("java.lang.System::setSecurityManager will be removed in a future release");
+
+            // Default SecurityManager does not allow setSecurityManager
+
             run("")
                     .shouldNotHaveExitValue(0)
                     .shouldContain("SM is enabled: true")
-                    .shouldContain("-Djava.security.manager")
+                    .shouldContain("-Djava.security.manager will have no effect")
                     .shouldContain("AccessControlException");
+
             run("default")
                     .shouldNotHaveExitValue(0)
                     .shouldContain("SM is enabled: true")
-                    .shouldContain("-Djava.security.manager")
+                    .shouldContain("-Djava.security.manager=default will have no effect")
                     .shouldContain("AccessControlException");
         } else {
             System.out.println("SM is enabled: " + (System.getSecurityManager() != null));
@@ -79,7 +83,6 @@ public class SecurityManagerWarnings {
             System.setErr(new PrintStream(new ByteArrayOutputStream()));
             Exception ex = null;
             try {
-                System.setSecurityManager(new MySM());
                 System.setSecurityManager(new MySM());
             } catch (Exception e) {
                 ex = e;
