@@ -2433,7 +2433,7 @@ bool Node::is_dead_loop_safe() const {
 //=============================================================================
 //------------------------------yank-------------------------------------------
 // Find and remove
-bool Node_List::yank( Node *n ) {
+void Node_List::yank( Node *n ) {
   uint i;
   for (i = 0; i < _cnt; i++) {
     if (_nodes[i] == n) {
@@ -2443,9 +2443,7 @@ bool Node_List::yank( Node *n ) {
 
   if (i < _cnt) {
     _nodes[i] = _nodes[--_cnt];
-    return true;
   }
-  return false;
 }
 
 //------------------------------dump-------------------------------------------
