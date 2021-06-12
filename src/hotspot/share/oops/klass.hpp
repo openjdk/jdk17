@@ -334,8 +334,8 @@ protected:
     NOT_CDS(return false;)
   }
 
-  void clear_verified_at_dump_time() {
-    CDS_ONLY(_shared_class_flags &= ~_verified_at_dump_time;)
+  void set_verified_at_dump_time() {
+    CDS_ONLY(_shared_class_flags |= _verified_at_dump_time;)
   }
   bool verified_at_dump_time() const {
     CDS_ONLY(return (_shared_class_flags & _verified_at_dump_time) != 0;)

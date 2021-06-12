@@ -2402,9 +2402,9 @@ void InstanceKlass::metaspace_pointers_do(MetaspaceClosure* it) {
 
 void InstanceKlass::remove_unshareable_info() {
 
-  if (!can_be_verified_at_dumptime()) {
-    // Clear the _verified_at_dump_time bit.
-    clear_verified_at_dump_time();
+  if (can_be_verified_at_dumptime()) {
+    // Remember this so we can avoid walking the hierarchy at runtime.
+    set_verified_at_dump_time();
   }
 
   Klass::remove_unshareable_info();
