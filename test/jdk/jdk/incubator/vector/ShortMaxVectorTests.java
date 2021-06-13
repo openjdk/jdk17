@@ -36,7 +36,12 @@ import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.Vector;
 
+import jdk.incubator.vector.ByteVector;
+import jdk.incubator.vector.FloatVector;
+import jdk.incubator.vector.IntVector;
+import jdk.incubator.vector.DoubleVector;
 import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.LongVector;
 
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -68,6 +73,10 @@ public class ShortMaxVectorTests extends AbstractVectorTest {
     static final int BUFFER_REPS = Integer.getInteger("jdk.incubator.vector.test.buffer-vectors", 25000 / Max);
 
     static final int BUFFER_SIZE = Integer.getInteger("jdk.incubator.vector.test.buffer-size", BUFFER_REPS * (Max / 8));
+
+    static List<VectorSpecies> VALIDCASTSPECIES = castSpeciesProvider(SPECIES, true);
+
+    static List<VectorSpecies> INVALIDCASTSPECIES = castSpeciesProvider(SPECIES, false);
 
     interface FUnOp {
         short apply(short a);
@@ -931,6 +940,34 @@ public class ShortMaxVectorTests extends AbstractVectorTest {
     public Object[][] maskProvider() {
         return BOOLEAN_MASK_GENERATORS.stream().
                 map(f -> new Object[]{f}).
+                toArray(Object[][]::new);
+    }
+
+    @DataProvider
+    public Object[][] castSpeciesMaskProvider() {
+        return BOOLEAN_MASK_GENERATORS.stream().
+                map(f -> new Object[]{f,VALIDCASTSPECIES}).
+                toArray(Object[][]::new);
+    }
+
+    @DataProvider
+    public Object[][] castSpeciesShuffleProvider() {
+        return INT_SHUFFLE_GENERATORS.stream().
+                map(f -> new Object[]{f,VALIDCASTSPECIES}).
+                toArray(Object[][]::new);
+    }
+
+    @DataProvider
+    public Object[][] castInvalidSpeciesMaskProvider() {
+        return BOOLEAN_MASK_GENERATORS.stream().
+                map(f -> new Object[]{f,INVALIDCASTSPECIES}).
+                toArray(Object[][]::new);
+    }
+
+    @DataProvider
+    public Object[][] castInvalidSpeciesShuffleProvider() {
+        return INT_SHUFFLE_GENERATORS.stream().
+                map(f -> new Object[]{f,INVALIDCASTSPECIES}).
                 toArray(Object[][]::new);
     }
 
@@ -5395,23 +5432,72 @@ public class ShortMaxVectorTests extends AbstractVectorTest {
         }
     }
 
-    @Test(dataProvider = "maskProvider")
-    static void maskFirstTrueShortMaxVectorTestsSmokeTest(IntFunction<boolean[]> fa) {
+    @Test(dataProvider = "castSpeciesMaskProvider")
+    static void maskCastShortMaxVectorTestsTest(IntFunction<boolean[]> fa, List<VectorSpecies> fb) {
         boolean[] a = fa.apply(SPECIES.length());
-
-        for (int i = 0; i < a.length; i += SPECIES.length()) {
-            var vmask = SPECIES.loadMask(a, i);
-            int ftrue = vmask.firstTrue();
-            int j = i;
-            for (; j < i + SPECIES.length() ; j++) {
-                if (a[j]) break;
+        VectorSpecies[] vsp = fb.toArray(VectorSpecies[]::new);
+        for (int ic = 0; ic < INVOC_COUNT; ic++) {
+            for (int i = 0; i < a.length; i += SPECIES.length()) {
+                var vmask = SPECIES.loadMask(a, i);
+                for (int j = 0 ; j < vsp.length; j++) {
+                    var res = vmask.cast(vsp[j]);
+                    assertArraysEquals(res.toArray(), a, i);
+                }
             }
-            int expectedFtrue = j - i;
-
-            Assert.assertTrue(ftrue == expectedFtrue, "at index " + i +
-                ", firstTrue should be = " + expectedFtrue + ", but is = " + ftrue);
         }
     }
+
+    @Test(dataProvider = "castSpeciesShuffleProvider")
+    static void shuffleCastShortMaxVectorTestsTest(BiFunction<Integer,Integer,int[]> fa, List<VectorSpecies> fb) {
+        int[] a = fa.apply(SPECIES.length() * BUFFER_REPS, SPECIES.length());
+        VectorSpecies[] vsp = fb.toArray(VectorSpecies[]::new);
+        for (int ic = 0; ic < INVOC_COUNT; ic++) {
+            for (int i = 0; i < a.length; i += SPECIES.length()) {
+                var vshuffle = VectorShuffle.fromArray(SPECIES, a, i);
+                for (int j = 0 ; j < vsp.length; j++) {
+                    var res = vshuffle.cast(vsp[j]);
+                    assertArraysEquals(res.toArray(), a, i);
+                }
+            }
+        }
+    }
+
+    @Test(dataProvider = "castInvalidSpeciesMaskProvider")
+    static void maskIllegalCastShortMaxVectorTestsTest(IntFunction<boolean[]> fa, List<VectorSpecies> fb) {
+        boolean[] a = fa.apply(SPECIES.length());
+        VectorSpecies[] invsp = fb.toArray(VectorSpecies[]::new);
+        for (int ic = 0; ic < INVOC_COUNT; ic++) {
+            for (int i = 0; i < a.length; i += SPECIES.length()) {
+                var vmask = SPECIES.loadMask(a, i);
+                for (int j = 0 ; j < invsp.length; j++) {
+                    try {
+                        vmask.cast(invsp[j]);
+                        Assert.fail();
+                    } catch (IllegalArgumentException e) {
+                    }
+                }
+            }
+        }
+    }
+
+    @Test(dataProvider = "castInvalidSpeciesShuffleProvider")
+    static void shuffleIllegalCastShortMaxVectorTestsTest(BiFunction<Integer,Integer,int[]> fa, List<VectorSpecies> fb) {
+        int[] a = fa.apply(SPECIES.length() * BUFFER_REPS, SPECIES.length());
+        VectorSpecies[] invsp = fb.toArray(VectorSpecies[]::new);
+        for (int ic = 0; ic < INVOC_COUNT; ic++) {
+            for (int i = 0; i < a.length; i += SPECIES.length()) {
+                var vshuffle = VectorShuffle.fromArray(SPECIES, a, i);
+                for (int j = 0 ; j < invsp.length; j++) {
+                    try {
+                        vshuffle.cast(invsp[j]);
+                        Assert.fail();
+                    } catch (IllegalArgumentException e) {
+                    }
+                }
+            }
+        }
+    }
+
 
 
     @DataProvider

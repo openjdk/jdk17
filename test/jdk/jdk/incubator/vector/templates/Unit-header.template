@@ -36,24 +36,12 @@ import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.Vector;
 
-#if[Byte]
 import jdk.incubator.vector.ByteVector;
-#end[Byte]
-#if[Float]
 import jdk.incubator.vector.FloatVector;
-#end[Float]
-#if[Int]
 import jdk.incubator.vector.IntVector;
-#end[Int]
-#if[Double]
 import jdk.incubator.vector.DoubleVector;
-#end[Double]
-#if[Short]
 import jdk.incubator.vector.ShortVector;
-#end[Short]
-#if[Long]
 import jdk.incubator.vector.LongVector;
-#end[Long]
 
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -92,6 +80,10 @@ public class $vectorteststype$ extends AbstractVectorTest {
     static final int BUFFER_REPS = Integer.getInteger("jdk.incubator.vector.test.buffer-vectors", 25000 / $bits$);
 
     static final int BUFFER_SIZE = Integer.getInteger("jdk.incubator.vector.test.buffer-size", BUFFER_REPS * ($bits$ / 8));
+
+    static List<VectorSpecies> VALIDCASTSPECIES = castSpeciesProvider(SPECIES, true);
+
+    static List<VectorSpecies> INVALIDCASTSPECIES = castSpeciesProvider(SPECIES, false);
 
     interface FUnOp {
         $type$ apply($type$ a);
@@ -1139,6 +1131,34 @@ public class $vectorteststype$ extends AbstractVectorTest {
     public Object[][] maskProvider() {
         return BOOLEAN_MASK_GENERATORS.stream().
                 map(f -> new Object[]{f}).
+                toArray(Object[][]::new);
+    }
+
+    @DataProvider
+    public Object[][] castSpeciesMaskProvider() {
+        return BOOLEAN_MASK_GENERATORS.stream().
+                map(f -> new Object[]{f,VALIDCASTSPECIES}).
+                toArray(Object[][]::new);
+    }
+
+    @DataProvider
+    public Object[][] castSpeciesShuffleProvider() {
+        return INT_SHUFFLE_GENERATORS.stream().
+                map(f -> new Object[]{f,VALIDCASTSPECIES}).
+                toArray(Object[][]::new);
+    }
+
+    @DataProvider
+    public Object[][] castInvalidSpeciesMaskProvider() {
+        return BOOLEAN_MASK_GENERATORS.stream().
+                map(f -> new Object[]{f,INVALIDCASTSPECIES}).
+                toArray(Object[][]::new);
+    }
+
+    @DataProvider
+    public Object[][] castInvalidSpeciesShuffleProvider() {
+        return INT_SHUFFLE_GENERATORS.stream().
+                map(f -> new Object[]{f,INVALIDCASTSPECIES}).
                 toArray(Object[][]::new);
     }
 
