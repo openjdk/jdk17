@@ -2124,7 +2124,7 @@ static void mcast_join_leave(JNIEnv *env, jobject this,
 #ifdef __APPLE__
             if (errno == ENOMEM) {
                 if (setsockopt(fd, IPPROTO_IPV6, (join ? ADD_MEMBERSHIP : DRP_MEMBERSHIP),
-                           (char *) &mname6, sizeof(mname6)) < 0) { 
+                           (char *) &mname6, sizeof(mname6)) < 0) {
                     if (join) {
                         NET_ThrowCurrent(env, "setsockopt " S_ADD_MEMBERSHIP " failed");
                     } else {
