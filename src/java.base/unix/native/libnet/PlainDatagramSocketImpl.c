@@ -2012,8 +2012,8 @@ static void mcast_join_leave(JNIEnv *env, jobject this,
                             }
                             return;
                         }
-                } 
-            } else { 
+                }
+            } else {
 #endif
             /*
              * If IP_ADD_MEMBERSHIP returns ENOPROTOOPT on Linux and we've got
@@ -2135,8 +2135,8 @@ static void mcast_join_leave(JNIEnv *env, jobject this,
                             NET_ThrowCurrent(env, "setsockopt " S_DRP_MEMBERSHIP " failed");
                         }
                     }
-                } 
-            } else { 
+                }
+            } else {
 #endif
 
                 if (join) {
