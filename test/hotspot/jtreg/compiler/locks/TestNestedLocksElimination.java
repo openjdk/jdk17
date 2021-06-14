@@ -46,8 +46,8 @@ public class TestNestedLocksElimination {
         // Don't inline dummy method
     }
 
+    // Don't inline
     char[] getNext(int length, int count) {
-        // Don't inline
         if (this.buffers.isEmpty()) {
             return new char[100];
         }
@@ -67,6 +67,7 @@ public class TestNestedLocksElimination {
         return (buffers.isEmpty() == false);
     }
 
+    // Don't inline
     TestNestedLocksElimination getHolder(TestNestedLocksElimination s1, TestNestedLocksElimination s2, int count) {
         return (count & 7) == 0 ? s2 : s1;
     }
@@ -88,9 +89,30 @@ public class TestNestedLocksElimination {
                 size = 0;
                 while (size < maxToSend) {
                     char[] b = null;
+                    // This is outer Lock region for object 's'.
+                    // Locks from following inlined methods are "nested"
+                    // because they reference the same object.
                     synchronized(s) {
                         b = s.getNext(maxToSend - size, count);
+
+                        // The next is bi-morphic call with both calls inlined.
+                        // But one is synchronized and the other is not.
+                        // Class check for bi-morphic call is loop invariant
+                        // and will trigger loop unswitching.
+                        // Loop unswitching will create two versions of loop
+                        // with gollowing calls inlinined in both versions.
+
                         isComplete = s.isComplete();
+
+                        // The next synchronized method availableSegment() is
+                        // inlined and its Lock will be "coarsened" with Unlock
+                        // in version of loop with inlined synchronized method
+                        // isComplete().
+                        // Nested Lock Optimization will mark only this Unlock
+                        // as nested (as part of "nested" pair lock/unlock).
+                        // Locks elimination will remove "coarsened" Lock from
+                        // availableSegment() method leaving unmatched unlock.
+
                         availableSegment = s.availableSegment();
                     }
                     foo(b);
@@ -110,7 +132,6 @@ public class TestNestedLocksElimination {
         TestNestedLocksElimination s2 = new TestNestedLocksEliminationSub();
 
         char[] c = new char[100];
-        // warmup
         while (n++ < 20_000) {
             s1.buffers.add(c);
             s2.buffers.add(c);
