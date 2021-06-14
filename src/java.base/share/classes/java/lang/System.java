@@ -381,16 +381,16 @@ public final class System {
             String signature = caller.getName() + " (" + codeSource(caller) + ")";
             originalErrStream.printf("""
                     WARNING: A terminally deprecated method in java.lang.System has been called
-                    WARNING: java.lang.System::setSecurityManager has been called by %s
+                    WARNING: System::setSecurityManager has been called by %s
                     WARNING: Please consider reporting this to the maintainers of %s
-                    WARNING: java.lang.System::setSecurityManager will be removed in a future release
+                    WARNING: System::setSecurityManager will be removed in a future release
                     """, signature, caller.getName());
             implSetSecurityManager(sm);
         } else {
             // security manager not allowed
             if (sm != null) {
                 throw new UnsupportedOperationException(
-                    "The Security Manager API is deprecated and will be removed in a future release");
+                    "The Security Manager is deprecated and will be removed in a future release");
             }
         }
     }
@@ -2210,11 +2210,9 @@ public final class System {
         }
 
         if (needWarning) {
-            System.err.printf("""
-                    WARNING: A Security Manager has been enabled on the command line
-                    WARNING: The Security Manager API is deprecated and will be removed in a future release
-                    WARNING: -Djava.security.manager%s will have no effect when the API is removed
-                    """, smProp.isEmpty() ? "" : ("=" + smProp));
+            System.err.println("""
+                    WARNING: A command line option has enabled the Security Manager
+                    WARNING: The Security Manager is deprecated and will be removed in a future release""");
         }
 
         originalErrStream = System.err;

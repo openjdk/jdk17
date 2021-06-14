@@ -41,39 +41,39 @@ public class SecurityManagerWarnings {
             run(null)
                     .shouldHaveExitValue(0)
                     .shouldContain("SM is enabled: false")
-                    .shouldNotContain("-Djava.security.manager")
-                    .shouldContain("java.lang.System::setSecurityManager will be removed in a future release");
+                    .shouldNotContain("A command line option has enabled the Security Manager")
+                    .shouldContain("System::setSecurityManager will be removed in a future release");
 
             run("allow")
                     .shouldHaveExitValue(0)
                     .shouldContain("SM is enabled: false")
-                    .shouldNotContain("-Djava.security.manager")
-                    .shouldContain("java.lang.System::setSecurityManager will be removed in a future release");
+                    .shouldNotContain("A command line option has enabled the Security Manager")
+                    .shouldContain("System::setSecurityManager will be removed in a future release");
 
             run("disallow")
                     .shouldNotHaveExitValue(0)
                     .shouldContain("SM is enabled: false")
-                    .shouldNotContain("-Djava.security.manager")
+                    .shouldNotContain("A command line option has enabled the Security Manager")
                     .shouldContain("UnsupportedOperationException");
 
             run("SecurityManagerWarnings$MySM")
                     .shouldHaveExitValue(0)
                     .shouldContain("SM is enabled: true")
-                    .shouldContain("-Djava.security.manager=SecurityManagerWarnings$MySM will have no effect")
-                    .shouldContain("java.lang.System::setSecurityManager will be removed in a future release");
+                    .shouldContain("A command line option has enabled the Security Manager")
+                    .shouldContain("System::setSecurityManager will be removed in a future release");
 
             // Default SecurityManager does not allow setSecurityManager
 
             run("")
                     .shouldNotHaveExitValue(0)
                     .shouldContain("SM is enabled: true")
-                    .shouldContain("-Djava.security.manager will have no effect")
+                    .shouldContain("A command line option has enabled the Security Manager")
                     .shouldContain("AccessControlException");
 
             run("default")
                     .shouldNotHaveExitValue(0)
                     .shouldContain("SM is enabled: true")
-                    .shouldContain("-Djava.security.manager=default will have no effect")
+                    .shouldContain("A command line option has enabled the Security Manager")
                     .shouldContain("AccessControlException");
         } else {
             System.out.println("SM is enabled: " + (System.getSecurityManager() != null));
