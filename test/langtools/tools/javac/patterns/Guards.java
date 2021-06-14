@@ -57,6 +57,7 @@ public class Guards {
 
     void runIfTrue(Function<Object, String> convert) {
         assertEquals("true", convert.apply(0));
+        assertEquals("second", convert.apply(2));
         assertEquals("any", convert.apply(""));
     }
 
@@ -96,6 +97,7 @@ public class Guards {
         Object o2 = "";
         switch (o) {
             case Integer i && i == 0 && i < 1 && o2 instanceof String s: o = s + String.valueOf(i); return "true";
+            case Integer i && i == 0 || i > 1: o = String.valueOf(i); return "second";
             case Object x: return "any";
         }
     }
@@ -104,6 +106,7 @@ public class Guards {
         Object o2 = "";
         return switch (o) {
             case Integer i && i == 0 && i < 1 && o2 instanceof String s: o = s + String.valueOf(i); yield "true";
+            case Integer i && i == 0 || i > 1: o = String.valueOf(i); yield "second";
             case Object x: yield "any";
         };
     }
@@ -112,6 +115,8 @@ public class Guards {
         Object o2 = "";
         if (o != null && o instanceof (Integer i && i == 0 && i < 1) && (o = i) != null && o2 instanceof String s) {
             return s != null ? "true" : null;
+        } else if (o != null && o instanceof (Integer i && i == 0 || i > 1) && (o = i) != null) {
+            return "second";
         } else {
             return "any";
         }
