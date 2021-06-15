@@ -123,7 +123,7 @@ public class ToolProviderTest extends TestRunner {
         String out = swOut.toString();
         String err = swErr.toString();
 
-        if (!out.contains("Loading")) {
+        if (!err.contains("Loading")) {
             error("stdout: unexpected output");
         }
         if (!err.contains("illegal character")) {
