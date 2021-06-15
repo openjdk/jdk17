@@ -1977,10 +1977,10 @@ static void clone_outer_loop_helper(Node* n, const IdealLoopTree *loop, const Id
     Node* u = n->fast_out(j);
     assert(check_old_new || old_new[u->_idx] == NULL, "shouldn't have been cloned");
     if (!u->is_CFG() && (!check_old_new || old_new[u->_idx] == NULL)) {
-      Node* c = u->in(0) != NULL ? u->in(0) : phase->get_ctrl(u);
+      Node* c = phase->get_ctrl(u);
       IdealLoopTree* u_loop = phase->get_loop(c);
       assert(!loop->is_member(u_loop), "can be in outer loop or out of both loops only");
-      if (outer_loop->is_member(u_loop)) {
+      if (outer_loop->is_member(u_loop) || (u->in(0) != NULL && outer_loop->is_member(phase->get_loop(u->in(0))))) {
         wq.push(u);
       }
     }
