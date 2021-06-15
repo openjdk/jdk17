@@ -2802,7 +2802,7 @@ int PhaseIdealLoop::clone_for_use_outside_loop( IdealLoopTree *loop, Node* n, No
   }
 
   if (C->check_node_count(worklist.size() + NodeLimitFudgeFactor,
-                          "Too many clones required in clone_for_use_outside in partial peeling")) {
+                          "Too many clones required in clone_for_use_outside_loop in partial peeling")) {
     return -1;
   }
 
