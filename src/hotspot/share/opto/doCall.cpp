@@ -167,6 +167,12 @@ CallGenerator* Compile::call_generator(ciMethod* callee, int vtable_index, bool 
       bool should_delay = false;
       if (ilt->ok_to_inline(callee, jvms, profile, should_delay)) {
         CallGenerator* cg = CallGenerator::for_inline(callee, expected_uses);
+        // For optimized virtual calls assert at runtime that receiver object
+        // is a subtype of the inlined method holder. CHA can report a method
+        // as a unique target under an abstract method, but receiver type
+        // sometimes has a broader type. Similar scenario is possible with
+        // default methods when type system loses information about implemented
+        // interfaces.
         if (cg != NULL && is_virtual_or_interface && !callee->is_static()) {
           CallGenerator* trap_cg = CallGenerator::for_uncommon_trap(callee,
               Deoptimization::Reason_receiver_constraint, Deoptimization::Action_none);
@@ -355,6 +361,8 @@ CallGenerator* Compile::call_generator(ciMethod* callee, int vtable_index, bool 
   } else {
     // Class Hierarchy Analysis or Type Profile reveals a unique target, or it is a static or special call.
     CallGenerator* cg = CallGenerator::for_direct_call(callee, should_delay_inlining(callee, jvms));
+    // For optimized virtual calls assert at runtime that receiver object
+    // is a subtype of the method holder.
     if (cg != NULL && is_virtual_or_interface && !callee->is_static()) {
       CallGenerator* trap_cg = CallGenerator::for_uncommon_trap(callee,
           Deoptimization::Reason_receiver_constraint, Deoptimization::Action_none);
