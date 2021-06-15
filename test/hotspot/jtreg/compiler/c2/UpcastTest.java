@@ -25,7 +25,7 @@
  * @test
  * @requires vm.flavor == "server"
  *
- * @run main/othervm -Xbatch -XX:-TieredCompilation -XX:+PrintCompilation -XX:+PrintInlining
+ * @run main/othervm -Xbatch -XX:-TieredCompilation -XX:+PrintCompilation -XX:+UnlockDiagnosticVMOptions -XX:+PrintInlining
  *                   -XX:CompileCommand=quiet -XX:CompileCommand=compileonly,*::test
  *                     compiler.c2.UpcastTest
  */
