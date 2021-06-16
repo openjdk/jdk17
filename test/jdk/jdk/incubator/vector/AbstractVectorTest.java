@@ -27,7 +27,6 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -35,8 +34,6 @@ import java.util.function.IntFunction;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
-import jdk.incubator.vector.VectorSpecies;
-import jdk.incubator.vector.VectorShape;
 
 import org.testng.Assert;
 
@@ -252,28 +249,6 @@ public class AbstractVectorTest {
 
     interface FBooleanBinOp {
         boolean apply(boolean a, boolean b);
-    }
-
-    static void assertArraysEquals(int[] r, int[] a, int offs) {
-        int i = 0;
-        try {
-            for (; i < r.length; i++) {
-                Assert.assertEquals(r[i], a[i+offs]);
-            }
-        } catch (AssertionError e) {
-            Assert.assertEquals(r[i], a[i+offs], "at index #" + i + ", input = " + a[i+offs]);
-        }
-    }
-
-    static void assertArraysEquals(boolean[] r, boolean[] a, int offs) {
-        int i = 0;
-        try {
-            for (; i < r.length; i++) {
-                Assert.assertEquals(r[i], a[i+offs]);
-            }
-        } catch (AssertionError e) {
-            Assert.assertEquals(r[i], a[i+offs], "at index #" + i + ", input = " + a[i+offs]);
-        }
     }
 
     static void assertArraysEquals(boolean[] r, boolean[] a, boolean[] b, FBooleanBinOp f) {
