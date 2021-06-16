@@ -387,6 +387,7 @@ public class TransPatterns extends TreeTranslator {
 
             int i = 0;
             boolean previousCompletesNormally = false;
+            boolean hasDefault = false;
 
             for (var c : cases) {
                 List<JCCaseLabel> clearedPatterns = c.labels;
@@ -423,7 +424,9 @@ public class TransPatterns extends TreeTranslator {
                 for (var p : c.labels) {
                     if (p.hasTag(Tag.DEFAULTCASELABEL)) {
                         translatedLabels.add(p);
-                    } else if (hasTotalPattern && c == lastCase && p.isPattern()) {
+                        hasDefault = true;
+                    } else if (hasTotalPattern && !hasDefault &&
+                               c == lastCase && p.isPattern()) {
                         //If the switch has total pattern, the last case will contain it.
                         //Convert the total pattern to default:
                         translatedLabels.add(make.DefaultCaseLabel());
