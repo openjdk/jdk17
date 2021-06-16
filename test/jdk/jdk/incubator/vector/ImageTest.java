@@ -32,6 +32,7 @@ import java.util.spi.ToolProvider;
 /**
  * @test
  * @summary Tests that the SVML shared library is present in an image only when jdk.incubator.vector is present
+ * @requires vm.compiler2.enabled
  * @requires os.arch == "x86_64" | os.arch == "amd64"
  * @requires os.family == "linux" | os.family == "windows"
  * @modules jdk.incubator.vector jdk.jlink
