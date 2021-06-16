@@ -527,23 +527,17 @@ public interface ObjectInputFilter {
      * The syntax for the property value is the same as for the
      * {@link #createFilter(String) createFilter} method.
      *
-     * <p> If only `jdk.serialFilter` is set and not `jdk.serialFilterFactory` the builtin
-     * filter factory, compatible with previous versions, is set and can not be replaced,
-     * see below to override the builtin filter factory.
      * <p>
      * If the Java virtual machine is started with the system property
      * {@systemProperty jdk.serialFilterFactory} or the {@link java.security.Security} property
      * of the same name, its value names the class to configure the JVM-wide deserialization
-     * filter factory or the special value `OVERRIDE`.
+     * filter factory.
      * If the system property is not defined, and the {@link java.security.Security} property
      * {@code jdk.serialFilterFactory} is defined then it is used to configure the filter factory.
-     *
-     * If the value is `OVERRIDE`, the filter factory can be set by the application before
-     * the first deserialization using {@link Config#setSerialFilterFactory(BinaryOperator)};
      * If it remains unset, the filter factory is a builtin filter factory compatible
      * with previous versions.
      *
-     * <p>If not `OVERRIDE`, the class must be public, must have a public zero-argument constructor, implement the
+     * <p>The class must be public, must have a public zero-argument constructor, implement the
      * {@link BinaryOperator {@literal BinaryOperator<ObjectInputFilter>}} interface, provide its implementation and
      * be accessible via the {@linkplain ClassLoader#getSystemClassLoader() application class loader}.
      * If the filter factory constructor is not invoked successfully, an {@link ExceptionInInitializerError}
@@ -622,7 +616,7 @@ public interface ObjectInputFilter {
              *     and if set, defines the configured static JVM-wide filter and is logged.
              * <li>The property jdk.serialFilterFactory is read, either as a system property or a security property,
              *     and if set, defines the initial filter factory and is logged.
-             * <li>The property jdk.serialFilterTrace, is read, and if set enables tracing of filters.
+             * <li>The property jdk.serialFilterTrace, is read, and if true enables tracing of filters.
              * <li>If either property is defined or tracing is enabled, the logger is created.
              * </ul>
              */
@@ -664,14 +658,8 @@ public interface ObjectInputFilter {
 
             // Initialize the filter factory if the jdk.serialFilterFactory is defined
             // otherwise use the builtin filter factory.
-            if (factoryClassName == null || "OVERRIDE".equals(factoryClassName)) {
+            if (factoryClassName == null) {
                 serialFilterFactory = new BuiltinFilterFactory();
-                if (serialFilter != null && factoryClassName == null) {
-                    // Ensure backward compatibility, unless factory is explicitly allowed to override
-                    // Do not allow factory to be overridden by Config.setSerialFilterFactory
-                    filterFactoryNoReplace.set(true);
-                }
-
             } else {
                 configLog.log(DEBUG,
                         "Creating deserialization filter factory for {0}", factoryClassName);
@@ -846,6 +834,9 @@ public interface ObjectInputFilter {
                 throw new IllegalStateException("Cannot replace filter factory: " +
                         serialFilterFactory.getClass().getName());
             }
+            if (configLog != null)
+                configLog.log(DEBUG,
+                    "Setting deserialization filter factory to {0}", filterFactory.getClass().getName());
             serialFilterFactory = filterFactory;
         }
 
