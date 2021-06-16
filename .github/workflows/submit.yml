@@ -1571,7 +1571,6 @@ jobs:
     needs:
       - prerequisites
       - linux_additional_build
-      - windows_aarch64_build
       - linux_x64_test
       - linux_x86_test
       - windows_x64_test
