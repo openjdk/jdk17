@@ -36,11 +36,6 @@ import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorOperators;
 import jdk.incubator.vector.Vector;
 
-import jdk.incubator.vector.ByteVector;
-import jdk.incubator.vector.FloatVector;
-import jdk.incubator.vector.IntVector;
-import jdk.incubator.vector.DoubleVector;
-import jdk.incubator.vector.ShortVector;
 import jdk.incubator.vector.LongVector;
 
 import org.testng.Assert;
@@ -68,10 +63,6 @@ public class Long256VectorTests extends AbstractVectorTest {
     static final int BUFFER_REPS = Integer.getInteger("jdk.incubator.vector.test.buffer-vectors", 25000 / 256);
 
     static final int BUFFER_SIZE = Integer.getInteger("jdk.incubator.vector.test.buffer-size", BUFFER_REPS * (256 / 8));
-
-    static List<VectorSpecies> VALIDCASTSPECIES = castSpeciesProvider(SPECIES, true);
-
-    static List<VectorSpecies> INVALIDCASTSPECIES = castSpeciesProvider(SPECIES, false);
 
     interface FUnOp {
         long apply(long a);
@@ -931,34 +922,6 @@ public class Long256VectorTests extends AbstractVectorTest {
     public Object[][] maskProvider() {
         return BOOLEAN_MASK_GENERATORS.stream().
                 map(f -> new Object[]{f}).
-                toArray(Object[][]::new);
-    }
-
-    @DataProvider
-    public Object[][] castSpeciesMaskProvider() {
-        return BOOLEAN_MASK_GENERATORS.stream().
-                map(f -> new Object[]{f,VALIDCASTSPECIES}).
-                toArray(Object[][]::new);
-    }
-
-    @DataProvider
-    public Object[][] castSpeciesShuffleProvider() {
-        return INT_SHUFFLE_GENERATORS.stream().
-                map(f -> new Object[]{f,VALIDCASTSPECIES}).
-                toArray(Object[][]::new);
-    }
-
-    @DataProvider
-    public Object[][] castInvalidSpeciesMaskProvider() {
-        return BOOLEAN_MASK_GENERATORS.stream().
-                map(f -> new Object[]{f,INVALIDCASTSPECIES}).
-                toArray(Object[][]::new);
-    }
-
-    @DataProvider
-    public Object[][] castInvalidSpeciesShuffleProvider() {
-        return INT_SHUFFLE_GENERATORS.stream().
-                map(f -> new Object[]{f,INVALIDCASTSPECIES}).
                 toArray(Object[][]::new);
     }
 
@@ -5283,72 +5246,6 @@ public class Long256VectorTests extends AbstractVectorTest {
 
             Assert.assertTrue(ltrue == expectedLtrue, "at index " + i +
                 ", lastTrue should be = " + expectedLtrue + ", but is = " + ltrue);
-        }
-    }
-
-    @Test(dataProvider = "castSpeciesMaskProvider")
-    static void maskCastLong256VectorTestsTest(IntFunction<boolean[]> fa, List<VectorSpecies> fb) {
-        boolean[] a = fa.apply(SPECIES.length());
-        VectorSpecies[] vsp = fb.toArray(VectorSpecies[]::new);
-        for (int ic = 0; ic < INVOC_COUNT; ic++) {
-            for (int i = 0; i < a.length; i += SPECIES.length()) {
-                var vmask = SPECIES.loadMask(a, i);
-                for (int j = 0 ; j < vsp.length; j++) {
-                    var res = vmask.cast(vsp[j]);
-                    assertArraysEquals(res.toArray(), a, i);
-                }
-            }
-        }
-    }
-
-    @Test(dataProvider = "castSpeciesShuffleProvider")
-    static void shuffleCastLong256VectorTestsTest(BiFunction<Integer,Integer,int[]> fa, List<VectorSpecies> fb) {
-        int[] a = fa.apply(SPECIES.length() * BUFFER_REPS, SPECIES.length());
-        VectorSpecies[] vsp = fb.toArray(VectorSpecies[]::new);
-        for (int ic = 0; ic < INVOC_COUNT; ic++) {
-            for (int i = 0; i < a.length; i += SPECIES.length()) {
-                var vshuffle = VectorShuffle.fromArray(SPECIES, a, i);
-                for (int j = 0 ; j < vsp.length; j++) {
-                    var res = vshuffle.cast(vsp[j]);
-                    assertArraysEquals(res.toArray(), a, i);
-                }
-            }
-        }
-    }
-
-    @Test(dataProvider = "castInvalidSpeciesMaskProvider")
-    static void maskIllegalCastLong256VectorTestsTest(IntFunction<boolean[]> fa, List<VectorSpecies> fb) {
-        boolean[] a = fa.apply(SPECIES.length());
-        VectorSpecies[] invsp = fb.toArray(VectorSpecies[]::new);
-        for (int ic = 0; ic < INVOC_COUNT; ic++) {
-            for (int i = 0; i < a.length; i += SPECIES.length()) {
-                var vmask = SPECIES.loadMask(a, i);
-                for (int j = 0 ; j < invsp.length; j++) {
-                    try {
-                        vmask.cast(invsp[j]);
-                        Assert.fail();
-                    } catch (IllegalArgumentException e) {
-                    }
-                }
-            }
-        }
-    }
-
-    @Test(dataProvider = "castInvalidSpeciesShuffleProvider")
-    static void shuffleIllegalCastLong256VectorTestsTest(BiFunction<Integer,Integer,int[]> fa, List<VectorSpecies> fb) {
-        int[] a = fa.apply(SPECIES.length() * BUFFER_REPS, SPECIES.length());
-        VectorSpecies[] invsp = fb.toArray(VectorSpecies[]::new);
-        for (int ic = 0; ic < INVOC_COUNT; ic++) {
-            for (int i = 0; i < a.length; i += SPECIES.length()) {
-                var vshuffle = VectorShuffle.fromArray(SPECIES, a, i);
-                for (int j = 0 ; j < invsp.length; j++) {
-                    try {
-                        vshuffle.cast(invsp[j]);
-                        Assert.fail();
-                    } catch (IllegalArgumentException e) {
-                    }
-                }
-            }
         }
     }
 

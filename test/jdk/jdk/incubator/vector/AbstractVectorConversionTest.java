@@ -241,6 +241,31 @@ abstract class AbstractVectorConversionTest {
         return args.toArray(Object[][]::new);
     }
 
+    static Object[][] fixedShapeXSegmentedCastSpeciesArgs(VectorShape srcShape) {
+        List<Object[]> args = new ArrayList<>();
+
+        for (Class<?> srcE : List.of(byte.class, short.class, int.class, long.class, float.class, double.class)) {
+            VectorSpecies<?> src = VectorSpecies.of(srcE, srcShape);
+
+            for (VectorShape dstShape : VectorShape.values()) {
+                for (Class<?> dstE : List.of(byte.class, short.class, int.class, long.class, float.class, double.class)) {
+                    VectorSpecies<?> dst = VectorSpecies.of(dstE, dstShape);
+
+                    List<VectorSpecies> legal = new ArrayList<VectorSpecies>();
+                    List<VectorSpecies> illegal = new ArrayList<VectorSpecies>();
+
+                    if (dst.length() == src.length()) {
+                        legal.add(dst);
+                    } else {
+                        illegal.add(dst);
+                    }
+
+                    args.add(new Object[]{src, legal, illegal});
+                }
+            }
+        }
+        return args.toArray(Object[][]::new);
+    }
 
     public enum ConvAPI {CONVERT, CONVERTSHAPE, CASTSHAPE, REINTERPRETSHAPE}
 

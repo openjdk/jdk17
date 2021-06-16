@@ -22,12 +22,15 @@
  */
 
 import jdk.incubator.vector.VectorShape;
+import jdk.incubator.vector.VectorMask;
+import jdk.incubator.vector.VectorShuffle;
 import jdk.incubator.vector.VectorSpecies;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.Assert;
 
 import java.util.function.IntFunction;
-
+import java.util.List;
 
 /**
  * @test
@@ -74,6 +77,11 @@ public class Vector64ConversionTests extends AbstractVectorConversionTest {
         return fixedShapeXShapeSpeciesArgs(SHAPE);
     }
 
+    @DataProvider
+    public Object[][] fixedShapeXSegmentedCastSpecies() {
+        return fixedShapeXSegmentedCastSpeciesArgs(SHAPE);
+    }
+
     @Test(dataProvider = "fixedShapeXfixedShape")
     static <I, O> void convert(VectorSpecies<I> src, VectorSpecies<O> dst, IntFunction<?> fa) {
         Object a = fa.apply(BUFFER_SIZE);
@@ -96,5 +104,46 @@ public class Vector64ConversionTests extends AbstractVectorConversionTest {
     static <I, O> void reinterpret(VectorSpecies<I> src, VectorSpecies<O> dst, IntFunction<?> fa) {
         Object a = fa.apply(BUFFER_SIZE);
         reinterpret_kernel(src, dst, a);
+    }
+
+    @Test(dataProvider = "fixedShapeXSegmentedCastSpecies")
+    static void shuffleCast(VectorSpecies src, List<VectorSpecies> legal, List<VectorSpecies> illegal) {
+        int [] arr = new int[src.length()];
+        for(int i = 0; i < arr.length; i++) {
+            arr[i] = i;
+        }
+        VectorShuffle shuffle = VectorShuffle.fromArray(src, arr, 0);
+
+        for(var sps : legal) {
+            VectorShuffle res = shuffle.cast(sps);
+            Assert.assertEquals(res.toArray(), arr);
+        }
+
+        for(var sps : illegal) {
+            try {
+                shuffle.cast(sps);
+                Assert.fail();
+            } catch (IllegalArgumentException e) {
+            }
+        }
+    }
+
+    @Test(dataProvider = "fixedShapeXSegmentedCastSpecies")
+    static void maskCast(VectorSpecies src, List<VectorSpecies> legal, List<VectorSpecies> illegal) {
+        long val = (1L << (src.length() & 63)) - 1L;
+        VectorMask mask = VectorMask.fromLong(src, val);
+
+        for(var sps : legal) {
+            VectorMask res = mask.cast(sps);
+            Assert.assertEquals(res.toLong(), val);
+        }
+
+        for(var sps : illegal) {
+            try {
+                mask.cast(sps);
+                Assert.fail();
+            } catch (IllegalArgumentException e) {
+            }
+        }
     }
 }
