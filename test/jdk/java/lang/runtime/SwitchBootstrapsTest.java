@@ -63,7 +63,8 @@ public class SwitchBootstrapsTest {
     }
 
     public enum E1 {
-        A;
+        A,
+        B;
     }
 
     public enum E2 {
@@ -96,6 +97,7 @@ public class SwitchBootstrapsTest {
         testType("", 0, 0, String.class, String.class, String.class);
         testType("", 1, 1, String.class, String.class, String.class);
         testType("", 2, 2, String.class, String.class, String.class);
+        testType(E1.A, 0, 2, E1.B, null, E1.A, Object.class);
     }
 
     public void testWrongSwitchTypes() throws Throwable {
@@ -120,13 +122,6 @@ public class SwitchBootstrapsTest {
             BSM_TYPE_SWITCH.invoke(MethodHandles.lookup(), "", switchType, (Object[]) null);
             fail("Didn't get the expected exception.");
         } catch (NullPointerException ex) {
-            //OK
-        }
-        try {
-            BSM_TYPE_SWITCH.invoke(MethodHandles.lookup(), "", switchType,
-                                   new Object[] {1, null, String.class});
-            fail("Didn't get the expected exception.");
-        } catch (IllegalArgumentException ex) {
             //OK
         }
     }
