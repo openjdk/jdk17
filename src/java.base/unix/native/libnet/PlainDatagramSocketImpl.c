@@ -1837,6 +1837,9 @@ static void mcast_join_leave(JNIEnv *env, jobject this,
     jint fd;
     jint family;
     jint ipv6_join_leave;
+#ifdef __APPLE__
+    int res;
+#endif
 
     if (IS_NULL(fdObj)) {
         JNU_ThrowByName(env, JNU_JAVANETPKG "SocketException",
@@ -1993,28 +1996,17 @@ static void mcast_join_leave(JNIEnv *env, jobject this,
         /*
          * Join the multicast group.
          */
-        if (setsockopt(fd, IPPROTO_IP, (join ? IP_ADD_MEMBERSHIP:IP_DROP_MEMBERSHIP),
-                       (char *) &mname, mname_len) < 0) {
+        res = setsockopt(fd, IPPROTO_IP, (join ? IP_ADD_MEMBERSHIP:IP_DROP_MEMBERSHIP),
+                       (char *) &mname, mname_len);
 
 #ifdef __APPLE__
-            if (errno == ENOMEM) {
-                if (setsockopt(fd, IPPROTO_IP, (join ? IP_ADD_MEMBERSHIP:IP_DROP_MEMBERSHIP),
-                           (char *) &mname, mname_len) < 0 ) {
-                        if (errno) {
-                            if (join) {
-                                NET_ThrowCurrent(env, "setsockopt IP_ADD_MEMBERSHIP failed");
-                            } else {
-                                if (errno == ENOENT)
-                                    JNU_ThrowByName(env, JNU_JAVANETPKG "SocketException",
-                                        "Not a member of the multicast group");
-                                else
-                                    NET_ThrowCurrent(env, "setsockopt IP_DROP_MEMBERSHIP failed");
-                            }
-                            return;
-                        }
-                }
-            } else {
+        if (res < 0 && errno == ENOMEM) {
+            res = setsockopt(fd, IPPROTO_IP, (join ? IP_ADD_MEMBERSHIP:IP_DROP_MEMBERSHIP),
+                       (char *) &mname, mname_len);
+        }
 #endif
+
+        if (res < 0) {
             /*
              * If IP_ADD_MEMBERSHIP returns ENOPROTOOPT on Linux and we've got
              * IPv6 enabled then it's possible that the kernel has been fixed
@@ -2047,9 +2039,6 @@ static void mcast_join_leave(JNIEnv *env, jobject this,
                 }
                 return;
             }
-#ifdef __APPLE__
-          }
-#endif
         }
 
         /*
@@ -2118,40 +2107,26 @@ static void mcast_join_leave(JNIEnv *env, jobject this,
 #endif
 
         /* Join the multicast group */
-        if (setsockopt(fd, IPPROTO_IPV6, (join ? ADD_MEMBERSHIP : DRP_MEMBERSHIP),
-                       (char *) &mname6, sizeof (mname6)) < 0) {
+        res = setsockopt(fd, IPPROTO_IPV6, (join ? ADD_MEMBERSHIP : DRP_MEMBERSHIP),
+                       (char *) &mname6, sizeof (mname6));
 
 #ifdef __APPLE__
-            if (errno == ENOMEM) {
-                if (setsockopt(fd, IPPROTO_IPV6, (join ? ADD_MEMBERSHIP : DRP_MEMBERSHIP),
-                           (char *) &mname6, sizeof(mname6)) < 0) {
-                    if (join) {
-                        NET_ThrowCurrent(env, "setsockopt " S_ADD_MEMBERSHIP " failed");
-                    } else {
-                        if (errno == ENOENT) {
-                           JNU_ThrowByName(env, JNU_JAVANETPKG "SocketException",
-                                "Not a member of the multicast group");
-                        } else {
-                            NET_ThrowCurrent(env, "setsockopt " S_DRP_MEMBERSHIP " failed");
-                        }
-                    }
-                }
-            } else {
+        if (res < 0 && errno == ENOMEM) {
+            res = setsockopt(fd, IPPROTO_IPV6, (join ? ADD_MEMBERSHIP : DRP_MEMBERSHIP),
+                       (char *) &mname6, sizeof(mname6));
+        }
 #endif
-
-                if (join) {
+        if (res < 0) {
+            if (join) {
                     NET_ThrowCurrent(env, "setsockopt " S_ADD_MEMBERSHIP " failed");
+            } else {
+                if (errno == ENOENT) {
+                   JNU_ThrowByName(env, JNU_JAVANETPKG "SocketException",
+                        "Not a member of the multicast group");
                 } else {
-                    if (errno == ENOENT) {
-                       JNU_ThrowByName(env, JNU_JAVANETPKG "SocketException",
-                            "Not a member of the multicast group");
-                    } else {
-                        NET_ThrowCurrent(env, "setsockopt " S_DRP_MEMBERSHIP " failed");
-                    }
+                    NET_ThrowCurrent(env, "setsockopt " S_DRP_MEMBERSHIP " failed");
                 }
-#ifdef __APPLE__
             }
-#endif
         }
     }
 }
