@@ -51,12 +51,7 @@ inline bool frame::is_stub_frame() const {
 
 inline bool frame::is_first_frame() const {
   return (is_entry_frame() && entry_frame_is_first())
-      // optimized_entry_frame_is_first is currently only implemented on x86_64.
-      // This is okay since optimized entry frames are only generated on x86_64
-      // as well (see ProgrammableUpcallHandler::generate_optimized_upcall_stub
-      // in universalUpcallHandler_x86_64.cpp), so is_optimized_entry_frame will
-      // always return false on platforms where optimized_entry_frame_is_first
-      // is not implemented.
+      // Optimized entry frames are only present on certain platforms 
       || (is_optimized_entry_frame() && optimized_entry_frame_is_first());
 }
 
