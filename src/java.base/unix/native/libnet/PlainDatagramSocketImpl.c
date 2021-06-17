@@ -1837,9 +1837,7 @@ static void mcast_join_leave(JNIEnv *env, jobject this,
     jint fd;
     jint family;
     jint ipv6_join_leave;
-#ifdef __APPLE__
     int res;
-#endif
 
     if (IS_NULL(fdObj)) {
         JNU_ThrowByName(env, JNU_JAVANETPKG "SocketException",
@@ -2108,7 +2106,7 @@ static void mcast_join_leave(JNIEnv *env, jobject this,
 
         /* Join the multicast group */
         res = setsockopt(fd, IPPROTO_IPV6, (join ? ADD_MEMBERSHIP : DRP_MEMBERSHIP),
-                       (char *) &mname6, sizeof (mname6));
+                       (char *) &mname6, sizeof(mname6));
 
 #ifdef __APPLE__
         if (res < 0 && errno == ENOMEM) {
@@ -2118,7 +2116,7 @@ static void mcast_join_leave(JNIEnv *env, jobject this,
 #endif
         if (res < 0) {
             if (join) {
-                    NET_ThrowCurrent(env, "setsockopt " S_ADD_MEMBERSHIP " failed");
+                NET_ThrowCurrent(env, "setsockopt " S_ADD_MEMBERSHIP " failed");
             } else {
                 if (errno == ENOENT) {
                    JNU_ThrowByName(env, JNU_JAVANETPKG "SocketException",
