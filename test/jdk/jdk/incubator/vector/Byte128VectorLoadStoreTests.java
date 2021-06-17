@@ -1227,27 +1227,7 @@ public class Byte128VectorLoadStoreTests extends AbstractVectorTest {
         Assert.assertEquals(r, expected);
     }
 
-    @DataProvider
-    public Object[][] byteGatherScatterProvider() {
-        return INT_INDEX_GENERATORS.stream().
-                flatMap(fs -> BYTE_GENERATORS.stream().map(fa -> {
-                    return new Object[] {fa, fs};
-                })).
-                toArray(Object[][]::new);
-    }
-
-    @DataProvider
-    public Object[][] byteGatherScatterMaskProvider() {
-        return BOOLEAN_MASK_GENERATORS.stream().
-          flatMap(fs -> INT_INDEX_GENERATORS.stream().flatMap(fm ->
-            BYTE_GENERATORS.stream().map(fa -> {
-                    return new Object[] {fa, fm, fs};
-            }))).
-            toArray(Object[][]::new);
-    }
-
-
-    @Test(dataProvider = "byteGatherScatterProvider")
+    @Test(dataProvider = "gatherScatterProvider")
     static void booleanGather(IntFunction<byte[]> fa, BiFunction<Integer,Integer,int[]> fs) {
         boolean[] a = convertToBooleanArray(fa.apply(SPECIES.length()));
         int[] b = fs.apply(a.length, SPECIES.length());
@@ -1263,7 +1243,7 @@ public class Byte128VectorLoadStoreTests extends AbstractVectorTest {
         assertGatherArraysEquals(r, a, b);
     }
 
-    @Test(dataProvider = "byteGatherScatterMaskProvider")
+    @Test(dataProvider = "gatherScatterMaskProvider")
     static void booleanGatherMask(IntFunction<byte[]> fa, BiFunction<Integer,Integer,int[]> fs, IntFunction<boolean[]> fm) {
         boolean[] a = convertToBooleanArray(fa.apply(SPECIES.length()));
         int[] b = fs.apply(a.length, SPECIES.length());
@@ -1281,7 +1261,7 @@ public class Byte128VectorLoadStoreTests extends AbstractVectorTest {
         assertGatherArraysEquals(r, a, b, mask);
     }
 
-    @Test(dataProvider = "byteGatherScatterProvider")
+    @Test(dataProvider = "gatherScatterProvider")
     static void booleanScatter(IntFunction<byte[]> fa, BiFunction<Integer,Integer,int[]> fs) {
         boolean[] a = convertToBooleanArray(fa.apply(SPECIES.length()));
         int[] b = fs.apply(a.length, SPECIES.length());
@@ -1297,7 +1277,7 @@ public class Byte128VectorLoadStoreTests extends AbstractVectorTest {
         assertScatterArraysEquals(r, a, b);
     }
 
-    @Test(dataProvider = "byteGatherScatterMaskProvider")
+    @Test(dataProvider = "gatherScatterMaskProvider")
     static void booleanScatterMask(IntFunction<byte[]> fa, BiFunction<Integer,Integer,int[]> fs, IntFunction<boolean[]> fm) {
         boolean[] a = convertToBooleanArray(fa.apply(SPECIES.length()));
         int[] b = fs.apply(a.length, SPECIES.length());
