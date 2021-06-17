@@ -203,8 +203,8 @@ public class PrettyPrintTest {
      * Bug: 8265073
      * source and expected output
      */
-    @DataProvider(name = "preserveSpace")
-    public Object[][] preserveSpace() throws Exception {
+    @DataProvider
+    public Object[][] preserveSpace() {
         return new Object[][]{
             {xml1, expected1},
             {xml2, expected2},
@@ -217,7 +217,8 @@ public class PrettyPrintTest {
      * within the relevant elements.
      * @param xml the source
      * @param expected the expected result
-     * @throws Exception if the test fails
+     * @throws Exception if the assertion fails or an error occurs in the
+     * transform process
      */
     @Test(dataProvider = "preserveSpace")
     public void test(String xml, String expected) throws Exception {
