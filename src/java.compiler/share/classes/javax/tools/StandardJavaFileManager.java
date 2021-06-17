@@ -192,7 +192,7 @@ public interface StandardJavaFileManager extends JavaFileManager {
      * @implSpec
      * The default implementation lazily converts each path to a file and calls
      * {@link #getJavaFileObjectsFromFiles(Iterable) getJavaFileObjectsFromFiles}.
-     * {@linkplain IllegalArgumentException IllegalArgumentException} will be thrown
+     * {@code IllegalArgumentException} will be thrown
      * if any of the paths cannot be converted to a file at the point the conversion happens.
      *
      * @param paths a list of paths
@@ -214,7 +214,7 @@ public interface StandardJavaFileManager extends JavaFileManager {
      * @implSpec
      * The default implementation lazily converts each path to a file and calls
      * {@link #getJavaFileObjectsFromPaths(Collection) getJavaFileObjectsFromPaths}.
-     * {@linkplain IllegalArgumentException IllegalArgumentException} will be thrown
+     * {@code IllegalArgumentException} will be thrown
      * if any of the paths cannot be converted to a file at the point the conversion happens.
      *
      * @param paths a list of paths
@@ -264,7 +264,7 @@ public interface StandardJavaFileManager extends JavaFileManager {
      * </pre>
      *
      * @implSpec
-     * The default implementation will only throw {@linkplain NullPointerException NullPointerException}
+     * The default implementation will only throw {@code NullPointerException}
      * if {@linkplain #getJavaFileObjectsFromPaths(Collection)} throws it.
      *
      * @param paths an array of paths
@@ -340,9 +340,8 @@ public interface StandardJavaFileManager extends JavaFileManager {
      * @implSpec
      * The default implementation lazily converts each path to a file and calls
      * {@link #setLocation setLocation}.
-     * {@linkplain IllegalArgumentException IllegalArgumentException}
-     * will be thrown if any of the paths cannot be converted to a file at
-     * the point the conversion happens.
+     * {@code IllegalArgumentException} will be thrown if any of the paths cannot
+     * be converted to a file at the point the conversion happens.
      *
      * @param location a location
      * @param paths a list of paths, if {@code null} use the default
