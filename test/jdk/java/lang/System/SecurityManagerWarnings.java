@@ -23,7 +23,7 @@
 
 /*
  * @test
- * @bug 8266459
+ * @bug 8266459 8268349
  * @summary check various warnings
  * @library /test/lib
  */
