@@ -94,8 +94,8 @@ public interface Reporter {
      * The positions are all 0-based character offsets from the beginning of content of the file.
      * The positions should satisfy the relation {@code start <= pos <= end}.
      *
-     * @implNote
-     * This implementation throws {@code UnsupportedOperationException}.
+     * @implSpec
+     * This implementation always throws {@code UnsupportedOperationException}.
      * The implementation provided by the {@code javadoc} tool to
      * {@link Doclet#init(Locale, Reporter) initialize} a doclet
      * overrides this implementation.
