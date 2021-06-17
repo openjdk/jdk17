@@ -52,12 +52,15 @@ public class SwitchBootstraps {
 
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 
-    private static final MethodHandle DO_SWITCH;
+    private static final MethodHandle DO_TYPE_SWITCH;
+    private static final MethodHandle DO_ENUM_SWITCH;
 
     static {
         try {
-            DO_SWITCH = LOOKUP.findStatic(SwitchBootstraps.class, "doSwitch",
+            DO_TYPE_SWITCH = LOOKUP.findStatic(SwitchBootstraps.class, "doTypeSwitch",
                                            MethodType.methodType(int.class, Object.class, int.class, Object[].class));
+            DO_ENUM_SWITCH = LOOKUP.findStatic(SwitchBootstraps.class, "doEnumSwitch",
+                                           MethodType.methodType(int.class, Enum.class, int.class, Object[].class));
         }
         catch (ReflectiveOperationException e) {
             throw new ExceptionInInitializerError(e);
@@ -68,7 +71,7 @@ public class SwitchBootstraps {
      * Bootstrap method for linking an {@code invokedynamic} call site that
      * implements a {@code switch} on a target of a reference type.  The static
      * arguments are an array of case labels which must be non-null and of type
-     * {@code String} or {@code Integer}, an enum constant or {@code Class}.
+     * {@code String} or {@code Integer} or {@code Class}.
      * <p>
      * The type of the returned {@code CallSite}'s method handle will have
      * a return type of {@code int}.   It has two parameters: the first argument
@@ -84,7 +87,7 @@ public class SwitchBootstraps {
      * <ul>
      *   <li>the element is of type {@code Class} that is assignable
      *       from the target's class; or</li>
-     *   <li>the element is of type {@code String} or {@code Integer} or an enum constant and
+     *   <li>the element is of type {@code String} or {@code Integer} and
      *       equals to the target.</li>
      * </ul>
      * <p>
@@ -102,11 +105,11 @@ public class SwitchBootstraps {
      * @return a {@code CallSite} returning the first matching element as described above
      *
      * @throws NullPointerException if any argument is {@code null}
-     * @throws IllegalArgumentException if the
+     * @throws IllegalArgumentException if any element in the labels array is null, if the
      * invocation type is not not a method type of first parameter of a reference type,
      * second parameter of type {@code int} and with {@code int} as its return type,
      * or if {@code labels} contains an element that is not of type {@code String},
-     * {@code Integer} or and enum constant or {@code Class}.
+     * {@code Integer} or {@code Class}.
      * @throws Throwable if there is any error linking the call site
      * @jvms 4.4.6 The CONSTANT_NameAndType_info Structure
      * @jvms 4.4.10 The CONSTANT_Dynamic_info and CONSTANT_InvokeDynamic_info Structures
@@ -125,25 +128,23 @@ public class SwitchBootstraps {
         labels = labels.clone();
         Stream.of(labels).forEach(SwitchBootstraps::verifyLabel);
 
-        MethodHandle target = MethodHandles.insertArguments(DO_SWITCH, 2, (Object) labels);
+        MethodHandle target = MethodHandles.insertArguments(DO_TYPE_SWITCH, 2, (Object) labels);
         return new ConstantCallSite(target);
     }
 
     private static void verifyLabel(Object label) {
         if (label == null) {
-            return ;
+            throw new IllegalArgumentException("null label found");
         }
-
         Class<?> labelClass = label.getClass();
         if (labelClass != Class.class &&
             labelClass != String.class &&
-            labelClass != Integer.class &&
-            !labelClass.isEnum()) {
+            labelClass != Integer.class) {
             throw new IllegalArgumentException("label with illegal type found: " + label.getClass());
         }
     }
 
-    private static int doSwitch(Object target, int startIndex, Object[] labels) {
+    private static int doTypeSwitch(Object target, int startIndex, Object[] labels) {
         if (target == null)
             return -1;
 
@@ -151,19 +152,13 @@ public class SwitchBootstraps {
         Class<?> targetClass = target.getClass();
         for (int i = startIndex; i < labels.length; i++) {
             Object label = labels[i];
-            if (label == null) {
-                //ignore
-            } else if (label instanceof Class<?> c) {
+            if (label instanceof Class<?> c) {
                 if (c.isAssignableFrom(targetClass))
                     return i;
             } else if (label instanceof Integer constant) {
                 if (target instanceof Number input && constant.intValue() == input.intValue()) {
                     return i;
                 } else if (target instanceof Character input && constant.intValue() == input.charValue()) {
-                    return i;
-                }
-            } else if (label instanceof Enum<?>) {
-                if (label == target) {
                     return i;
                 }
             } else if (label.equals(target)) {
@@ -175,34 +170,113 @@ public class SwitchBootstraps {
     }
 
     /**
-     * Returns an {@code enum} constant of the type specified by {@code type}
-     * with the name specified by {@code name}.
+     * Bootstrap method for linking an {@code invokedynamic} call site that
+     * implements a {@code switch} on a target of an enum type.  The static
+     * arguments are an array of case labels which must be non-null and of type
+     * {@code String} (representing enum constants) or {@code Class}.
+     * <p>
+     * The type of the returned {@code CallSite}'s method handle will have
+     * a return type of {@code int}.   It has two parameters: the first argument
+     * will be an {@code Enum} instance ({@code target}) and the second
+     * will be {@code int} ({@code restart}).
+     * <p>
+     * If the {@code target} is {@code null}, then the method of the call site
+     * returns {@literal -1}.
+     * <p>
+     * If the {@code target} is not {@code null}, then the method of the call site
+     * returns the index of the first element in the {@code labels} array starting from
+     * the {@code restart} index matching one of the following conditions:
+     * <ul>
+     *   <li>the element is of type {@code Class} that is assignable
+     *       from the target's class; or</li>
+     *   <li>the element is of type {@code String} and equals to the target
+     *       enum constant's {@link Enum#name()}.</li>
+     * </ul>
+     * <p>
+     * If no element in the {@code labels} array matches the target, then
+     * the method of the call site return the length of the {@code labels} array.
      *
      * @param lookup Represents a lookup context with the accessibility
      *               privileges of the caller.  When used with {@code invokedynamic},
      *               this is stacked automatically by the VM.
      * @param invocationName unused
-     * @param invocationClass unused
-     * @param name the name of the constant to return, which must exactly match
-     * an enum constant in the specified type.
-     * @param type the {@code Class} object describing the enum type for which
-     * a constant is to be returned
-     * @param <E> The enum type for which a constant value is to be returned
-     * @return the enum constant of the specified enum type with the
-     * specified name, or null if not found
-     * @throws IllegalAccessError if the declaring class or the field is not
-     * accessible to the class performing the operation
-     * @see Enum#valueOf(Class, String)
+     * @param invocationType The invocation type of the {@code CallSite} with two parameters,
+     *                       an enum type, an {@code int}, and {@code int} as a return type.
+     * @param labels case labels - {@code String} constants and {@code Class} instances,
+     *               in any combination
+     * @return a {@code CallSite} returning the first matching element as described above
+     *
+     * @throws NullPointerException if any argument is {@code null}
+     * @throws IllegalArgumentException if any element in the labels array is null, if the
+     * invocation type is not a method type of first parameter of an enum type,
+     * second parameter of type {@code int} and with {@code int} as its return type,
+     * or if {@code labels} contains an element that is not of type {@code String} or
+     * {@code Class}.
+     * @throws Throwable if there is any error linking the call site
+     * @jvms 4.4.6 The CONSTANT_NameAndType_info Structure
+     * @jvms 4.4.10 The CONSTANT_Dynamic_info and CONSTANT_InvokeDynamic_info Structures
      */
-    public static <E extends Enum<E>> E enumConstant(MethodHandles.Lookup lookup,
-                                                     String invocationName,
-                                                     Class<?> invocationClass,
-                                                     String name,
-                                                     Class<E> type) {
-        try {
-            return ConstantBootstraps.enumConstant(lookup, name, type);
-        } catch (IllegalArgumentException ex) {
-            return null;
+    public static CallSite enumSwitch(MethodHandles.Lookup lookup,
+                                      String invocationName,
+                                      MethodType invocationType,
+                                      Object... labels) throws Throwable {
+        if (invocationType.parameterCount() != 2
+            || (!invocationType.returnType().equals(int.class))
+            || invocationType.parameterType(0).isPrimitive()
+            || !invocationType.parameterType(0).isEnum()
+            || !invocationType.parameterType(1).equals(int.class))
+            throw new IllegalArgumentException("Illegal invocation type " + invocationType);
+        requireNonNull(labels);
+
+        labels = labels.clone();
+
+        Class<?> enumClass = invocationType.parameterType(0);
+        labels = Stream.of(labels).map(l -> convertEnumConstants(lookup, enumClass, l)).toArray();
+
+        MethodHandle target =
+                MethodHandles.insertArguments(DO_ENUM_SWITCH, 2, (Object) labels);
+        target = MethodHandles.explicitCastArguments(target, invocationType);
+
+        return new ConstantCallSite(target);
+    }
+
+    private static <E extends Enum<E>> Object convertEnumConstants(MethodHandles.Lookup lookup, Class<?> enumClassTemplate, Object label) {
+        if (label == null) {
+            throw new IllegalArgumentException("null label found");
+        }
+        Class<?> labelClass = label.getClass();
+        if (labelClass == Class.class) {
+            return label;
+        } else if (labelClass == String.class) {
+            @SuppressWarnings("unchecked")
+            Class<E> enumClass = (Class<E>) enumClassTemplate;
+            try {
+                return ConstantBootstraps.enumConstant(lookup, (String) label, enumClass);
+            } catch (IllegalArgumentException ex) {
+                return null;
+            }
+        } else {
+            throw new IllegalArgumentException("label with illegal type found: " + labelClass);
         }
     }
+
+    private static int doEnumSwitch(Enum<?> target, int startIndex, Object[] labels) {
+        if (target == null)
+            return -1;
+
+        // Dumbest possible strategy
+        Class<?> targetClass = target.getClass();
+        for (int i = startIndex; i < labels.length; i++) {
+            Object label = labels[i];
+            if (label instanceof Class<?> c) {
+                if (c.isAssignableFrom(targetClass))
+                    return i;
+            } else if (label == target) {
+                return i;
+            }
+        }
+
+        return labels.length;
+    }
+
 }

@@ -362,16 +362,18 @@ public class TransPatterns extends TreeTranslator {
                          .filter(c -> c != null)
                          .toArray(s -> new LoadableConstant[s]);
 
+            boolean enumSelector = seltype.tsym.isEnum();
+            Name bootstrapName = enumSelector ? names.enumSwitch : names.typeSwitch;
             Symbol bsm = rs.resolveInternalMethod(tree.pos(), env, syms.switchBootstrapsType,
-                    names.fromString("typeSwitch"), staticArgTypes, List.nil());
+                    bootstrapName, staticArgTypes, List.nil());
 
             MethodType indyType = new MethodType(
-                    List.of(syms.objectType, syms.intType),
+                    List.of(enumSelector ? seltype : syms.objectType, syms.intType),
                     syms.intType,
                     List.nil(),
                     syms.methodClass
             );
-            DynamicMethodSymbol dynSym = new DynamicMethodSymbol(names.fromString("typeSwitch"),
+            DynamicMethodSymbol dynSym = new DynamicMethodSymbol(bootstrapName,
                     syms.noSymbol,
                     ((MethodSymbol)bsm).asHandle(),
                     indyType,
@@ -483,30 +485,7 @@ public class TransPatterns extends TreeTranslator {
             return (LoadableConstant) principalType((JCPattern) l);
         } else if (l.isExpression() && !TreeInfo.isNull((JCExpression) l)) {
             if ((l.type.tsym.flags_field & Flags.ENUM) != 0) {
-                Assert.check(l.hasTag(Tag.IDENT));
-
-                List<Type> staticArgTypes = List.of(syms.methodHandleLookupType,
-                                                    syms.stringType,
-                                                    syms.classType,
-                                                    syms.stringType,
-                                                    new ClassType(syms.classType.getEnclosingType(),
-                                                                  List.of(l.type),
-                                                                  syms.classType.tsym));
-                LoadableConstant[] staticArgValues = new LoadableConstant[] {
-                    LoadableConstant.String(((JCIdent) l).name.toString()),
-                    (ClassType) l.type
-                };
-
-                Symbol bsm = rs.resolveInternalMethod(l.pos(), env, syms.switchBootstrapsType,
-                        names.fromString("enumConstant"), staticArgTypes, List.nil());
-
-                DynamicVarSymbol dynSym = new DynamicVarSymbol(names.fromString("enumConstant"),
-                        syms.noSymbol,
-                        ((MethodSymbol)bsm).asHandle(),
-                        l.type,
-                        staticArgValues);
-
-                return dynSym;
+                return LoadableConstant.String(((JCIdent) l).name.toString());
             } else {
                 Assert.checkNonNull(l.type.constValue());
 
