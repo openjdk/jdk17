@@ -4448,14 +4448,17 @@ void LibraryCallKit::arraycopy_move_allocation_here(AllocateArrayNode* alloc, No
     // the allocation (i.e. is only valid if the allocation succeeds):
     // 1) replace CastIINode with AllocateArrayNode's length here
     // 2) Create CastIINode again once allocation has moved (see below) at the end of this method
+    //
+    // Multiple identical CastIINodes might exist here. Each GraphKit::load_array_length() call will generate
+    // new separate CastIINode (arraycopy guard checks or any array length use between array allocation and ararycopy)
     Node* init_control = init->proj_out(TypeFunc::Control);
     Node* alloc_length = alloc->Ideal_length();
 #ifdef ASSERT
     Node* prev_cast = NULL;
 #endif
     for (uint i = 0; i < init_control->outcnt(); i++) {
-      Node *init_out = init_control->raw_out(i);
-      if (init_out->is_CastII() && init_out->in(0) == init_control && init_out->in(1) == alloc_length) {
+      Node* init_out = init_control->raw_out(i);
+      if (init_out->is_CastII() && init_out->in(TypeFunc::Control) == init_control && init_out->in(1) == alloc_length) {
 #ifdef ASSERT
         if (prev_cast == NULL) {
           prev_cast = init_out;
@@ -4502,18 +4505,7 @@ void LibraryCallKit::arraycopy_move_allocation_here(AllocateArrayNode* alloc, No
     Node* destx = _gvn.transform(dest);
     assert(destx == dest, "where has the allocation result gone?");
 
-    // Cast length on remaining path to be as narrow as possible
-    // previous CastNode inserted when creating AllocateArrayNode
-    // is removed in early step in LibraryCallKit::inline_arraycopy
-    Node* length = alloc->in(AllocateNode::ALength);
-    if (map()->find_edge(length) >= 0) {
-      Node* ccast = alloc->make_ideal_length(ary_type, &_gvn);
-      if (ccast != length) {
-        _gvn.set_type_bottom(ccast);
-        record_for_igvn(ccast);
-        replace_in_map(length, ccast);
-      }
-    }
+    cast_replace_array_length_post_allocation(alloc, ary_type);
   }
 }
 

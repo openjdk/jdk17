@@ -1195,6 +1195,18 @@ Node* GraphKit::load_array_length(Node* array) {
   return alen;
 }
 
+void GraphKit::cast_replace_array_length_post_allocation(AllocateArrayNode* alloc, const TypeOopPtr* oop_type) {
+  Node* length = alloc->in(AllocateNode::ALength);
+  if (map()->find_edge(length) >= 0) {
+    Node* ccast = alloc->make_ideal_length(oop_type, &_gvn);
+    if (ccast != length) {
+      _gvn.set_type_bottom(ccast);
+      record_for_igvn(ccast);
+      replace_in_map(length, ccast);
+    }
+  }
+}
+
 //------------------------------do_null_check----------------------------------
 // Helper function to do a NULL pointer check.  Returned value is
 // the incoming address with NULL casted away.  You are allowed to use the
@@ -3969,16 +3981,7 @@ Node* GraphKit::new_array(Node* klass_node,     // array klass (maybe variable)
 
   Node* javaoop = set_output_for_allocation(alloc, ary_type, deoptimize_on_exception);
 
-  // Cast length on remaining path to be as narrow as possible
-  if (map()->find_edge(length) >= 0) {
-    Node* ccast = alloc->make_ideal_length(ary_type, &_gvn);
-    if (ccast != length) {
-      _gvn.set_type_bottom(ccast);
-      record_for_igvn(ccast);
-      replace_in_map(length, ccast);
-    }
-  }
-
+  cast_replace_array_length_post_allocation(alloc, ary_type);
   return javaoop;
 }
 

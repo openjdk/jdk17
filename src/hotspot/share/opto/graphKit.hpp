@@ -343,6 +343,8 @@ class GraphKit : public Phase {
   Node* load_object_klass(Node* object);
   // Find out the length of an array.
   Node* load_array_length(Node* array);
+  // Cast and replace array allocation's length as narrow as possible after allocation.
+  void cast_replace_array_length_post_allocation(AllocateArrayNode* alloc, const TypeOopPtr* oop_type);
 
 
   // Helper function to do a NULL pointer check or ZERO check based on type.
