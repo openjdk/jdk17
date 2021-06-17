@@ -91,54 +91,22 @@ public class Vector128ConversionTests extends AbstractVectorConversionTest {
     }
 
     @Test(dataProvider = "fixedShapeXSegmentedLegalCastSpecies")
-    static void shuffleCast(VectorSpecies src, List<VectorSpecies> legal) {
-        int [] arr = new int[src.length()];
-        for(int i = 0; i < arr.length; i++) {
-            arr[i] = i;
-        }
-        VectorShuffle shuffle = VectorShuffle.fromArray(src, arr, 0);
-        for(var sps : legal) {
-            VectorShuffle res = shuffle.cast(sps);
-            Assert.assertEquals(res.toArray(), arr);
-        }
+    static <E,F> void shuffleCast(VectorSpecies<E> src, VectorSpecies<F> dst) {
+        legal_shuffle_cast_kernel(src, dst);
     }
 
     @Test(dataProvider = "fixedShapeXSegmentedIllegalCastSpecies")
-    static void shuffleCastNeg(VectorSpecies src, List<VectorSpecies> illegal) {
-        int [] arr = new int[src.length()];
-        for(int i = 0; i < arr.length; i++) {
-            arr[i] = i;
-        }
-        VectorShuffle shuffle = VectorShuffle.fromArray(src, arr, 0);
-        for(var sps : illegal) {
-            try {
-                shuffle.cast(sps);
-                Assert.fail();
-            } catch (IllegalArgumentException e) {
-            }
-        }
+    static <E,F> void shuffleCastNeg(VectorSpecies<E> src, VectorSpecies<F> dst) {
+        illegal_shuffle_cast_kernel(src, dst);
     }
 
     @Test(dataProvider = "fixedShapeXSegmentedLegalCastSpecies")
-    static void maskCast(VectorSpecies src, List<VectorSpecies> legal) {
-        long val = (1L << (src.length() & 63)) - 1L;
-        VectorMask mask = VectorMask.fromLong(src, val);
-        for(var sps : legal) {
-            VectorMask res = mask.cast(sps);
-            Assert.assertEquals(res.toLong(), val);
-        }
+    static <E,F> void maskCast(VectorSpecies<E> src, VectorSpecies<F> dst) {
+        legal_mask_cast_kernel(src, dst);
     }
 
     @Test(dataProvider = "fixedShapeXSegmentedIllegalCastSpecies")
-    static void maskCastNeg(VectorSpecies src, List<VectorSpecies> illegal) {
-        long val = (1L << (src.length() & 63)) - 1L;
-        VectorMask mask = VectorMask.fromLong(src, val);
-        for(var sps : illegal) {
-            try {
-                mask.cast(sps);
-                Assert.fail();
-            } catch (IllegalArgumentException e) {
-            }
-        }
+    static <E,F> void maskCastNeg(VectorSpecies<E> src, VectorSpecies<F> dst) {
+        illegal_mask_cast_kernel(src, dst);
     }
 }
