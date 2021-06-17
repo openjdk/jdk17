@@ -241,28 +241,26 @@ abstract class AbstractVectorConversionTest {
         return args.toArray(Object[][]::new);
     }
 
-    static Object[][] fixedShapeXSegmentedCastSpeciesArgs(VectorShape srcShape) {
+    static Object[][] fixedShapeXSegmentedCastSpeciesArgs(VectorShape srcShape, boolean legal) {
         List<Object[]> args = new ArrayList<>();
-
         for (Class<?> srcE : List.of(byte.class, short.class, int.class, long.class, float.class, double.class)) {
             VectorSpecies<?> src = VectorSpecies.of(srcE, srcShape);
-
+            List<VectorSpecies> sps = new ArrayList<VectorSpecies>();
             for (VectorShape dstShape : VectorShape.values()) {
                 for (Class<?> dstE : List.of(byte.class, short.class, int.class, long.class, float.class, double.class)) {
                     VectorSpecies<?> dst = VectorSpecies.of(dstE, dstShape);
-
-                    List<VectorSpecies> legal = new ArrayList<VectorSpecies>();
-                    List<VectorSpecies> illegal = new ArrayList<VectorSpecies>();
-
-                    if (dst.length() == src.length()) {
-                        legal.add(dst);
+                    if (legal) {
+                        if (dst.length() == src.length()) {
+                            sps.add(dst);
+                        }
                     } else {
-                        illegal.add(dst);
+                        if (dst.length() != src.length()) {
+                            sps.add(dst);
+                        }
                     }
-
-                    args.add(new Object[]{src, legal, illegal});
                 }
             }
+            args.add(new Object[]{src, sps});
         }
         return args.toArray(Object[][]::new);
     }

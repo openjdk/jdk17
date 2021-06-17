@@ -56,8 +56,13 @@ public class VectorMaxConversionTests extends AbstractVectorConversionTest {
     }
 
     @DataProvider
-    public Object[][] fixedShapeXSegmentedCastSpecies() {
-        return fixedShapeXSegmentedCastSpeciesArgs(SHAPE);
+    public Object[][] fixedShapeXSegmentedLegalCastSpecies() {
+        return fixedShapeXSegmentedCastSpeciesArgs(SHAPE, true);
+    }
+
+    @DataProvider
+    public Object[][] fixedShapeXSegmentedIllegalCastSpecies() {
+        return fixedShapeXSegmentedCastSpeciesArgs(SHAPE, false);
     }
 
     @Test(dataProvider = "fixedShapeXfixedShape")
@@ -84,19 +89,26 @@ public class VectorMaxConversionTests extends AbstractVectorConversionTest {
         reinterpret_kernel(src, dst, a);
     }
 
-    @Test(dataProvider = "fixedShapeXSegmentedCastSpecies")
-    static void shuffleCast(VectorSpecies src, List<VectorSpecies> legal, List<VectorSpecies> illegal) {
+    @Test(dataProvider = "fixedShapeXSegmentedLegalCastSpecies")
+    static void shuffleCast(VectorSpecies src, List<VectorSpecies> legal) {
         int [] arr = new int[src.length()];
         for(int i = 0; i < arr.length; i++) {
             arr[i] = i;
         }
         VectorShuffle shuffle = VectorShuffle.fromArray(src, arr, 0);
-
         for(var sps : legal) {
             VectorShuffle res = shuffle.cast(sps);
             Assert.assertEquals(res.toArray(), arr);
         }
+    }
 
+    @Test(dataProvider = "fixedShapeXSegmentedIllegalCastSpecies")
+    static void shuffleCastNeg(VectorSpecies src, List<VectorSpecies> illegal) {
+        int [] arr = new int[src.length()];
+        for(int i = 0; i < arr.length; i++) {
+            arr[i] = i;
+        }
+        VectorShuffle shuffle = VectorShuffle.fromArray(src, arr, 0);
         for(var sps : illegal) {
             try {
                 shuffle.cast(sps);
@@ -106,16 +118,20 @@ public class VectorMaxConversionTests extends AbstractVectorConversionTest {
         }
     }
 
-    @Test(dataProvider = "fixedShapeXSegmentedCastSpecies")
-    static void maskCast(VectorSpecies src, List<VectorSpecies> legal, List<VectorSpecies> illegal) {
+    @Test(dataProvider = "fixedShapeXSegmentedLegalCastSpecies")
+    static void maskCast(VectorSpecies src, List<VectorSpecies> legal) {
         long val = (1L << (src.length() & 63)) - 1L;
         VectorMask mask = VectorMask.fromLong(src, val);
-
         for(var sps : legal) {
             VectorMask res = mask.cast(sps);
             Assert.assertEquals(res.toLong(), val);
         }
+    }
 
+    @Test(dataProvider = "fixedShapeXSegmentedIllegalCastSpecies")
+    static void maskCastNeg(VectorSpecies src, List<VectorSpecies> illegal) {
+        long val = (1L << (src.length() & 63)) - 1L;
+        VectorMask mask = VectorMask.fromLong(src, val);
         for(var sps : illegal) {
             try {
                 mask.cast(sps);
