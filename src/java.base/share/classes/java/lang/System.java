@@ -326,8 +326,8 @@ public final class System {
     private static native void setOut0(PrintStream out);
     private static native void setErr0(PrintStream err);
 
-    // Remember original System.err. setSecurityManager() warning goes here
-    private static volatile @Stable PrintStream originalErrStream = null;
+    // Remember initial System.err. setSecurityManager() warning goes here
+    private static volatile @Stable PrintStream initialErrStream;
 
     private static URL codeSource(Class<?> clazz) {
         PrivilegedAction<ProtectionDomain> pa = clazz::getProtectionDomain;
@@ -379,7 +379,7 @@ public final class System {
         if (allowSecurityManager()) {
             var caller = Reflection.getCallerClass();
             String signature = caller.getName() + " (" + codeSource(caller) + ")";
-            originalErrStream.printf("""
+            initialErrStream.printf("""
                     WARNING: A terminally deprecated method in java.lang.System has been called
                     WARNING: System::setSecurityManager has been called by %s
                     WARNING: Please consider reporting this to the maintainers of %s
@@ -2215,7 +2215,7 @@ public final class System {
                     WARNING: The Security Manager is deprecated and will be removed in a future release""");
         }
 
-        originalErrStream = System.err;
+        initialErrStream = System.err;
 
         // initializing the system class loader
         VM.initLevel(3);
