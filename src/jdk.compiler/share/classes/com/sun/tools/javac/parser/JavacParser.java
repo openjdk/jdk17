@@ -3074,6 +3074,7 @@ public class JavacParser implements Parser {
                                   ((twoBack = S.token(lookahead - 2)).kind == IDENTIFIER ||
                                    twoBack.kind == GT || twoBack.kind == GTGT || twoBack.kind == GTGTGT);
                 if (pattern) {
+                    checkSourceLevel(token.pos, Feature.PATTERN_SWITCH);
                     return parsePattern(token.pos, null, null, false);
                 } else {
                     return term(EXPR | TYPE | NOLAMBDA);
