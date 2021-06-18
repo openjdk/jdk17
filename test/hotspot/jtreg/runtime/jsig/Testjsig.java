@@ -53,6 +53,7 @@ public class Testjsig {
 
         // Start the process and check the output
         OutputAnalyzer output = new OutputAnalyzer(pb.start());
+        output.shouldHaveExitValue(0);
         output.shouldContain("old handler");
     }
 }
