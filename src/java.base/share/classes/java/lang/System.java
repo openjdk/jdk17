@@ -377,14 +377,20 @@ public final class System {
     @CallerSensitive
     public static void setSecurityManager(@SuppressWarnings("removal") SecurityManager sm) {
         if (allowSecurityManager()) {
-            var caller = Reflection.getCallerClass();
-            String signature = caller.getName() + " (" + codeSource(caller) + ")";
+            var callerClass = Reflection.getCallerClass();
+            URL url = codeSource(callerClass);
+            final String source;
+            if (url == null) {
+                source = callerClass.getName();
+            } else {
+                source = callerClass.getName() + " (" + url + ")";
+            }
             initialErrStream.printf("""
                     WARNING: A terminally deprecated method in java.lang.System has been called
                     WARNING: System::setSecurityManager has been called by %s
                     WARNING: Please consider reporting this to the maintainers of %s
                     WARNING: System::setSecurityManager will be removed in a future release
-                    """, signature, caller.getName());
+                    """, source, callerClass.getName());
             implSetSecurityManager(sm);
         } else {
             // security manager not allowed
