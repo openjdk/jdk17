@@ -26,10 +26,10 @@
  * @bug 8267904
  * @requires vm.compiler2.enabled
  * @summary C2 inline array_copy move CastIINode(Array Length) before allocation cause crash.
- * @run main/othervm compiler.c2.TestNegativeArrayCopyAfterLoop
+ * @run main/othervm compiler.arraycopy.TestNegativeArrayCopyAfterLoop
  */
 
-package compiler.c2;
+package compiler.arraycopy;
 import java.util.Arrays;
 
 class test {

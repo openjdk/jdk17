@@ -27,10 +27,10 @@
  * @requires vm.compiler2.enabled & vm.debug
  * @summary C2 using negative array length as index, using array allocation length.
  *          This assertion is triggered by 8267904.
- * @run main/othervm compiler.c2.TestNegArrayLengthAsIndex2
+ * @run main/othervm compiler.arraycopy.TestNegArrayLengthAsIndex2
  */
 
-package compiler.c2;
+package compiler.arraycopy;
 public class TestNegArrayLengthAsIndex2 {
 
     public static void main(String[] args) throws Exception {

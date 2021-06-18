@@ -1184,27 +1184,29 @@ Node* GraphKit::load_array_length(Node* array) {
     Node *r_adr = basic_plus_adr(array, arrayOopDesc::length_offset_in_bytes());
     alen = _gvn.transform( new LoadRangeNode(0, immutable_memory(), r_adr, TypeInt::POS));
   } else {
-    alen = alloc->Ideal_length();
-    Node* ccast = alloc->make_ideal_length(_gvn.type(array)->is_oopptr(), &_gvn);
-    if (ccast != alen) {
-      _gvn.set_type_bottom(ccast);
-      record_for_igvn(ccast);
-      alen = ccast;
-    }
+    alen = array_ideal_length(alloc, _gvn.type(array)->is_oopptr(), false);
   }
   return alen;
 }
 
-void GraphKit::cast_replace_array_length_post_allocation(AllocateArrayNode* alloc, const TypeOopPtr* oop_type) {
-  Node* length = alloc->in(AllocateNode::ALength);
-  if (map()->find_edge(length) >= 0) {
+Node* GraphKit::array_ideal_length(AllocateArrayNode* alloc,
+                                   const TypeOopPtr* oop_type,
+                                   bool replace_length_in_map) {
+  Node* length = alloc->Ideal_length();
+  if (replace_length_in_map == false || map()->find_edge(length) >= 0) {
     Node* ccast = alloc->make_ideal_length(oop_type, &_gvn);
     if (ccast != length) {
+      // do not transfrom ccast here, it might convert to top node for
+      // negative array length and break assumptions in parsing stage.
       _gvn.set_type_bottom(ccast);
       record_for_igvn(ccast);
-      replace_in_map(length, ccast);
+      if (replace_length_in_map) {
+        replace_in_map(length, ccast);
+      }
+      return ccast;
     }
   }
+  return length;
 }
 
 //------------------------------do_null_check----------------------------------
@@ -3981,7 +3983,7 @@ Node* GraphKit::new_array(Node* klass_node,     // array klass (maybe variable)
 
   Node* javaoop = set_output_for_allocation(alloc, ary_type, deoptimize_on_exception);
 
-  cast_replace_array_length_post_allocation(alloc, ary_type);
+  array_ideal_length(alloc, ary_type, true);
   return javaoop;
 }
 

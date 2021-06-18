@@ -29,10 +29,10 @@
  *          AllocateArrayNode::make_ideal_length create CastIINode to not negative range.
  *          Apply transform in GraphKit::load_array_length will covert array load index type to top.
  *          This cause assert in Parse::array_addressing, it expect index type is int.
- * @run main/othervm -XX:-PrintCompilation compiler.c2.TestNegArrayLengthAsIndex1
+ * @run main/othervm -XX:-PrintCompilation compiler.arraycopy.TestNegArrayLengthAsIndex1
  */
 
-package compiler.c2;
+package compiler.arraycopy;
 public class TestNegArrayLengthAsIndex1 {
 
     public static void main(String[] args) throws Exception {

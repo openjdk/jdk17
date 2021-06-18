@@ -4505,7 +4505,7 @@ void LibraryCallKit::arraycopy_move_allocation_here(AllocateArrayNode* alloc, No
     Node* destx = _gvn.transform(dest);
     assert(destx == dest, "where has the allocation result gone?");
 
-    cast_replace_array_length_post_allocation(alloc, ary_type);
+    array_ideal_length(alloc, ary_type, true);
   }
 }
 
