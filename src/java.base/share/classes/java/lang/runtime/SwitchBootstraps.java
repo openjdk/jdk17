@@ -175,8 +175,8 @@ public class SwitchBootstraps {
      * arguments are an array of case labels which must be non-null and of type
      * {@code String} (representing enum constants) or {@code Class}.
      * <p>
-     * The type of the returned {@code CallSite}'s method handle will have
-     * a return type of {@code int}.   It has two parameters: the first argument
+     * The returned {@code CallSite}'s method handle will have
+     * a return type of {@code int} and accepts two parameters: the first argument
      * will be an {@code Enum} instance ({@code target}) and the second
      * will be {@code int} ({@code restart}).
      * <p>
@@ -235,7 +235,7 @@ public class SwitchBootstraps {
 
         MethodHandle target =
                 MethodHandles.insertArguments(DO_ENUM_SWITCH, 2, (Object) labels);
-        target = MethodHandles.explicitCastArguments(target, invocationType);
+        target = target.asType(invocationType);
 
         return new ConstantCallSite(target);
     }
