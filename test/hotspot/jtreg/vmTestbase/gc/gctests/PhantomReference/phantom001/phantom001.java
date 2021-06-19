@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004, 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2004, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -60,6 +60,7 @@
 package gc.gctests.PhantomReference.phantom001;
 
 import java.lang.ref.*;
+import java.time.LocalTime;
 import nsk.share.gc.*;
 import nsk.share.gc.gp.*;
 import nsk.share.gc.gp.string.InternedStringProducer;
@@ -98,12 +99,43 @@ public class phantom001 extends ThreadedGCTest implements GarbageProducerAware, 
         int iteration;
         private volatile boolean finalized;
 
+        private String addMessageContext(String message) {
+            return "T:" + Thread.currentThread().getId() +
+                " I:" + iteration +
+                " " + LocalTime.now().toString() +
+                ": " + message;
+        }
+
+        private void info(String message) {
+            log.info(addMessageContext(message));
+        }
+
+        private void progress(String message) {
+            // Uncomment this to get (much) more verbose logging.
+            // log.debug(addMessageContext(message));
+        }
+
+        private void fail(String message) {
+            log.error(addMessageContext("[FAILED] " + message));
+            setFailed(true);
+        }
+
+        private boolean shouldTerminate() {
+            return !getExecutionController().continueExecution();
+        }
+
+        private void provokeGC(int initialFactor) {
+            GarbageUtils.eatMemory(getExecutionController(),
+                                   garbageProducer,
+                                   initialFactor , 10, 0);
+        }
+
         public void run() {
             try {
-                log.info("iteration " + iteration);
+                int code = iteration % TYPES_COUNT;
+                info("start code " + code);
                 ReferenceQueue queue = new ReferenceQueue();
                 PhantomReference reference;
-                int code = iteration % TYPES_COUNT;
                 String type;
                 // Define a specific type for each thread to test
                 switch (code) {
@@ -158,50 +190,84 @@ public class phantom001 extends ThreadedGCTest implements GarbageProducerAware, 
                 }
 
                 int initialFactor = memoryStrategy.equals(MemoryStrategy.HIGH) ? 1 : (memoryStrategy.equals(MemoryStrategy.LOW) ? 10 : 2);
-                GarbageUtils.eatMemory(getExecutionController(), garbageProducer, initialFactor , 10, 0);
+
+                // If referent is finalizable, provoke and wait for finalization.
                 if (type.equals("class")) {
-                    while (!finalized && getExecutionController().continueExecution()) {
-                        System.runFinalization(); //does not guarantee finalization, but increases the chance
+                    // Don't check shouldTerminate() in the loop.  We want to
+                    // treat failure to finalize as a test failure by eventually
+                    // timing out.
+                    progress("start waiting for finalization");
+                    for (int checks = 0; true; ++checks) {
+                        if (finalized) {
+                            progress("finished waiting for finalization: " + checks);
+                            break;
+                        }
+                        provokeGC(initialFactor);
+                        // Does not guarantee finalization, but increases the chance.
+                        System.runFinalization();
                         try {
                             Thread.sleep(100);
                         } catch (InterruptedException e) {}
-                        GarbageUtils.eatMemory(getExecutionController(), garbageProducer, initialFactor , 10, 0);
                     }
-
-                    //provoke gc once more to make finalized object phantom reachable
-                    GarbageUtils.eatMemory(getExecutionController(), garbageProducer, initialFactor , 10, 0);
+                    if (shouldTerminate()) {
+                        info("terminated after finalization");
+                        return;
+                    }
                 }
-                if (!getExecutionController().continueExecution()) {
-                    // we were interrrupted by stresser. just exit...
+
+                // Provoke and wait for reference to be cleared.
+                // One GC might not be sufficient if the referent is finalizable.
+                // The referent might remain reachable from the finalization
+                // thread for a little while.  But don't check shouldTerminate()
+                // in the loop.  We want to treat failure to be cleared as a test
+                // failure by eventually timing out.
+                progress("start waiting for clearing");
+                for (int checks = 0; true; ++checks) {
+                    if (reference.refersTo(null)) {
+                        progress("finished waiting for clearing: " + checks);
+                        break;
+                    }
+                    provokeGC(initialFactor);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {}
+                }
+                if (shouldTerminate()) {
+                    info("terminated after clearing");
                     return;
                 }
+
+                // Wait for notification.
+                progress("start waiting for enqueue");
                 Reference polledReference = null;
                 try {
                     polledReference = queue.remove();
                 } catch (InterruptedException e) {
-                    log.error("Unexpected InterruptedException during queue.remove().");
-                    setFailed(true);
+                    fail("Unexpected InterruptedException during queue.remove().");
+                    return;
                 }
+                progress("finished waiting for enqueue");
                 // Check the reference and the queue
                 // The polled reference must be equal to the one enqueued to
                 // the queue
 
                 if (polledReference != reference) {
-                    log.error("The original reference is not equal to polled reference.");
-                    setFailed(true);
+                    fail("The original reference is not equal to polled reference.");
+                    return;
                 }
 
                 // queue.poll() once again must return null now, since there is
                 // only one reference in the queue
                 polledReference = queue.poll();
                 if (polledReference != null) {
-                    log.error("There are more  than one references in the queue.");
-                    setFailed(true);
+                    fail("There are more  than one references in the queue.");
+                    return;
                 }
-                reference.clear();
+                progress("finished code " + code);
             } catch (OutOfMemoryError e) {
+            } finally {
+                iteration++;
             }
-            iteration++;
         }
 
         class Referent {
