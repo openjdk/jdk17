@@ -160,16 +160,16 @@ public class phantom001 extends ThreadedGCTest implements GarbageProducerAware, 
                 int initialFactor = memoryStrategy.equals(MemoryStrategy.HIGH) ? 1 : (memoryStrategy.equals(MemoryStrategy.LOW) ? 10 : 2);
                 GarbageUtils.eatMemory(getExecutionController(), garbageProducer, initialFactor , 10, 0);
                 if (type.equals("class")) {
-                        while (!finalized && getExecutionController().continueExecution()) {
-                                System.runFinalization(); //does not guarantee finalization, but increases the chance
-                                try {
-                                        Thread.sleep(100);
-                                } catch (InterruptedException e) {}
-                                GarbageUtils.eatMemory(getExecutionController(), garbageProducer, initialFactor , 10, 0);
-                        }
-
-                        //provoke gc once more to make finalized object phantom reachable
+                    while (!finalized && getExecutionController().continueExecution()) {
+                        System.runFinalization(); //does not guarantee finalization, but increases the chance
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {}
                         GarbageUtils.eatMemory(getExecutionController(), garbageProducer, initialFactor , 10, 0);
+                    }
+
+                    //provoke gc once more to make finalized object phantom reachable
+                    GarbageUtils.eatMemory(getExecutionController(), garbageProducer, initialFactor , 10, 0);
                 }
                 if (!getExecutionController().continueExecution()) {
                     // we were interrrupted by stresser. just exit...
@@ -206,12 +206,12 @@ public class phantom001 extends ThreadedGCTest implements GarbageProducerAware, 
 
         class Referent {
 
-                //We need discard this flag to make second and following checks with type.equals("class") useful
-                public Referent() {
-                                finalized = false;
-                        }
+            //We need discard this flag to make second and following checks with type.equals("class") useful
+            public Referent() {
+                finalized = false;
+            }
 
-                        protected void finalize() {
+            protected void finalize() {
                 finalized = true;
             }
         }
