@@ -250,14 +250,8 @@ abstract class AbstractVectorConversionTest {
             for (VectorShape dstShape : VectorShape.values()) {
                 for (Class<?> dstE : List.of(byte.class, short.class, int.class, long.class, float.class, double.class)) {
                     VectorSpecies<?> dst = VectorSpecies.of(dstE, dstShape);
-                    if (legal) {
-                        if (dst.length() == src.length()) {
-                            args.add(new Object[]{src, dst});
-                        }
-                    } else {
-                        if (dst.length() != src.length()) {
-                            args.add(new Object[]{src, dst});
-                        }
+                    if (legal == (dst.length() == src.length())) {
+                        args.add(new Object[]{src, dst});
                     }
                 }
             }
@@ -521,13 +515,11 @@ abstract class AbstractVectorConversionTest {
     }
 
     static <E,F> void illegal_mask_cast_kernel(VectorSpecies<E> src, VectorSpecies<F> dst) {
-        for(int i = 0; i < INVOC_COUNT; i++) {
-            VectorMask<E> mask = VectorMask.fromLong(src, i);
-            try {
-                mask.cast(dst);
-                Assert.fail();
-            } catch (IllegalArgumentException e) {
-            }
+        VectorMask<E> mask = VectorMask.fromLong(src, -1);
+        try {
+            mask.cast(dst);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
         }
     }
 
@@ -544,17 +536,15 @@ abstract class AbstractVectorConversionTest {
     }
 
     static <E,F> void illegal_shuffle_cast_kernel(VectorSpecies<E> src, VectorSpecies<F> dst) {
-        int [] arr = new int[src.length()*INVOC_COUNT];
+        int [] arr = new int[src.length()];
         for(int i = 0; i < arr.length; i++) {
             arr[i] = i;
         }
-        for(int i = 0; i < INVOC_COUNT; i++) {
-            VectorShuffle<E> shuffle = VectorShuffle.fromArray(src, arr, i);
-            try {
-                shuffle.cast(dst);
-                Assert.fail();
-            } catch (IllegalArgumentException e) {
-            }
+        VectorShuffle<E> shuffle = VectorShuffle.fromArray(src, arr, 0);
+        try {
+            shuffle.cast(dst);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
         }
     }
 }
