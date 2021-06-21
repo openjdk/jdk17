@@ -47,8 +47,8 @@ import static java.io.ObjectInputFilter.Status.REJECTED;
 import static java.io.ObjectInputFilter.Status.UNDECIDED;
 
 /* @test
- * @run testng/othervm -Djdk.serialFilterTrace=true SerialFactoryExample
- * @run testng/othervm -Djdk.serialFilterFactory=SerialFactoryExample$FilterInThread -Djdk.serialFilterTrace=true SerialFactoryExample
+ * @run testng/othervm SerialFactoryExample
+ * @run testng/othervm -Djdk.serialFilterFactory=SerialFactoryExample$FilterInThread SerialFactoryExample
  * @summary Test SerialFactoryExample
  */
 

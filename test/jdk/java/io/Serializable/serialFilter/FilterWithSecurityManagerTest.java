@@ -67,7 +67,7 @@ public class FilterWithSecurityManagerTest {
      */
     @Test
     @SuppressWarnings("removal")
-    public void testGlobalFilter() throws Exception {
+    public void testGlobalFilter() {
         ObjectInputFilter global = ObjectInputFilter.Config.getSerialFilter();
 
         try  {

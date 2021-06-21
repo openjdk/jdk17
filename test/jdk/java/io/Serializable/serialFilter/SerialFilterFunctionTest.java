@@ -36,7 +36,7 @@ import static java.io.ObjectInputFilter.Status.REJECTED;
 import static java.io.ObjectInputFilter.Status.UNDECIDED;
 
 /* @test
- * @run testng/othervm -Djdk.serialFilterTrace=true SerialFilterFunctionTest
+ * @run testng/othervm SerialFilterFunctionTest
  * @summary ObjectInputFilter.Config Function Tests
  */
 @Test
