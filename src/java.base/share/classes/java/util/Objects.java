@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2009, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -489,7 +489,7 @@ public final class Objects {
 
     /**
      * {@return a new instance of an unspecified class}
-     * The object has a unique identity&mdash; no other references to it exist.
+     * The object has a unique identity; no other references to it exist.
      * It can be used for synchronization, or where a placeholder Object is needed.
      * Use this method to avoid relying on the {@linkplain Object#Object() Object constructor}.
      *
