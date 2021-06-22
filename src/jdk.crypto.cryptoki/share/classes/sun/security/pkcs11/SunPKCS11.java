@@ -908,7 +908,7 @@ public final class SunPKCS11 extends AuthProvider {
     // background thread that periodically checks for token insertion
     // if no token is present. We need to do that in a separate thread because
     // the insertion check may block for quite a long time on some tokens.
-    private static class TokenPoller extends Thread {
+    private static class TokenPoller implements Runnable {
         private final SunPKCS11 provider;
         private volatile boolean enabled;
 
