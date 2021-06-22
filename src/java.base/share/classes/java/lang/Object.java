@@ -25,6 +25,8 @@
 
 package java.lang;
 
+import java.util.Objects;
+
 import jdk.internal.vm.annotation.IntrinsicCandidate;
 
 /**
@@ -39,6 +41,7 @@ public class Object {
 
     /**
      * Constructs a new object.
+     * @see Objects#newIdentity()
      */
     @IntrinsicCandidate
     public Object() {}
