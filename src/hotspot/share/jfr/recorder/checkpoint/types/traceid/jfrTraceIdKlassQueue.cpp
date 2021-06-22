@@ -67,7 +67,7 @@ static const size_t ELEMENT_SIZE = sizeof(JfrEpochQueueKlassElement);
 static const size_t NARROW_ELEMENT_SIZE = sizeof(JfrEpochQueueNarrowKlassElement);
 static const size_t THRESHOLD_SHIFT = 30;
 
-// If the upshifted traceid value is less than this threshold (1 073 741 824),
+// If the traceid value is less than this threshold (1 073 741 824),
 // compress the element for more effective queue storage.
 static const traceid uncompressed_threshold = ((traceid)1) << THRESHOLD_SHIFT;
 
@@ -122,7 +122,11 @@ static traceid read_element(const u1* pos, const Klass** klass, bool compressed)
 }
 
 static void store_compressed_element(traceid id, const Klass* klass, u1* pos) {
+  assert(can_compress_element(id), "invariant");
   JfrEpochQueueNarrowKlassElement* const element = new (pos) JfrEpochQueueNarrowKlassElement();
+#ifdef VM_LITTLE_ENDIAN
+  id <<= METADATA_SHIFT;
+#endif
   element->id = id;
   element->compressed_klass = encode(klass);
 }
@@ -136,15 +140,12 @@ static void store_uncompressed_element(traceid id, const Klass* klass, u1* pos) 
 static void store_element(const Klass* klass, u1* pos) {
   assert(pos != NULL, "invariant");
   assert(klass != NULL, "invariant");
-  traceid id = JfrTraceId::load_raw(klass);
-#ifdef VM_LITTLE_ENDIAN
-  id <<= METADATA_SHIFT;
-#endif
+  const traceid id = JfrTraceId::load_raw(klass);
   if (can_compress_element(id)) {
     store_compressed_element(id, klass, pos);
-  } else {
-    store_uncompressed_element(id, klass, pos);
+    return;
   }
+  store_uncompressed_element(id, klass, pos);
 }
 
 static void set_unloaded(const u1* pos) {
