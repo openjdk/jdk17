@@ -652,27 +652,20 @@ public interface ObjectInputFilter {
             } else {
                 try {
                     // Load using the system class loader, the named class may be an application class.
-                    // The static initialization of the class or constructor may create a race
-                    // if either calls Config.setSerialFilterFactory; the command line configured
-                    // Class should not be overridden.
+                    // Cause Config.setSerialFilterFactory to throw {@link IllegalStateException}
+                    // if Config.setSerialFilterFactory is called as a side effect of the
+                    // static initialization of the class or constructor.
+                    filterFactoryNoReplace.set(true);
+
                     Class<?> factoryClass = Class.forName(factoryClassName, true,
                             ClassLoader.getSystemClassLoader());
                     @SuppressWarnings("unchecked")
-                    BinaryOperator<ObjectInputFilter> f =
+                    BinaryOperator<ObjectInputFilter> factory =
                             (BinaryOperator<ObjectInputFilter>)
                             factoryClass.getConstructor().newInstance(new Object[0]);
-                    if (serialFilterFactory != null) {
-                        // Init cycle if Config.setSerialFilterFactory called from class initialization
-                        configLog.log(ERROR,
-                                "FilterFactory provided on the command line can not be overridden");
-                        // Do not continue if configuration not initialized
-                        throw new ExceptionInInitializerError(
-                                "FilterFactory provided on the command line can not be overridden");
-                    }
                     configLog.log(DEBUG,
                             "Creating deserialization filter factory for {0}", factoryClassName);
-                    serialFilterFactory = f;
-                    filterFactoryNoReplace.set(true);
+                    serialFilterFactory = factory;
                 } catch (RuntimeException | ClassNotFoundException | NoSuchMethodException |
                         IllegalAccessException | InstantiationException | InvocationTargetException ex) {
                     configLog.log(ERROR,
