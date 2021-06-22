@@ -121,19 +121,24 @@ static traceid read_element(const u1* pos, const Klass** klass, bool compressed)
   return compressed ? read_compressed_element(pos, klass) : read_uncompressed_element(pos, klass);
 }
 
-static void store_compressed_element(traceid id, const Klass* klass, u1* pos) {
-  assert(can_compress_element(id), "invariant");
-  JfrEpochQueueNarrowKlassElement* const element = new (pos) JfrEpochQueueNarrowKlassElement();
+template <typename T>
+static inline void store_traceid(T* element, traceid id, bool uncompressed) {
 #ifdef VM_LITTLE_ENDIAN
   id <<= METADATA_SHIFT;
 #endif
-  element->id = id;
+  element->id = uncompressed ? id | UNCOMPRESSED : id;
+}
+
+static void store_compressed_element(traceid id, const Klass* klass, u1* pos) {
+  assert(can_compress_element(id), "invariant");
+  JfrEpochQueueNarrowKlassElement* const element = new (pos) JfrEpochQueueNarrowKlassElement();
+  store_traceid(element, id, false);
   element->compressed_klass = encode(klass);
 }
 
 static void store_uncompressed_element(traceid id, const Klass* klass, u1* pos) {
   JfrEpochQueueKlassElement* const element = new (pos) JfrEpochQueueKlassElement();
-  element->id = id | UNCOMPRESSED;
+  store_traceid(element, id, true);
   element->klass = klass;
 }
 
