@@ -113,6 +113,18 @@ public class SwitchBootstrapsTest {
         testEnum(E1.A, 0, 2, "B", "C", "A", E1.class);
         testEnum(E1.B, 0, 0, "B", "C", "A", E1.class);
         testEnum(E1.B, 1, 3, "B", "C", "A", E1.class);
+        try {
+            testEnum(E1.B, 1, 3, "B", "C", "A", E2.class);
+            fail("Didn't get the expected exception.");
+        } catch (IllegalArgumentException ex) {
+            //OK
+        }
+        try {
+            testEnum(E1.B, 1, 3, "B", "C", "A", String.class);
+            fail("Didn't get the expected exception.");
+        } catch (IllegalArgumentException ex) {
+            //OK
+        }
     }
 
     public void testWrongSwitchTypes() throws Throwable {

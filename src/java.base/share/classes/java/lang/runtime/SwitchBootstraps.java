@@ -171,9 +171,11 @@ public class SwitchBootstraps {
 
     /**
      * Bootstrap method for linking an {@code invokedynamic} call site that
-     * implements a {@code switch} on a target of an enum type.  The static
-     * arguments are an array of case labels which must be non-null and of type
-     * {@code String} (representing enum constants) or {@code Class}.
+     * implements a {@code switch} on a target of an enum type. The static
+     * arguments are used to encode the case labels associated to the switch
+     * construct, where each label can be encoded as a String (to represent
+     * an enum constant), or, alternatively, as a Class of the target enum type
+     * (to represent a type test pattern whose type is the enum type).
      * <p>
      * The returned {@code CallSite}'s method handle will have
      * a return type of {@code int} and accepts two parameters: the first argument
@@ -211,7 +213,7 @@ public class SwitchBootstraps {
      * invocation type is not a method type of first parameter of an enum type,
      * second parameter of type {@code int} and with {@code int} as its return type,
      * or if {@code labels} contains an element that is not of type {@code String} or
-     * {@code Class}.
+     * {@code Class} of the target enum type.
      * @throws Throwable if there is any error linking the call site
      * @jvms 4.4.6 The CONSTANT_NameAndType_info Structure
      * @jvms 4.4.10 The CONSTANT_Dynamic_info and CONSTANT_InvokeDynamic_info Structures
@@ -246,6 +248,9 @@ public class SwitchBootstraps {
         }
         Class<?> labelClass = label.getClass();
         if (labelClass == Class.class) {
+            if (label != enumClassTemplate) {
+                throw new IllegalArgumentException("illegal Class label: " + label);
+            }
             return label;
         } else if (labelClass == String.class) {
             @SuppressWarnings("unchecked")
