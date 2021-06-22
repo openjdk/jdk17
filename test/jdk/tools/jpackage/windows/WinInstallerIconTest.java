@@ -69,10 +69,10 @@ public class WinInstallerIconTest {
         long size1 = createInstaller(null, "WithDefaultIcon");
 
         // Create installer with custom icon.
-        long size2 = createInstaller(customIcon, "WithCustom2Icon");
+        long size2 = createInstaller(customIcon, "WithCustomIcon");
 
         // Create another installer with custom icon.
-        long size3 = createInstaller(customIcon, "WithCustom3Icon");
+        long size3 = createInstaller(customIcon, null);
 
         TKit.assertTrue(size2 < size1, "Installer 2 built with custom icon " +
                 "should  be smaller than Installer 1 built with default icon");
@@ -111,7 +111,7 @@ public class WinInstallerIconTest {
         if (installerExePath[0] != null) {
             size = installerExePath[0].toFile().length();
             TKit.trace(" installer: " + installerExePath[0] + " - size: " + size);
-            if (nameSuffix != "3") {
+            if (nameSuffix != null) {
                 TKit.deleteIfExists(installerExePath[0]);
             }
         }
