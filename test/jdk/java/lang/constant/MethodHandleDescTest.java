@@ -373,9 +373,16 @@ public class MethodHandleDescTest extends SymbolicDescTest {
                 REF_newInvokeSpecial,
                 REF_invokeInterface
         };
-
         for (int refKind : isInterfaceIgnored) {
             assertEquals(Kind.valueOf(refKind, false), Kind.valueOf(refKind, true));
         }
+
+        // some explicit tests for REF_invokeStatic and REF_invokeSpecial
+        assertNotEquals(Kind.valueOf(REF_invokeStatic, false), Kind.valueOf(REF_invokeStatic, true));
+        assertNotEquals(Kind.valueOf(REF_invokeSpecial, false), Kind.valueOf(REF_invokeSpecial, true));
+        assertEquals(Kind.valueOf(REF_invokeStatic, false), Kind.STATIC);
+        assertEquals(Kind.valueOf(REF_invokeStatic, true), Kind.INTERFACE_STATIC);
+        assertEquals(Kind.valueOf(REF_invokeSpecial, false), Kind.SPECIAL);
+        assertEquals(Kind.valueOf(REF_invokeSpecial, true), Kind.INTERFACE_SPECIAL);
     }
 }
