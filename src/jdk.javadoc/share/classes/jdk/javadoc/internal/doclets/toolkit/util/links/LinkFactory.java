@@ -166,6 +166,15 @@ public abstract class LinkFactory {
 
                 @Override
                 public Content visitDeclared(DeclaredType type, LinkInfo linkInfo) {
+                    if (linkInfo.linkEnclosingTypes(type)) {
+                        TypeMirror enc = type.getEnclosingType();
+                        if (enc instanceof DeclaredType dt) {
+                            setEnclosingTypeLinkInfo(linkInfo, dt);
+                            visitDeclared(dt, linkInfo);
+                            link.add(".");
+                            setEnclosingTypeLinkInfo(linkInfo, type);
+                        }
+                    }
                     link.add(getTypeAnnotationLinks(linkInfo));
                     linkInfo.typeElement = utils.asTypeElement(type);
                     link.add(getClassLink(linkInfo));
@@ -193,6 +202,12 @@ public abstract class LinkFactory {
         linkInfo.label = null;
         linkInfo.type = bound;
         linkInfo.skipPreview = false;
+    }
+
+    private void setEnclosingTypeLinkInfo(LinkInfo linkinfo, DeclaredType enclosing) {
+        linkinfo.typeElement = null;
+        linkinfo.label = null;
+        linkinfo.type = enclosing;
     }
 
     /**

@@ -1079,7 +1079,7 @@ public class HtmlDocletWriter {
         } else if (refMemName == null) {
             // Must be a class reference since refClass is not null and refMemName is null.
             if (labelContent.isEmpty()) {
-                if (!refClass.getTypeParameters().isEmpty() && seeText.contains("<")) {
+                if (seeText.contains("<")) {
                     // If this is a generic type link try to use the TypeMirror representation.
                     TypeMirror refType = ch.getReferencedType(see);
                     if (refType != null) {
