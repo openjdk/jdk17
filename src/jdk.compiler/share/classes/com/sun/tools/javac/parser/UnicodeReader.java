@@ -169,7 +169,7 @@ public class UnicodeReader {
             // May be an unicode escape.
             switch (unicodeEscape()) {
                 case BACKSLASH -> wasBackslash = true;
-                case VALID_ESCAPE -> wasBackslash = false;
+                case VALID_ESCAPE -> wasBackslash = character == '\\';
                 case BROKEN_ESCAPE -> nextUnicodeInputCharacter(); //skip broken unicode escapes
             }
         }
