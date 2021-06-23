@@ -32,6 +32,7 @@ class ConsiderExceptionTVarsInStuckExprs {
 
     public static void test() {
         outer(nested(x -> mightThrow()));
+        outer(nested(ConsiderExceptionTVarsInStuckExprs::mightThrow2));
     }
 
     static <A> void outer(Object o) {}
@@ -45,4 +46,5 @@ class ConsiderExceptionTVarsInStuckExprs {
     }
 
     static void mightThrow() throws Exception {}
+    static <C> void mightThrow2(C c) throws Exception {}
 }
