@@ -668,11 +668,11 @@ public interface ObjectInputFilter {
                     serialFilterFactory = factory;
                 } catch (RuntimeException | ClassNotFoundException | NoSuchMethodException |
                         IllegalAccessException | InstantiationException | InvocationTargetException ex) {
+                    Throwable th = (ex instanceof InvocationTargetException ite) ? ite.getCause() : ex;
                     configLog.log(ERROR,
-                            "Error configuring filter factory", ex);
+                            "Error configuring filter factory", th);
                     // Do not continue if configuration not initialized
-                    throw new ExceptionInInitializerError(
-                            "FilterFactory configuration: jdk.serialFilterFactory: " + ex.getMessage());
+                    throw new ExceptionInInitializerError(th);
                 }
             }
             // Setup shared secrets for RegistryImpl to use.
@@ -808,11 +808,11 @@ public interface ObjectInputFilter {
             if (sm != null) {
                 sm.checkPermission(ObjectStreamConstants.SERIAL_FILTER_PERMISSION);
             }
-            if (serialFilterFactory == null)
-                throw new IllegalStateException("Serial filter factory initialization incomplete");
             if (filterFactoryNoReplace.getAndSet(true)) {
-                throw new IllegalStateException("Cannot replace filter factory: " +
-                        serialFilterFactory.getClass().getName());
+                final String msg = serialFilterFactory != null
+                        ? serialFilterFactory.getClass().getName()
+                        : "initialization incomplete";
+                throw new IllegalStateException("Cannot replace filter factory: " + msg);
             }
             configLog.log(DEBUG,
                     "Setting deserialization filter factory to {0}", filterFactory.getClass().getName());

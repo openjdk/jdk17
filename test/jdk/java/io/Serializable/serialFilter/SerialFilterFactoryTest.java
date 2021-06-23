@@ -49,7 +49,6 @@ import java.util.function.BinaryOperator;
  * @run testng/othervm/policy=security.policy
  *        -Djava.security.properties=${test.src}/java.security-extra-factory
  *        -Djava.security.debug=properties SerialFilterFactoryTest
- * @run testng/othervm/fail  -Djdk.serialFilterFactory=ForcedError_NoSuchClass SerialFilterFactoryTest
  * @run testng/othervm/policy=security.policy SerialFilterFactoryTest
  * @run testng/othervm/policy=security.policy.without.globalFilter SerialFilterFactoryTest
 
