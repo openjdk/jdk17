@@ -110,14 +110,14 @@ public class SwitchBootstraps {
      * second parameter of type {@code int} and with {@code int} as its return type,
      * or if {@code labels} contains an element that is not of type {@code String},
      * {@code Integer} or {@code Class}.
-     * @throws Throwable if there is any error linking the call site
      * @jvms 4.4.6 The CONSTANT_NameAndType_info Structure
      * @jvms 4.4.10 The CONSTANT_Dynamic_info and CONSTANT_InvokeDynamic_info Structures
      */
     public static CallSite typeSwitch(MethodHandles.Lookup lookup,
                                       String invocationName,
                                       MethodType invocationType,
-                                      Object... labels) throws Throwable {
+                                      Object... labels) throws NullPointerException,
+                                                               IllegalArgumentException {
         if (invocationType.parameterCount() != 2
             || (!invocationType.returnType().equals(int.class))
             || invocationType.parameterType(0).isPrimitive()
@@ -173,9 +173,13 @@ public class SwitchBootstraps {
      * Bootstrap method for linking an {@code invokedynamic} call site that
      * implements a {@code switch} on a target of an enum type. The static
      * arguments are used to encode the case labels associated to the switch
-     * construct, where each label can be encoded as a String (to represent
-     * an enum constant), or, alternatively, as a Class of the target enum type
-     * (to represent a type test pattern whose type is the enum type).
+     * construct, where each label can be encoded in two ways:
+     * <ul>
+     *   <li>as a {@code String} value, which represents the name of
+     *       the enum constant associated with the label</li>
+     *   <li>as a {@code Class} value, which represents the enum type
+     *       associated with a type test pattern</li>
+     * </ul>
      * <p>
      * The returned {@code CallSite}'s method handle will have
      * a return type of {@code int} and accepts two parameters: the first argument
@@ -214,14 +218,14 @@ public class SwitchBootstraps {
      * second parameter of type {@code int} and with {@code int} as its return type,
      * or if {@code labels} contains an element that is not of type {@code String} or
      * {@code Class} of the target enum type.
-     * @throws Throwable if there is any error linking the call site
      * @jvms 4.4.6 The CONSTANT_NameAndType_info Structure
      * @jvms 4.4.10 The CONSTANT_Dynamic_info and CONSTANT_InvokeDynamic_info Structures
      */
     public static CallSite enumSwitch(MethodHandles.Lookup lookup,
                                       String invocationName,
                                       MethodType invocationType,
-                                      Object... labels) throws Throwable {
+                                      Object... labels) throws NullPointerException,
+                                                               IllegalArgumentException {
         if (invocationType.parameterCount() != 2
             || (!invocationType.returnType().equals(int.class))
             || invocationType.parameterType(0).isPrimitive()
