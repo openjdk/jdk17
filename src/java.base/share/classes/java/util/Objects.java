@@ -491,6 +491,7 @@ public final class Objects {
      * {@return a new instance of an unspecified class}
      * The object has a unique identity; no other references to it exist.
      * It can be used for synchronization, or where a placeholder Object is needed.
+     * The class does not override any of the methods of {@code java.lang.Object}.
      * Use this method to avoid relying on the {@linkplain Object#Object() Object constructor}.
      *
      * @since 17
