@@ -25,9 +25,17 @@
 
 package jdk.internal.vm.vector;
 
+import jdk.internal.access.JavaNioAccess;
+import jdk.internal.access.SharedSecrets;
+import jdk.internal.access.foreign.MemorySegmentProxy;
+import jdk.internal.misc.ScopedMemoryAccess;
+import jdk.internal.vm.annotation.ForceInline;
 import jdk.internal.vm.annotation.IntrinsicCandidate;
 import jdk.internal.misc.Unsafe;
 
+import java.lang.ref.Reference;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.util.function.*;
 
 public class VectorSupport {
@@ -36,6 +44,34 @@ public class VectorSupport {
     }
 
     private static final Unsafe U = Unsafe.getUnsafe();
+
+    // Buffer.address
+    static final long BUFFER_ADDRESS
+            = U.objectFieldOffset(Buffer.class, "address");
+
+    // ByteBuffer.hb
+    static final long BYTE_BUFFER_HB
+            = U.objectFieldOffset(ByteBuffer.class, "hb");
+
+    @ForceInline
+    static Object bufferBase(ByteBuffer bb) {
+        return U.getReference(bb, BYTE_BUFFER_HB);
+    }
+
+    @ForceInline
+    static long bufferAddress(ByteBuffer bb, long offset) {
+        return U.getLong(bb, BUFFER_ADDRESS) + offset;
+    }
+
+    static final JavaNioAccess NIO_ACCESS = SharedSecrets.getJavaNioAccess();
+
+    @ForceInline
+    static ScopedMemoryAccess.Scope scope(ByteBuffer bb) {
+        MemorySegmentProxy segmentProxy = NIO_ACCESS.bufferSegment(bb);
+        return segmentProxy != null ?
+                segmentProxy.scope() : null;
+    }
+
 
     // Unary
     public static final int VECTOR_OP_ABS  = 0;
@@ -311,6 +347,48 @@ public class VectorSupport {
         return defaultImpl.load(container, index, s);
     }
 
+    @ForceInline
+    public static
+    <VM, E, S extends VectorSpecies<E>>
+    VM loadFromByteBuffer(Class<? extends VM> vmClass, Class<E> e, int length,
+                          ByteBuffer bb, int offset,
+                          S s,
+                          LoadOperation<ByteBuffer, VM, E, S> defaultImpl) {
+        try {
+            return loadFromByteBufferScoped(
+                    scope(bb),
+                    vmClass, e, length,
+                    bb, offset,
+                    s,
+                    defaultImpl);
+        } catch (ScopedMemoryAccess.Scope.ScopedAccessError ex) {
+            throw new IllegalStateException("This segment is already closed");
+        }
+    }
+
+    @ScopedMemoryAccess.Scoped
+    @ForceInline
+    private static
+    <VM, E, S extends VectorSpecies<E>>
+    VM loadFromByteBufferScoped(ScopedMemoryAccess.Scope scope,
+                          Class<? extends VM> vmClass, Class<E> e, int length,
+                          ByteBuffer bb, int offset,    // Unsafe addressing
+                          S s,     // Arguments for default implementation
+                          LoadOperation<ByteBuffer, VM, E, S> defaultImpl) {
+        try {
+            if (scope != null) {
+                scope.checkValidState();
+            }
+
+            return load(vmClass, e, length,
+                    bufferBase(bb), bufferAddress(bb, offset),
+                    bb, offset, s,
+                    defaultImpl);
+        } finally {
+            Reference.reachabilityFence(scope);
+        }
+    }
+
     /* ============================================================================ */
 
     public interface LoadVectorOperationWithMap<C, V extends Vector<?>, E, S extends VectorSpecies<E>> {
@@ -345,6 +423,49 @@ public class VectorSupport {
                StoreVectorOperation<C, V> defaultImpl) {
         assert isNonCapturingLambda(defaultImpl) : defaultImpl;
         defaultImpl.store(container, index, v);
+    }
+
+    @ForceInline
+    public static
+    <V extends Vector<?>>
+    void storeIntoByteBuffer(Class<?> vmClass, Class<?> e, int length,
+                             V v,
+                             ByteBuffer bb, int offset,
+                             StoreVectorOperation<ByteBuffer, V> defaultImpl) {
+        try {
+            storeIntoByteBufferScoped(
+                    scope(bb),
+                    vmClass, e, length,
+                    v,
+                    bb, offset,
+                    defaultImpl);
+        } catch (ScopedMemoryAccess.Scope.ScopedAccessError ex) {
+            throw new IllegalStateException("This segment is already closed");
+        }
+    }
+
+    @ScopedMemoryAccess.Scoped
+    @ForceInline
+    private static
+    <V extends Vector<?>>
+    void storeIntoByteBufferScoped(ScopedMemoryAccess.Scope scope,
+                                   Class<?> vmClass, Class<?> e, int length,
+                                   V v,
+                                   ByteBuffer bb, int offset,
+                                   StoreVectorOperation<ByteBuffer, V> defaultImpl) {
+        try {
+            if (scope != null) {
+                scope.checkValidState();
+            }
+
+            store(vmClass, e, length,
+                    bufferBase(bb), bufferAddress(bb, offset),
+                    v,
+                    bb, offset,
+                    defaultImpl);
+        } finally {
+            Reference.reachabilityFence(scope);
+        }
     }
 
     /* ============================================================================ */

@@ -35,6 +35,8 @@ import java.util.function.IntUnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
+import jdk.incubator.foreign.MemorySegment;
+import jdk.incubator.foreign.ResourceScope;
 import org.testng.Assert;
 
 public class AbstractVectorTest {
@@ -94,6 +96,11 @@ public class AbstractVectorTest {
             }),
             withToString("DB:RW:NE", (int s) -> {
                 return ByteBuffer.allocateDirect(s)
+                        .order(ByteOrder.nativeOrder());
+            }),
+            withToString("MS:RW:NE", (int s) -> {
+                return MemorySegment.allocateNative(s, ResourceScope.newImplicitScope())
+                        .asByteBuffer()
                         .order(ByteOrder.nativeOrder());
             })
     );

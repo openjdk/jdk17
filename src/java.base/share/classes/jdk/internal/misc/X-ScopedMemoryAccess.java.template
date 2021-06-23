@@ -131,7 +131,7 @@ public class ScopedMemoryAccess {
 
     @Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface Scoped { }
+    public @interface Scoped { }
 
     // bulk ops
 

@@ -23,7 +23,7 @@
 
 /*
  * @test
- * @modules jdk.incubator.vector java.base/jdk.internal.vm.annotation
+ * @modules jdk.incubator.foreign jdk.incubator.vector java.base/jdk.internal.vm.annotation
  * @run testng/othervm -XX:-TieredCompilation Int256VectorLoadStoreTests
  *
  */
@@ -43,7 +43,6 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ByteOrder;
 import java.nio.ReadOnlyBufferException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.*;
 
