@@ -33,6 +33,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import jdk.internal.misc.ScopedMemoryAccess;
 import jdk.internal.misc.Unsafe;
 import jdk.internal.vm.annotation.ForceInline;
 import jdk.internal.vm.vector.VectorSupport;
@@ -3549,7 +3550,7 @@ public abstract class ShortVector extends AbstractVector<Short> {
     final
     ShortVector fromByteBuffer0Template(ByteBuffer bb, int offset) {
         ShortSpecies vsp = vspecies();
-        return VectorSupport.loadFromByteBuffer(
+        return ScopedMemoryAccess.loadFromByteBuffer(
                 vsp.vectorType(), vsp.elementType(), vsp.laneCount(),
                 bb, offset, vsp,
                 (buf, off, s) -> {
@@ -3599,7 +3600,7 @@ public abstract class ShortVector extends AbstractVector<Short> {
     final
     void intoByteBuffer0(ByteBuffer bb, int offset) {
         ShortSpecies vsp = vspecies();
-        VectorSupport.storeIntoByteBuffer(
+        ScopedMemoryAccess.storeIntoByteBuffer(
                 vsp.vectorType(), vsp.elementType(), vsp.laneCount(),
                 this, bb, offset,
                 (buf, off, v) -> {
