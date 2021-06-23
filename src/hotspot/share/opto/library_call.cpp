@@ -1033,6 +1033,7 @@ bool LibraryCallKit::inline_preconditions_checkIndex(BasicType bt) {
   }
 
   if (stopped()) {
+    // Length is known to be always negative during compilation and the IR graph so far constructed is good so return success
     return true;
   }
 
@@ -1061,6 +1062,7 @@ bool LibraryCallKit::inline_preconditions_checkIndex(BasicType bt) {
   }
 
   if (stopped()) {
+    // Range check is known to always fail during compilation and the IR graph so far constructed is good so return success
     return true;
   }
 
