@@ -517,8 +517,8 @@ public interface RandomGenerator {
      *         both positive and finite
      *
      * @implSpec The default implementation checks that {@code bound} is a
-     * positive non-infinite float. Then calls (@code nextFloat()}, scaling
-     * the result so that the final result lies between 0.0f (inclusive)
+     * positive non-infinite float. Then invokes {@code nextFloat()}, scaling
+     * the result so that the final result lies between {@code 0.0f} (inclusive)
      * and {@code bound} (exclusive).
      */
     default float nextFloat(float bound) {
@@ -542,8 +542,8 @@ public interface RandomGenerator {
      *         is greater than or equal to {@code bound}
      *
      * @implSpec The default implementation checks that {@code origin} and
-     * {@code bound} are positive non-infinite floats. Then calls
-     * (@code nextFloat()}, scaling and translating the result so that the final
+     * {@code bound} are positive non-infinite floats. Then invokes
+     * {@code nextFloat()}, scaling and translating the result so that the final
      * result lies between {@code origin} (inclusive) and {@code bound}
      * (exclusive).
      */
@@ -581,8 +581,8 @@ public interface RandomGenerator {
      *         both positive and finite
      *
      * @implSpec The default implementation checks that {@code bound} is a
-     * positive non-infinite float. Then calls (@code nextDouble()}, scaling
-     * the result so that the final result lies between 0.0 (inclusive)
+     * positive non-infinite double. Then invokes {@code nextDouble()}, scaling
+     * the result so that the final result lies between {@code 0.0} (inclusive)
      * and {@code bound} (exclusive).
      */
     default double nextDouble(double bound) {
@@ -606,8 +606,8 @@ public interface RandomGenerator {
      *         is greater than or equal to {@code bound}
      *
      * @implSpec The default implementation checks that {@code origin} and
-     * {@code bound} are positive non-infinite floats. Then calls
-     * (@code nextDouble()}, scaling and translating the result so that the final
+     * {@code bound} are positive non-infinite doubles. Then calls
+     * {@code nextDouble()}, scaling and translating the result so that the final
      * result lies between {@code origin} (inclusive) and {@code bound}
      * (exclusive).
      */
@@ -641,7 +641,7 @@ public interface RandomGenerator {
      * @throws IllegalArgumentException if {@code bound} is not positive
      *
      * @implSpec The default implementation checks that {@code bound} is a
-     * positive int. Then calls {@code nextInt()}, then limits the result to
+     * positive int. Then invokes {@code nextInt()}, then limits the result to
      * be greater equal zero and less than {@code bound}. If {@code bound} is a
      * power of two then limiting is a simple masking operation. Otherwise, a
      * new result is re-calculated by averaging the previous result and
@@ -668,7 +668,7 @@ public interface RandomGenerator {
      *         or equal to {@code bound}
      *
      * @implSpec The default implementation checks that {@code origin} and
-     * {@code bound} are positive ints. Then calls {@code nextInt()}, then limits
+     * {@code bound} are positive ints. Then invokes {@code nextInt()}, then limits
      * the result to be greater equal {@code origin} and less than {@code bound}.
      * If {@code bound} is a power of two then limiting is a simple masking
      * operation. Otherwise, a new result is re-calculated by averaging the
@@ -700,7 +700,7 @@ public interface RandomGenerator {
      * @throws IllegalArgumentException if {@code bound} is not positive
      *
      * @implSpec The default implementation checks that {@code bound} is a
-     * positive int. Then calls {@code nextLong()}, then limits the result to
+     * positive long. Then invokes {@code nextLong()}, then limits the result to
      * be greater equal zero and less than {@code bound}. If {@code bound} is a
      * power of two then limiting is a simple masking operation. Otherwise, a
      * new result is re-calculated by averaging the previous result and
@@ -726,13 +726,13 @@ public interface RandomGenerator {
      * @throws IllegalArgumentException if {@code origin} is greater than
      *         or equal to {@code bound}
      *
-     * @implSpec The default implementation checks that {@code bound} is a
-     * positive int. Then calls {@code nextLong()}, then limits the result to
-     * be greater equal zero and less than {@code bound}. If {@code bound} is a
-     * power of two then limiting is a simple masking operation. Otherwise, a
-     * new result is re-calculated by averaging the previous result and
-     * {@code nextLong()} until the final result is greater equal zero and less
-     * than {@code bound}.
+     * @implSpec The default implementation checks that {@code origin} and
+     * {@code bound} are positive longs. Then invokes {@code nextLong()}, then
+     * limits the result to be greater equal {@code origin} and less than
+     * {@code bound}. If {@code bound} is a power of two then limiting is a
+     * simple masking operation. Otherwise, a new result is re-calculated by
+     * averaging the previous result and {@code nextLong()} until the final
+     * result is greater equal {@code origin} and less than {@code bound}.
      */
     default long nextLong(long origin, long bound) {
         RandomSupport.checkRange(origin, bound);
