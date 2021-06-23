@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.function.*;
 
 @Test
-public class Short128VectorLoadStoreTests extends AbstractVectorTest {
+public class Short128VectorLoadStoreTests extends AbstractVectorLoadStoreTest {
     static final VectorSpecies<Short> SPECIES =
                 ShortVector.SPECIES_128;
 

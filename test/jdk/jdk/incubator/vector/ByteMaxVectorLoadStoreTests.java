@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.function.*;
 
 @Test
-public class ByteMaxVectorLoadStoreTests extends AbstractVectorTest {
+public class ByteMaxVectorLoadStoreTests extends AbstractVectorLoadStoreTest {
     static final VectorSpecies<Byte> SPECIES =
                 ByteVector.SPECIES_MAX;
 

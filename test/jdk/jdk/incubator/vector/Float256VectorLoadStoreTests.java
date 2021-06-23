@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.function.*;
 
 @Test
-public class Float256VectorLoadStoreTests extends AbstractVectorTest {
+public class Float256VectorLoadStoreTests extends AbstractVectorLoadStoreTest {
     static final VectorSpecies<Float> SPECIES =
                 FloatVector.SPECIES_256;
 

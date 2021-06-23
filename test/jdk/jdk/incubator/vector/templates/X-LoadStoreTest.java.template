@@ -61,7 +61,7 @@ import java.util.List;
 import java.util.function.*;
 
 @Test
-public class $vectorteststype$ extends AbstractVectorTest {
+public class $vectorteststype$ extends AbstractVectorLoadStoreTest {
 #if[MaxBit]
     static final VectorSpecies<$Wideboxtype$> SPECIES =
                 $Type$Vector.SPECIES_MAX;

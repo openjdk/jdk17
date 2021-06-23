@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.function.*;
 
 @Test
-public class Long64VectorLoadStoreTests extends AbstractVectorTest {
+public class Long64VectorLoadStoreTests extends AbstractVectorLoadStoreTest {
     static final VectorSpecies<Long> SPECIES =
                 LongVector.SPECIES_64;
 

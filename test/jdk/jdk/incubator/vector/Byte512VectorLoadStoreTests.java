@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.function.*;
 
 @Test
-public class Byte512VectorLoadStoreTests extends AbstractVectorTest {
+public class Byte512VectorLoadStoreTests extends AbstractVectorLoadStoreTest {
     static final VectorSpecies<Byte> SPECIES =
                 ByteVector.SPECIES_512;
 

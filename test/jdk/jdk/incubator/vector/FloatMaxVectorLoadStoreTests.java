@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.function.*;
 
 @Test
-public class FloatMaxVectorLoadStoreTests extends AbstractVectorTest {
+public class FloatMaxVectorLoadStoreTests extends AbstractVectorLoadStoreTest {
     static final VectorSpecies<Float> SPECIES =
                 FloatVector.SPECIES_MAX;
 

@@ -35,8 +35,6 @@ import java.util.function.IntUnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
 
-import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.ResourceScope;
 import org.testng.Assert;
 
 public class AbstractVectorTest {
@@ -85,25 +83,6 @@ public class AbstractVectorTest {
             }
         };
     }
-
-    static final Collection<ByteOrder> BYTE_ORDER_VALUES = Set.of(
-            ByteOrder.BIG_ENDIAN, ByteOrder.LITTLE_ENDIAN);
-
-    static final List<IntFunction<ByteBuffer>> BYTE_BUFFER_GENERATORS = List.of(
-            withToString("HB:RW:NE", (int s) -> {
-                return ByteBuffer.allocate(s)
-                        .order(ByteOrder.nativeOrder());
-            }),
-            withToString("DB:RW:NE", (int s) -> {
-                return ByteBuffer.allocateDirect(s)
-                        .order(ByteOrder.nativeOrder());
-            }),
-            withToString("MS:RW:NE", (int s) -> {
-                return MemorySegment.allocateNative(s, ResourceScope.newImplicitScope())
-                        .asByteBuffer()
-                        .order(ByteOrder.nativeOrder());
-            })
-    );
 
     static final List<IntFunction<boolean[]>> BOOL_ARRAY_GENERATORS = List.of(
             withToString("boolean[i % 2]", (int s) -> {

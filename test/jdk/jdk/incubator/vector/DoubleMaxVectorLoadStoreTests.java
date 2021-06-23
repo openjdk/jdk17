@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.function.*;
 
 @Test
-public class DoubleMaxVectorLoadStoreTests extends AbstractVectorTest {
+public class DoubleMaxVectorLoadStoreTests extends AbstractVectorLoadStoreTest {
     static final VectorSpecies<Double> SPECIES =
                 DoubleVector.SPECIES_MAX;
 
