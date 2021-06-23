@@ -641,7 +641,7 @@ public interface RandomGenerator {
      * @throws IllegalArgumentException if {@code bound} is not positive
      *
      * @implSpec The default implementation checks that {@code bound} is a
-     * positive int. Then invokes {@code nextInt()}, then limits the result to
+     * positive int. Then invokes {@code nextInt()}, limiting the result to
      * be greater equal zero and less than {@code bound}. If {@code bound} is a
      * power of two then limiting is a simple masking operation. Otherwise, a
      * new result is re-calculated by averaging the previous result and
@@ -668,7 +668,7 @@ public interface RandomGenerator {
      *         or equal to {@code bound}
      *
      * @implSpec The default implementation checks that {@code origin} and
-     * {@code bound} are positive ints. Then invokes {@code nextInt()}, then limits
+     * {@code bound} are positive ints. Then invokes {@code nextInt()}, limiting
      * the result to be greater equal {@code origin} and less than {@code bound}.
      * If {@code bound} is a power of two then limiting is a simple masking
      * operation. Otherwise, a new result is re-calculated by averaging the
@@ -700,7 +700,7 @@ public interface RandomGenerator {
      * @throws IllegalArgumentException if {@code bound} is not positive
      *
      * @implSpec The default implementation checks that {@code bound} is a
-     * positive long. Then invokes {@code nextLong()}, then limits the result to
+     * positive long. Then invokes {@code nextLong()}, limiting the result to
      * be greater equal zero and less than {@code bound}. If {@code bound} is a
      * power of two then limiting is a simple masking operation. Otherwise, a
      * new result is re-calculated by averaging the previous result and
@@ -727,8 +727,8 @@ public interface RandomGenerator {
      *         or equal to {@code bound}
      *
      * @implSpec The default implementation checks that {@code origin} and
-     * {@code bound} are positive longs. Then invokes {@code nextLong()}, then
-     * limits the result to be greater equal {@code origin} and less than
+     * {@code bound} are positive longs. Then invokes {@code nextLong()},
+     * limiting the result to be greater equal {@code origin} and less than
      * {@code bound}. If {@code bound} is a power of two then limiting is a
      * simple masking operation. Otherwise, a new result is re-calculated by
      * averaging the previous result and {@code nextLong()} until the final
