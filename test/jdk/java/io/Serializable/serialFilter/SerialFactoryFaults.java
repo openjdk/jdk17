@@ -39,6 +39,12 @@ import java.util.function.BinaryOperator;
 @Test
 public class SerialFactoryFaults {
 
+    static {
+        // Enable logging
+        System.setProperty("java.util.logging.config.file",
+                System.getProperty("test.src", ".") + "/logging.properties");
+    }
+
     public void initFaultTest() {
         String factoryName = System.getProperty("jdk.serialFilterFactory");
         ExceptionInInitializerError ex = Assert.expectThrows(ExceptionInInitializerError.class,

@@ -36,11 +36,18 @@ import static java.io.ObjectInputFilter.Status.REJECTED;
 import static java.io.ObjectInputFilter.Status.UNDECIDED;
 
 /* @test
- * @run testng/othervm SerialFilterFunctionTest
+ * @run testng/othervm -Djava.util.logging.config.file=${test.src}/logging.properties
+ *                      SerialFilterFunctionTest
  * @summary ObjectInputFilter.Config Function Tests
  */
 @Test
 public class SerialFilterFunctionTest {
+
+    static {
+        // Enable logging
+        System.setProperty("java.util.logging.config.file",
+                System.getProperty("test.src", ".") + "/logging.properties");
+    }
 
     @Test
     void testMerge() {

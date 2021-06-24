@@ -43,15 +43,16 @@ import java.util.function.BinaryOperator;
 
 /* @test
  * @build SerialFilterFactoryTest
- * @run testng/othervm  SerialFilterFactoryTest
- * @run testng/othervm -Djdk.serialFilterFactory=SerialFilterFactoryTest$PropertyFilterFactory SerialFilterFactoryTest
- * @run testng/othervm -Djdk.serialFilterFactory=SerialFilterFactoryTest$NotMyFilterFactory SerialFilterFactoryTest
+ * @run testng/othervm SerialFilterFactoryTest
+ * @run testng/othervm -Djdk.serialFilterFactory=SerialFilterFactoryTest$PropertyFilterFactory
+ *                     -Djava.util.logging.config.file=${test.src}/logging.properties SerialFilterFactoryTest
+ * @run testng/othervm -Djdk.serialFilterFactory=SerialFilterFactoryTest$NotMyFilterFactory
+ *                     -Djava.util.logging.config.file=${test.src}/logging.properties SerialFilterFactoryTest
  * @run testng/othervm/policy=security.policy
  *        -Djava.security.properties=${test.src}/java.security-extra-factory
  *        -Djava.security.debug=properties SerialFilterFactoryTest
  * @run testng/othervm/policy=security.policy SerialFilterFactoryTest
  * @run testng/othervm/policy=security.policy.without.globalFilter SerialFilterFactoryTest
-
  *
  * @summary Test Context-specific Deserialization Filters
  */
