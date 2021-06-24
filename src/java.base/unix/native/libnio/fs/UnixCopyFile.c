@@ -120,7 +120,7 @@ Java_sun_nio_fs_UnixCopyFile_transfer
     do {
         RESTARTABLE(sendfile64(dst, src, NULL, count), bytes_sent);
         if (bytes_sent == -1) {
-            if (errno == EINVAL) {
+            if (errno == EINVAL || errno == ENOSYS) {
                 // Fall back to copying via user-space buffers
                 transfer(env, dst, src, cancel);
             } else {
