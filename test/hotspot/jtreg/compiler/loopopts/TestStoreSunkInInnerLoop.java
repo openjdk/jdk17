@@ -70,7 +70,7 @@ public class TestStoreSunkInInnerLoop {
             }
         } while (++i13 < 247);
     }
-    
+
     public static void main(String[] strArr) {
         TestStoreSunkInInnerLoop _instance = new TestStoreSunkInInnerLoop();
         for (int i = 0; i < 10; i++ ) {
