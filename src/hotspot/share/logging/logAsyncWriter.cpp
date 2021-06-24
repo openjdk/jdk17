@@ -138,8 +138,8 @@ void AsyncLogWriter::write() {
       e->output()->write_blocking(e->decorations(), msg);
       os::free(msg);
     } else if (e->output() == nullptr) {
-      // encounter a flush token. take a record for the time being
-      // and notify flush() after the loop.
+      // This is a flush token. Record that we found it and then
+      // signal the flushing thread after the loop.
       req++;
     }
   }
@@ -184,7 +184,10 @@ AsyncLogWriter* AsyncLogWriter::instance() {
   return _instance;
 }
 
-// NOT MT-safe! see the comments in the header file.
+// Inserts a flush token into the async output buffer and waits until the AsyncLog thread
+// signals that it has seen it and completed all dequeued message processing.
+// This is method is not MT-safe in itself, but is guarded by another lock in the usual
+// usecase - see the comments in the header file for more details.
 void AsyncLogWriter::flush() {
   if (_instance != nullptr) {
     {
@@ -193,7 +196,7 @@ void AsyncLogWriter::flush() {
       LogDecorations d(LogLevel::Off, none::tagset(), LogDecorators::None);
       AsyncLogMessage token(nullptr, d, nullptr);
 
-      // not disposable
+      // Push directly in-case we are at logical max capacity, as this must not get dropped.
       _instance->_buffer.push_back(token);
       _instance->_sem.signal();
     }

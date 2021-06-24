@@ -213,13 +213,13 @@ void LogConfiguration::delete_output(size_t idx) {
 
 // MT-SAFETY
 //
-// ConfigurationLock can guarantee that only one thread is performing reconfiguration. This function still needs
+// The ConfigurationLock guarantees that only one thread is performing reconfiguration. This function still needs
 // to be MT-safe because logsites in other threads may be executing in parallel. Reconfiguration means unified
 // logging allows users to dynamically change tags and decorators of a log output via DCMD(logDiagnosticCommand.hpp).
 //
-// A RCU-style synchronization 'wait_until_no_readers()' is imposed inside of 'ts->set_output_level(output, level)'
-// if setting has changed. It guarantees that all logs either synchronous writing or enqueuing to the async buffer
-// see the new tags and decorators. It's worth noting that the synchronization happens even level does not change.
+// A RCU-style synchronization 'wait_until_no_readers()' is used inside of 'ts->set_output_level(output, level)'
+// if a setting has changed. It guarantees that all logs, either synchronous writes or enqueuing to the async buffer
+// see the new tags and decorators. It's worth noting that the synchronization occurs even if the level does not change.
 //
 // LogDecorator is a set of decorators represented in a uint. ts->update_decorators(decorators) is a union of the
 // current decorators and new_decorators. It's safe to do output->set_decorators(decorators) because new_decorators
@@ -268,13 +268,8 @@ void LogConfiguration::configure_output(size_t idx, const LogSelectionList& sele
     on_level[level]++;
   }
 
-  // for async logging, enqueuing instead of writing is still under protection of the synchronization
-  // `wait_until_no_readers()`. There are 2 hazards in async logging as follows.
-  //  1. asynclog buffer may be holding some log messages with previous decorators.
-  //  2. asynclog buffer may be holding some log messages targeting to the output 'idx'.
-  //
-  // A flush operation guarantees to all pending messages in buffer are written before returning. Therefore,
-  // the two hazards won't appear after it. It's a nop if async logging is not set.
+  // For async logging we have to ensure that all enqueued messages, which may refer to previous decorators,
+  // or a soon-to-be-deleted outputs, are written out first. The flush() call ensures this.
   AsyncLogWriter::flush();
 
   // It is now safe to set the new decorators for the actual output
@@ -303,10 +298,10 @@ void LogConfiguration::disable_outputs() {
     ts->disable_outputs();
   }
 
-  // Handle jcmd VM.log disable
-  // ts->disable_outputs() above has deleted output_list with RCU synchronization.
-  // Therefore, no new logging entry can enter AsyncLog buffer for the time being.
-  // flush pending entries before LogOutput instances die.
+  // Handle 'jcmd VM.log disable' and JVM termination.
+  // ts->disable_outputs() above has disabled all output_lists with RCU synchronization.
+  // Therefore, no new logging message can enter the async buffer for the time being.
+  // flush out all pending messages before LogOutput instances die.
   AsyncLogWriter::flush();
 
   while (idx > 0) {

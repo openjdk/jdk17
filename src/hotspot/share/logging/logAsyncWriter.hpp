@@ -121,16 +121,16 @@ typedef KVHashtable<LogFileOutput*, uint32_t, mtLogging> AsyncLogMap;
 // initialize() is called once when JVM is initialized. It creates and initializes the singleton instance of AsyncLogWriter.
 // Once async logging is established, there's no way to turn it off.
 //
-// instance() is MT-safe and returns the pointer of the singleton instance if and only if async logging is enabled and has well
-// initialized. Clients can use its return value to determine async logging is established or not.
+// instance() is MT-safe and returns the pointer of the singleton instance if and only if async logging is enabled and has
+// successfully initialized. Clients can use its return value to determine async logging is established or not.
 //
-// enqueue() is the basic operation of AsyncLogWriter. 2 overloading versions of it are provided to match LogOutput::write().
+// enqueue() is the basic operation of AsyncLogWriter. Two overloading versions of it are provided to match LogOutput::write().
 // They are both MT-safe and non-blocking. Derived classes of LogOutput can invoke the corresponding enqueue() in write() and
 // return 0. AsyncLogWriter is responsible of copying neccessary data.
 //
-// flush() is designated to flush out all pending messages. MT-safety is not provided. It is no-op if async logging is not in use.
-// In normal JVM termination, flush() is invoked in LogConfiguration::finalize(). When the users change logging configurations
-// via jcmd, LogConfiguration::configure_output() invokes it with the protection of ConfigurationLock.
+// flush() is designated to flush out all pending messages before returning. MT-safety is not provided. It is no-op if async
+// logging is not in use. In normal JVM termination, flush() is invoked in LogConfiguration::finalize(). When the users change
+// logging configurations via jcmd, LogConfiguration::configure_output() invokes it with the protection of ConfigurationLock.
 class AsyncLogWriter : public NonJavaThread {
   class AsyncLogLocker;
 
