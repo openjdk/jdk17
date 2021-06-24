@@ -748,42 +748,34 @@ public class Flow {
         }
 
         private void transitiveCovers(Set<Symbol> covered) {
-            boolean modified = true;
-            OUTER: while (modified) {
-                modified = false;
-                for (Symbol sym : covered) {
-                    switch (sym.kind) {
-                        case VAR -> {
-                            Iterable<Symbol> constants = sym.owner
-                                                            .members()
-                                                            .getSymbols(s -> s.isEnum() &&
-                                                                             s.kind == VAR);
-                            boolean hasAll = StreamSupport.stream(constants.spliterator(), false)
-                                                          .allMatch(covered::contains);
+            List<Symbol> todo = List.from(covered);
+            while (todo.nonEmpty()) {
+                Symbol sym = todo.head;
+                todo = todo.tail;
+                switch (sym.kind) {
+                    case VAR -> {
+                        Iterable<Symbol> constants = sym.owner
+                                                        .members()
+                                                        .getSymbols(s -> s.isEnum() &&
+                                                                         s.kind == VAR);
+                        boolean hasAll = StreamSupport.stream(constants.spliterator(), false)
+                                                      .allMatch(covered::contains);
 
-                            if (hasAll) {
-                                if (covered.add(sym.owner)) {
-                                    modified = true;
-                                    continue OUTER;
-                                }
-                            }
+                        if (hasAll && covered.add(sym.owner)) {
+                            todo = todo.prepend(sym.owner);
                         }
+                    }
 
-                        case TYP -> {
-                            for (Type sup : types.directSupertypes(sym.type)) {
-                                if (sup.tsym.kind == TYP && sup.tsym.isAbstract() && sup.tsym.isSealed()) {
-                                    boolean hasAll = ((ClassSymbol) sup.tsym).permitted
-                                                                             .stream()
-                                                                             .allMatch(covered::contains);
+                    case TYP -> {
+                        for (Type sup : types.directSupertypes(sym.type)) {
+                            if (sup.tsym.kind == TYP && sup.tsym.isAbstract() && sup.tsym.isSealed()) {
+                                boolean hasAll = ((ClassSymbol) sup.tsym).permitted
+                                                                         .stream()
+                                                                         .allMatch(covered::contains);
 
-                                    if (hasAll) {
-                                        modified |= covered.add(sup.tsym);
-                                    }
+                                if (hasAll && covered.add(sup.tsym)) {
+                                    todo = todo.prepend(sup.tsym);
                                 }
-                            }
-
-                            if (modified) {
-                                continue OUTER;
                             }
                         }
                     }

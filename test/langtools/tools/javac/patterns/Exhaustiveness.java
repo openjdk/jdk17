@@ -624,15 +624,58 @@ public class Exhaustiveness extends TestRunner {
                package test;
                import lib.*;
                public class Test {
-                   private int test(S obj) {
+                   private int test(S obj, boolean b) {
                        return switch (obj) {
                            case A a -> 0;
+                           case C c && b -> 0;
                            case C c -> 0;
                            case D d -> 0;
                        };
                    }
                }
                """);
+    }
+
+    @Test
+    public void testNotExhaustiveTransitive(Path base) throws Exception {
+        doTest(base,
+               new String[]{"""
+                            package lib;
+                            public sealed interface S permits A, B {}
+                            """,
+                            """
+                            package lib;
+                            public final class A implements S {}
+                            """,
+                            """
+                            package lib;
+                            public abstract sealed class B implements S permits C, D {}
+                            """,
+                            """
+                            package lib;
+                            public final class C extends B {}
+                            """,
+                            """
+                            package lib;
+                            public final class D extends B {}
+                            """},
+               """
+               package test;
+               import lib.*;
+               public class Test {
+                   private int test(S obj, boolean b) {
+                       return switch (obj) {
+                           case A a -> 0;
+                           case C c -> 0;
+                           case D d && b -> 0;
+                       };
+                   }
+               }
+               """,
+               "Test.java:5:16: compiler.err.not.exhaustive",
+               "- compiler.note.preview.filename: Test.java, DEFAULT",
+               "- compiler.note.preview.recompile",
+               "1 error");
     }
 
     @Test
@@ -670,15 +713,66 @@ public class Exhaustiveness extends TestRunner {
                package test;
                import lib.*;
                public class Test {
-                   private <T extends Base & S & Marker> int test(T obj) {
+                   private <T extends Base & S & Marker> int test(T obj, boolean b) {
                        return switch (obj) {
                            case A a -> 0;
+                           case C c && b -> 0;
                            case C c -> 0;
                            case D d -> 0;
                        };
                    }
                }
                """);
+    }
+
+    @Test
+    public void testNotExhaustiveIntersection(Path base) throws Exception {
+        doTest(base,
+               new String[]{"""
+                            package lib;
+                            public sealed interface S permits A, B {}
+                            """,
+                            """
+                            package lib;
+                            public abstract class Base {}
+                            """,
+                            """
+                            package lib;
+                            public interface Marker {}
+                            """,
+                            """
+                            package lib;
+                            public final class A extends Base implements S, Marker {}
+                            """,
+                            """
+                            package lib;
+                            public abstract sealed class B extends Base implements S permits C, D {}
+                            """,
+                            """
+                            package lib;
+                            public final class C extends B implements Marker {}
+                            """,
+                            """
+                            package lib;
+                            public final class D extends B implements Marker {}
+                            """},
+               """
+               package test;
+               import lib.*;
+               public class Test {
+                   private <T extends Base & S & Marker> int test(T obj, boolean b) {
+                       return switch (obj) {
+                           case A a -> 0;
+                           case C c -> 0;
+                           case D d && b -> 0;
+                       };
+                   }
+               }
+               """,
+               "Test.java:5:16: compiler.err.not.exhaustive",
+               "- compiler.note.preview.filename: Test.java, DEFAULT",
+               "- compiler.note.preview.recompile",
+               "1 error");
     }
 
     private void doTest(Path base, String[] libraryCode, String testCode, String... expectedErrors) throws IOException {
