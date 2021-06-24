@@ -25,6 +25,6 @@
 package p;
 
 public class Foo {
-     protected enum T { ONE } 
+     protected enum T { ONE }
 }
 
