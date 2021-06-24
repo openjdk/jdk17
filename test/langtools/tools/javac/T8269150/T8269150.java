@@ -25,12 +25,35 @@
  * @test
  * @bug 8269150
  * @summary Unicode \ u 0 0 5 C not treated as an escaping backslash
- * @run compile T8269150.java
+ * @run main T8269150
  */
 
 public class T8269150 {
     public static void main(String... args) {
-        System.err.println("\u005C\\u005D");
+        String source = """
+            \\]
+            \u005C\]
+            \\u005C]
+            \\\u005D
+            \u005C\u005C]
+            \u005C\\u005D
+            \\u005C\u005D
+            \u005C\u005C\u005D
+            """;
+        String expected = """
+            \\]
+            \\]
+            \\u005C]
+            \\]
+            \\u005C]
+            \\]
+            \\u005C]
+            \\u005C]
+            """;
+
+        if (!source.equals(expected)) {
+            throw new RuntimeException("Unicode escapes not handled correctly");
+        }
     }
 }
 
