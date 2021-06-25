@@ -43,12 +43,6 @@ import static java.io.ObjectInputFilter.Status.UNDECIDED;
 @Test
 public class SerialFilterFunctionTest {
 
-    static {
-        // Enable logging
-        System.setProperty("java.util.logging.config.file",
-                System.getProperty("test.src", ".") + "/logging.properties");
-    }
-
     @Test
     void testMerge() {
         Status[] cases = Status.values();

@@ -591,7 +591,6 @@ public interface ObjectInputFilter {
          * Boolean to indicate that the filter factory can not be set or replaced.
          * - an ObjectInputStream has already been created using the current filter factory
          * - has been set on the command line
-         * - jdk.serialFilter is set and jdk.serialFilterFactory is unset, the builtin can not be replaced
          * @see Config#setSerialFilterFactory(BinaryOperator)
          */
         private static final AtomicBoolean filterFactoryNoReplace = new AtomicBoolean();
