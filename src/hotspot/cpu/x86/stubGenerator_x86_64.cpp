@@ -7001,17 +7001,9 @@ address generate_avx_ghash_processBlocks() {
     // Get svml stub routine addresses
     void *libsvml = NULL;
     char ebuf[1024];
-    char dll_path[JVM_MAXPATHLEN];
-#ifdef _WINDOWS
-    int ret = jio_snprintf(dll_path, sizeof(dll_path), "%s%sbin", Arguments::get_java_home(), os::file_separator());
-#else
-    int ret = jio_snprintf(dll_path, sizeof(dll_path), "%s%slib", Arguments::get_java_home(), os::file_separator());
-#endif
-    if (ret != -1) {
-      char dll_name[JVM_MAXPATHLEN];
-      if (os::dll_locate_lib(dll_name, sizeof(dll_name), dll_path, "svml")) {
-        libsvml = os::dll_load(dll_name, ebuf, sizeof ebuf);
-      }
+    char dll_name[JVM_MAXPATHLEN];
+    if (os::dll_locate_lib(dll_name, sizeof(dll_name), Arguments::get_dll_dir(), "svml")) {
+      libsvml = os::dll_load(dll_name, ebuf, sizeof ebuf);
     }
     if (libsvml != NULL) {
       // SVML method naming convention
