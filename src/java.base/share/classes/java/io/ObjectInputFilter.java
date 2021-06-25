@@ -670,7 +670,7 @@ public interface ObjectInputFilter {
                         IllegalAccessException | InstantiationException | InvocationTargetException ex) {
                     Throwable th = (ex instanceof InvocationTargetException ite) ? ite.getCause() : ex;
                     configLog.log(ERROR,
-                            "Error configuring filter factory", th);
+                            "Error configuring filter factory: {0}", (Object)th);
                     // Do not continue if configuration not initialized
                     throw new ExceptionInInitializerError(th);
                 }
