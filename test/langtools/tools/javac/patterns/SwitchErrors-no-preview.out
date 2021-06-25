@@ -26,6 +26,8 @@ SwitchErrors.java:172:27: compiler.err.flows.through.to.pattern
 SwitchErrors.java:178:18: compiler.err.flows.through.to.pattern
 SwitchErrors.java:184:13: compiler.err.pattern.dominated
 SwitchErrors.java:196:18: compiler.err.const.expr.req
+SwitchErrors.java:202:76: compiler.err.cant.resolve.location: kindname.variable, n, , , (compiler.misc.location: kindname.class, SwitchErrors, null)
+SwitchErrors.java:208:71: compiler.err.cant.resolve.location: kindname.variable, n, , , (compiler.misc.location: kindname.class, SwitchErrors, null)
 SwitchErrors.java:33:9: compiler.err.not.exhaustive.statement
 SwitchErrors.java:39:9: compiler.err.not.exhaustive.statement
 SwitchErrors.java:45:9: compiler.err.not.exhaustive.statement
@@ -37,4 +39,4 @@ SwitchErrors.java:115:9: compiler.err.not.exhaustive.statement
 SwitchErrors.java:121:9: compiler.err.not.exhaustive.statement
 SwitchErrors.java:128:9: compiler.err.not.exhaustive.statement
 SwitchErrors.java:188:9: compiler.err.not.exhaustive.statement
-39 errors
+41 errors
