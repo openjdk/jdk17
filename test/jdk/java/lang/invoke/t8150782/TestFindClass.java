@@ -39,7 +39,6 @@ import static java.lang.invoke.MethodHandles.*;
 import static org.testng.AssertJUnit.*;
 
 import org.testng.annotations.*;
-import p.Foo;
 
 public class TestFindClass {
 
