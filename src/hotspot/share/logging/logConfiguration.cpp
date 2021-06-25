@@ -269,7 +269,7 @@ void LogConfiguration::configure_output(size_t idx, const LogSelectionList& sele
   }
 
   // For async logging we have to ensure that all enqueued messages, which may refer to previous decorators,
-  // or a soon-to-be-deleted outputs, are written out first. The flush() call ensures this.
+  // or a soon-to-be-deleted output, are written out first. The flush() call ensures this.
   AsyncLogWriter::flush();
 
   // It is now safe to set the new decorators for the actual output

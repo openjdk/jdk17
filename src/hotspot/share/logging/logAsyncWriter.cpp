@@ -186,7 +186,7 @@ AsyncLogWriter* AsyncLogWriter::instance() {
 
 // Inserts a flush token into the async output buffer and waits until the AsyncLog thread
 // signals that it has seen it and completed all dequeued message processing.
-// This is method is not MT-safe in itself, but is guarded by another lock in the usual
+// This method is not MT-safe in itself, but is guarded by another lock in the usual
 // usecase - see the comments in the header file for more details.
 void AsyncLogWriter::flush() {
   if (_instance != nullptr) {
