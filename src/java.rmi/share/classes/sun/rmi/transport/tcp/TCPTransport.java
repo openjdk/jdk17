@@ -106,12 +106,12 @@ public class TCPTransport extends Transport {
             Long.getLong("sun.rmi.transport.tcp.threadKeepAliveTime", 60000));
 
     /** thread pool for connection handlers */
-    @SuppressWarnings("removal")
     private static final ExecutorService connectionThreadPool =
         new ThreadPoolExecutor(0, maxConnectionThreads,
             threadKeepAliveTime, TimeUnit.MILLISECONDS,
             new SynchronousQueue<Runnable>(),
             new ThreadFactory() {
+                @SuppressWarnings("removal")
                 public Thread newThread(Runnable runnable) {
                     return AccessController.doPrivileged(new NewThreadAction(
                         runnable, "TCP Connection(idle)", true, true));
