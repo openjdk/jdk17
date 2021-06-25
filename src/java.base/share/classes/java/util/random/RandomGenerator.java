@@ -517,7 +517,7 @@ public interface RandomGenerator {
      *         both positive and finite
      *
      * @implSpec The default implementation checks that {@code bound} is a
-     * positive non-infinite float. Then invokes {@code nextFloat()}, scaling
+     * positive finite float. Then invokes {@code nextFloat()}, scaling
      * the result so that the final result lies between {@code 0.0f} (inclusive)
      * and {@code bound} (exclusive).
      */
@@ -542,7 +542,7 @@ public interface RandomGenerator {
      *         is greater than or equal to {@code bound}
      *
      * @implSpec The default implementation checks that {@code origin} and
-     * {@code bound} are positive non-infinite floats. Then invokes
+     * {@code bound} are positive finite floats. Then invokes
      * {@code nextFloat()}, scaling and translating the result so that the final
      * result lies between {@code origin} (inclusive) and {@code bound}
      * (exclusive).
@@ -581,7 +581,7 @@ public interface RandomGenerator {
      *         both positive and finite
      *
      * @implSpec The default implementation checks that {@code bound} is a
-     * positive non-infinite double. Then invokes {@code nextDouble()}, scaling
+     * positive finite double. Then invokes {@code nextDouble()}, scaling
      * the result so that the final result lies between {@code 0.0} (inclusive)
      * and {@code bound} (exclusive).
      */
@@ -606,7 +606,7 @@ public interface RandomGenerator {
      *         is greater than or equal to {@code bound}
      *
      * @implSpec The default implementation checks that {@code origin} and
-     * {@code bound} are positive non-infinite doubles. Then calls
+     * {@code bound} are positive finite doubles. Then calls
      * {@code nextDouble()}, scaling and translating the result so that the final
      * result lies between {@code origin} (inclusive) and {@code bound}
      * (exclusive).
