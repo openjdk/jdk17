@@ -33,7 +33,6 @@
  * @run main LoadSvmlTest
  */
 
-import jdk.test.lib.Platform;
 import jdk.test.lib.process.ProcessTools;
 import jdk.test.lib.process.OutputAnalyzer;
 
@@ -68,9 +67,6 @@ public class LoadSvmlTest {
 
         OutputAnalyzer output = new OutputAnalyzer(pb.start());
         output.shouldHaveExitValue(0);
-        if (Platform.isWindows())
-          output.shouldMatch("Loaded library .*svml.dll");
-        else
-          output.shouldMatch("Loaded library .*libsvml.so");
+        output.shouldMatch("Loaded library .*svml");
     }
 }
