@@ -63,7 +63,7 @@ public class LoadSvmlTest {
     public static void main(String... args) throws Exception {
         ProcessBuilder pb = ProcessTools.createJavaProcessBuilder(
             "-Xmn8m", "-Xlog:library=info",
-            "--add-modules=jdk.incubator.vector", 
+            "--add-modules=jdk.incubator.vector",
             "LoadSvmlTest$VectorTest");
 
         OutputAnalyzer output = new OutputAnalyzer(pb.start());
