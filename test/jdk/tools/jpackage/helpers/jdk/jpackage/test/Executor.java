@@ -249,7 +249,9 @@ public final class Executor extends CommandArguments<Executor> {
 
             try {
                 Thread.sleep(wait * 1000);
-            } catch (Exception ex) {} // Ignore
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }            
 
             count++;
         } while (count < max);
