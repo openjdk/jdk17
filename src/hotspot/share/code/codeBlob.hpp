@@ -79,7 +79,7 @@ struct CodeBlobType {
 
 class CodeBlobLayout;
 class OptimizedEntryBlob; // for as_optimized_entry_blob()
-class JavaFrameAnchor; // for EntryBlob::jfa_for_frame
+class JavaFrameAnchor; // for OptimizedEntryBlob::jfa_for_frame
 
 class CodeBlob {
   friend class VMStructs;
