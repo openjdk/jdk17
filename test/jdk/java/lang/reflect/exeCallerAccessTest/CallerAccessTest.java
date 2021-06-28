@@ -50,14 +50,14 @@ public class CallerAccessTest {
         Map<String, String> env = pb.environment();
 
         String libDir = Platform.libDir().toString();
-        String serverDir = Platform.jvmLibDir().toString();
+        String vmDir = Platform.jvmLibDir().toString();
 
         // set up shared library path
         String sharedLibraryPathEnvName = Platform.sharedLibraryPathVariableName();
         env.compute(sharedLibraryPathEnvName,
                     (k, v) -> (v == null) ? libDir : v + File.pathSeparator + libDir);
         env.compute(sharedLibraryPathEnvName,
-                    (k, v) -> (v == null) ? serverDir : v + File.pathSeparator + serverDir);
+                    (k, v) -> (v == null) ? vmDir : v + File.pathSeparator + vmDir);
 
         System.out.println("Launching: " + launcher + " shared library path: " +
                            env.get(sharedLibraryPathEnvName));
