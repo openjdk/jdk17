@@ -33,6 +33,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 /**
  * @test
  * @bug 8189604 8208702
+ * @requires !vm.debug | os.family != "windows"
  * @run main/othervm -Djava.awt.headless=false HangDuringStaticInitialization
  * @run main/othervm -Djava.awt.headless=true HangDuringStaticInitialization
  */
