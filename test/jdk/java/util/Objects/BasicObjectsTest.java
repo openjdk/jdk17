@@ -277,6 +277,9 @@ public class BasicObjectsTest {
         return errors;
     }
 
+    // Shared counter for testNewIdentity
+    private static int counter;
+
     private static int testNewIdentity() {
         int errors = 0;
 
@@ -288,6 +291,15 @@ public class BasicObjectsTest {
 
         if (o1 == o2)
             errors += 1;
+
+        try {
+            synchronized(o1) {
+                counter++;
+            }
+        } catch (RuntimeException rex) {
+            rex.printStackTrace();
+            errors += 1;
+        }
 
         return errors;
     }
