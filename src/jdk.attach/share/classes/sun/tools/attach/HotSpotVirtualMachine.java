@@ -47,9 +47,13 @@ import java.util.stream.Collectors;
 
 public abstract class HotSpotVirtualMachine extends VirtualMachine {
 
+    private static final long CURRENT_PID = pid();
+
     @SuppressWarnings("removal")
-    private static final long CURRENT_PID = AccessController.doPrivileged(
-            (PrivilegedAction<ProcessHandle>) ProcessHandle::current).pid();
+    private static long pid() {
+        PrivilegedAction<ProcessHandle> pa = () -> ProcessHandle.current();
+        return AccessController.doPrivileged(pa).pid();
+    }
 
     private static final boolean ALLOW_ATTACH_SELF;
     static {
