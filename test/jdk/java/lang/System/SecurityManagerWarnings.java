@@ -23,7 +23,7 @@
 
 /*
  * @test
- * @bug 8266459 8268349
+ * @bug 8266459 8268349 8269543
  * @summary check various warnings
  * @library /test/lib
  */
@@ -72,6 +72,9 @@ public class SecurityManagerWarnings {
             // to the original System.err and will not be swallowed.
             System.setErr(new PrintStream(new ByteArrayOutputStream()));
             try {
+                // Set twice and ensure the warning only appears once.
+                // First set to null so that the 2nd call always succeeds.
+                System.setSecurityManager(null);
                 System.setSecurityManager(new SecurityManager());
             } catch (Exception e) {
                 // Exception messages must show in original stderr
@@ -115,7 +118,8 @@ public class SecurityManagerWarnings {
                 .stderrShouldContain("WARNING: A terminally deprecated method in java.lang.System has been called")
                 .stderrShouldContain("WARNING: System::setSecurityManager has been called by SecurityManagerWarnings (" + uri + ")")
                 .stderrShouldContain("WARNING: Please consider reporting this to the maintainers of SecurityManagerWarnings")
-                .stderrShouldContain("WARNING: System::setSecurityManager will be removed in a future release");
+                .stderrShouldContain("WARNING: System::setSecurityManager will be removed in a future release")
+                .stderrShouldNotMatch("(?s)terminally.*terminally");    // appears only once
     }
 
     static OutputAnalyzer run(String prop, String cp) throws Exception {
@@ -133,6 +137,7 @@ public class SecurityManagerWarnings {
                     "-Djava.security.policy=policy",
                     "SecurityManagerWarnings", "run");
         }
-        return ProcessTools.executeProcess(pb);
+        return ProcessTools.executeProcess(pb)
+                .stderrShouldNotContain("AccessControlException");
     }
 }

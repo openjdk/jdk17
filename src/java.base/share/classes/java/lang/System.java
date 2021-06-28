@@ -54,6 +54,7 @@ import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,6 +62,7 @@ import java.util.Properties;
 import java.util.PropertyPermission;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.Supplier;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -326,6 +328,13 @@ public final class System {
     private static native void setOut0(PrintStream out);
     private static native void setErr0(PrintStream err);
 
+    private static class CallerHolder {
+        // Remember callers of setSecurityManager() here so that warning
+        // is only printed once for each different caller
+        final static Map<String, Boolean> callersOfSSM
+            = Collections.synchronizedMap(new WeakHashMap<>());
+    }
+
     // Remember initial System.err. setSecurityManager() warning goes here
     private static volatile @Stable PrintStream initialErrStream;
 
@@ -385,12 +394,14 @@ public final class System {
             } else {
                 source = callerClass.getName() + " (" + url + ")";
             }
-            initialErrStream.printf("""
-                    WARNING: A terminally deprecated method in java.lang.System has been called
-                    WARNING: System::setSecurityManager has been called by %s
-                    WARNING: Please consider reporting this to the maintainers of %s
-                    WARNING: System::setSecurityManager will be removed in a future release
-                    """, source, callerClass.getName());
+            if (CallerHolder.callersOfSSM.putIfAbsent(source, true) == null) {
+                initialErrStream.printf("""
+                        WARNING: A terminally deprecated method in java.lang.System has been called
+                        WARNING: System::setSecurityManager has been called by %s
+                        WARNING: Please consider reporting this to the maintainers of %s
+                        WARNING: System::setSecurityManager will be removed in a future release
+                        """, source, callerClass.getName());
+            }
             implSetSecurityManager(sm);
         } else {
             // security manager not allowed
