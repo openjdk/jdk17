@@ -455,10 +455,10 @@ import sun.util.locale.provider.TimeZoneNameUtility;
  *
  * <p>For the backward compatible behavior, the system property
  * {@systemProperty java.locale.useOldISOCodes} reverts the behavior
- * back to prior to Java SE 17 one. If the system property is set
- * to {@code true}, those three current language codes are mapped to their
- * backward compatible forms. It is only read at the Java runtime startup,
- * so the later call to {@code System.setProperty()} won't affect the backward
+ * back to that of before Java SE 17. If the system property is set to
+ * {@code true}, those three current language codes are mapped to their
+ * backward compatible forms. It is only read at Java runtime startup, so a
+ * subsequent call to {@code System.setProperty()} won't affect backward
  * compatible behavior.
  *
  * <p>The APIs added in 1.7 map between the old and new language codes,
