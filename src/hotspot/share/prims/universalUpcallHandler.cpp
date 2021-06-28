@@ -118,7 +118,7 @@ Thread* ProgrammableUpcallHandler::on_entry(OptimizedEntryBlob::FrameData* conte
     thread->clear_pending_exception();
   }
 
-  MACOS_AARCH64_ONLY(_thread->enable_wx(WXExec));
+  MACOS_AARCH64_ONLY(thread->enable_wx(WXExec));
 
   return thread;
 }
