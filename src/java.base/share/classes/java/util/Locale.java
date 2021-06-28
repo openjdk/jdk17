@@ -458,7 +458,7 @@ import sun.util.locale.provider.TimeZoneNameUtility;
  * back to that of before Java SE 17. If the system property is set to
  * {@code true}, those three current language codes are mapped to their
  * backward compatible forms. The property is only read at Java runtime
- * startup, so subsequent calls to {@code System.setProperty()} will
+ * startup and subsequent calls to {@code System.setProperty()} will
  * have no effect.
  *
  * <p>The APIs added in 1.7 map between the old and new language codes,
