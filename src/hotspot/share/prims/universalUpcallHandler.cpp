@@ -64,8 +64,6 @@ Thread* ProgrammableUpcallHandler::maybe_attach_and_get_thread(bool* should_deta
   } else {
     *should_detach = false;
   }
-  assert(thread->can_call_java(), "must be able to call Java");
-  guarantee(thread->as_Java_thread()->thread_state() == _thread_in_native, "must be comming from native");
   return thread;
 }
 
@@ -79,16 +77,18 @@ Thread* ProgrammableUpcallHandler::on_entry(OptimizedEntryBlob::FrameData* conte
   JavaThread* thread = maybe_attach_and_get_thread(&context->should_detach)->as_Java_thread();
   context->thread = thread;
 
-  // Allocate handle block for Java code. This must be done before we change thread_state to _thread_in_Java_or_stub,
+  assert(thread->can_call_java(), "must be able to call Java");
+
+  // Allocate handle block for Java code. This must be done before we change thread_state to _thread_in_Java,
   // since it can potentially block.
   context->new_handles = JNIHandleBlock::allocate_block(thread);
 
-  // After this, we are official in JavaCode. This needs to be done before we change any of the thread local
+  // After this, we are official in Java Code. This needs to be done before we change any of the thread local
   // info, since we cannot find oops before the new information is set up completely.
   ThreadStateTransition::transition_from_native(thread, _thread_in_Java);
 
   // Make sure that we handle asynchronous stops and suspends _before_ we clear all thread state
-  // in JavaCallWrapper::JavaCallWrapper(). This way, we can decide if we need to do any pd actions
+  // in OptimizedEntryBlob::FrameData. This way, we can decide if we need to do any pd actions
   // to prepare for stop/suspend (flush register windows on sparcs, cache sp, or other state).
   bool clear_pending_exception = true;
   if (thread->has_special_runtime_exit_condition()) {
@@ -130,36 +130,29 @@ void ProgrammableUpcallHandler::on_exit(OptimizedEntryBlob::FrameData* context) 
 
   MACOS_AARCH64_ONLY(thread->enable_wx(WXWrite));
 
-  // restore previous handle block & Java frame linkage
+  // restore previous handle block
   thread->set_active_handles(context->old_handles);
 
   thread->frame_anchor()->zap();
 
   debug_only(thread->dec_java_call_counter());
 
-  // Old thread-local info. has been restored. We are not back in the VM.
+  // Old thread-local info. has been restored. We are not back in native code.
   ThreadStateTransition::transition_from_java(thread, _thread_in_native);
 
   // State has been restored now make the anchor frame visible for the profiler.
   // Do this after the transition because this allows us to put an assert
-  // the Java->vm transition which checks to see that stack is not walkable
+  // the Java->native transition which checks to see that stack is not walkable
   // on sparc/ia64 which will catch violations of the reseting of last_Java_frame
   // invariants (i.e. _flags always cleared on return to Java)
 
   thread->frame_anchor()->copy(&context->jfa);
 
-  // Release handles after we are marked as being inside the VM again, since this
+  // Release handles after we are marked as being in native code again, since this
   // operation might block
   JNIHandleBlock::release_block(context->new_handles, thread);
 
-  // I don't think this is really needed, but let's keep it for now
-  if (thread->has_pending_exception() && thread->has_last_Java_frame()) {
-    // If we get here, the Java code threw an exception that unwound a frame.
-    // It could be that the new frame anchor has not passed through the required
-    // StackWatermark barriers. Therefore, we process any such deferred unwind
-    // requests here.
-    StackWatermarkSet::after_unwind(thread);
-  }
+  assert(!thread->has_pending_exception(), "Upcall can not throw an exception");
 
   if (context->should_detach) {
     detach_thread(thread);

@@ -419,6 +419,7 @@ static int compute_res_save_area_size(const CallRegs& conv) {
 
 static void save_java_result(MacroAssembler* _masm, const CallRegs& conv, int res_save_area_offset) {
   int offset = res_save_area_offset;
+  __ block_comment("{ save java result ");
   for (int i = 0; i < conv._rets_length; i++) {
     VMReg reg = conv._ret_regs[i];
     if (reg->is_Register()) {
@@ -432,10 +433,12 @@ static void save_java_result(MacroAssembler* _masm, const CallRegs& conv, int re
       ShouldNotReachHere(); // unhandled type
     }
   }
+  __ block_comment("} save java result ");
 }
 
 static void restore_java_result(MacroAssembler* _masm, const CallRegs& conv, int res_save_area_offset) {
   int offset = res_save_area_offset;
+  __ block_comment("{ restore java result ");
   for (int i = 0; i < conv._rets_length; i++) {
     VMReg reg = conv._ret_regs[i];
     if (reg->is_Register()) {
@@ -449,6 +452,7 @@ static void restore_java_result(MacroAssembler* _masm, const CallRegs& conv, int
       ShouldNotReachHere(); // unhandled type
     }
   }
+  __ block_comment("} restore java result ");
 }
 
 constexpr int MXCSR_MASK = 0xFFC0;  // Mask out any pending exceptions
@@ -650,7 +654,6 @@ address ProgrammableUpcallHandler::generate_optimized_upcall_stub(jobject receiv
   //////////////////////////////////////////////////////////////////////////////
 
   MacroAssembler* _masm = new MacroAssembler(&buffer);
-  Label call_return;
   address start = __ pc();
   __ enter(); // set up frame
   if ((abi._stack_alignment_bytes % 16) != 0) {
@@ -689,11 +692,9 @@ address ProgrammableUpcallHandler::generate_optimized_upcall_stub(jobject receiv
 
   __ mov_metadata(rbx, entry);
   __ movptr(Address(r15_thread, JavaThread::callee_target_offset()), rbx); // just in case callee is deoptimized
-  //__ reinit_heapbase();
 
   __ call(Address(rbx, Method::from_compiled_offset()));
 
-  __ bind(call_return);
   save_java_result(_masm, conv, res_save_area_offset);
 
   __ block_comment("{ on_exit");
