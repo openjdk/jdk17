@@ -643,10 +643,9 @@ public interface RandomGenerator {
      * @implSpec The default implementation checks that {@code bound} is a
      * positive int. Then invokes {@code nextInt()}, limiting the result to
      * be greater equal zero and less than {@code bound}. If {@code bound} is a
-     * power of two then limiting is a simple masking operation. Otherwise, a
-     * new result is re-calculated by averaging the previous result and
-     * {@code nextInt()} until the final result is greater equal zero and less
-     * than {@code bound}.
+     * power of two then limiting is a simple masking operation. Otherwise,
+     * the result is re-calculated by invoking {@code nextInt()} until the
+     * result is greater equal zero and less than {@code bound}.
      */
     default int nextInt(int bound) {
         RandomSupport.checkBound(bound);
@@ -671,9 +670,9 @@ public interface RandomGenerator {
      * {@code bound} are positive ints. Then invokes {@code nextInt()}, limiting
      * the result to be greater equal {@code origin} and less than {@code bound}.
      * If {@code bound} is a power of two then limiting is a simple masking
-     * operation. Otherwise, a new result is re-calculated by averaging the
-     * previous result and {@code nextInt()} until the final result is greater
-     * equal {@code origin} and less than {@code bound}.
+     * operation. Otherwise, the result is re-calculated  by invoking
+     * {@code nextInt()} until the result is greater equal {@code origin}
+     * and less than {@code bound}.
      */
     default int nextInt(int origin, int bound) {
         RandomSupport.checkRange(origin, bound);
@@ -702,10 +701,9 @@ public interface RandomGenerator {
      * @implSpec The default implementation checks that {@code bound} is a
      * positive long. Then invokes {@code nextLong()}, limiting the result to
      * be greater equal zero and less than {@code bound}. If {@code bound} is a
-     * power of two then limiting is a simple masking operation. Otherwise, a
-     * new result is re-calculated by averaging the previous result and
-     * {@code nextLong()} until the final result is greater equal zero and less
-     * than {@code bound}.
+     * power of two then limiting is a simple masking operation. Otherwise,
+     * the result is re-calculated by invoking {@code nextLong()} until the
+     * result is greater equal zero and less than {@code bound}.
      */
     default long nextLong(long bound) {
         RandomSupport.checkBound(bound);
@@ -730,9 +728,9 @@ public interface RandomGenerator {
      * {@code bound} are positive longs. Then invokes {@code nextLong()},
      * limiting the result to be greater equal {@code origin} and less than
      * {@code bound}. If {@code bound} is a power of two then limiting is a
-     * simple masking operation. Otherwise, a new result is re-calculated by
-     * averaging the previous result and {@code nextLong()} until the final
-     * result is greater equal {@code origin} and less than {@code bound}.
+     * simple masking operation. Otherwise, the result is re-calculated by
+     * invoking {@code nextLong()} until the result is greater equal
+     * {@code origin} and less than {@code bound}.
      */
     default long nextLong(long origin, long bound) {
         RandomSupport.checkRange(origin, bound);
