@@ -4768,14 +4768,16 @@ public class FloatMaxVectorTests extends AbstractVectorTest {
     static void maskTrueCountFloatMaxVectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
 
-        for (int i = 0; i < a.length; i += SPECIES.length()) {
-            var vmask = SPECIES.loadMask(a, i);
-            int tcount = vmask.trueCount();
-            int expectedTcount = 0;
-            for (int j = i; j < i + SPECIES.length(); j++) {
-                expectedTcount += a[j] ? 1 : 0;
+        for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
+            for (int i = 0; i < a.length; i += SPECIES.length()) {
+                var vmask = SPECIES.loadMask(a, i);
+                int tcount = vmask.trueCount();
+                int expectedTcount = 0;
+                for (int j = i; j < i + SPECIES.length(); j++) {
+                    expectedTcount += a[j] ? 1 : 0;
+                }
+                Assert.assertTrue(tcount == expectedTcount, "at index " + i + ", trueCount should be = " + expectedTcount + ", but is = " + tcount);
             }
-            Assert.assertTrue(tcount == expectedTcount, "at index " + i + ", trueCount should be = " + expectedTcount + ", but is = " + tcount);
         }
     }
 
@@ -4783,17 +4785,19 @@ public class FloatMaxVectorTests extends AbstractVectorTest {
     static void maskLastTrueFloatMaxVectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
 
-        for (int i = 0; i < a.length; i += SPECIES.length()) {
-            var vmask = SPECIES.loadMask(a, i);
-            int ltrue = vmask.lastTrue();
-            int j = i + SPECIES.length() - 1;
-            for (; j >= i; j--) {
-                if (a[j]) break;
-            }
-            int expectedLtrue = j - i;
+        for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
+            for (int i = 0; i < a.length; i += SPECIES.length()) {
+                var vmask = SPECIES.loadMask(a, i);
+                int ltrue = vmask.lastTrue();
+                int j = i + SPECIES.length() - 1;
+                for (; j >= i; j--) {
+                    if (a[j]) break;
+                }
+                int expectedLtrue = j - i;
 
-            Assert.assertTrue(ltrue == expectedLtrue, "at index " + i +
-                ", lastTrue should be = " + expectedLtrue + ", but is = " + ltrue);
+                Assert.assertTrue(ltrue == expectedLtrue, "at index " + i +
+                    ", lastTrue should be = " + expectedLtrue + ", but is = " + ltrue);
+            }
         }
     }
 
@@ -4801,17 +4805,19 @@ public class FloatMaxVectorTests extends AbstractVectorTest {
     static void maskFirstTrueFloatMaxVectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
 
-        for (int i = 0; i < a.length; i += SPECIES.length()) {
-            var vmask = SPECIES.loadMask(a, i);
-            int ftrue = vmask.firstTrue();
-            int j = i;
-            for (; j < i + SPECIES.length() ; j++) {
-                if (a[j]) break;
-            }
-            int expectedFtrue = j - i;
+        for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
+            for (int i = 0; i < a.length; i += SPECIES.length()) {
+                var vmask = SPECIES.loadMask(a, i);
+                int ftrue = vmask.firstTrue();
+                int j = i;
+                for (; j < i + SPECIES.length() ; j++) {
+                    if (a[j]) break;
+                }
+                int expectedFtrue = j - i;
 
-            Assert.assertTrue(ftrue == expectedFtrue, "at index " + i +
-                ", firstTrue should be = " + expectedFtrue + ", but is = " + ftrue);
+                Assert.assertTrue(ftrue == expectedFtrue, "at index " + i +
+                    ", firstTrue should be = " + expectedFtrue + ", but is = " + ftrue);
+            }
         }
     }
 
