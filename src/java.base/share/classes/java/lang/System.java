@@ -328,10 +328,10 @@ public final class System {
     private static native void setOut0(PrintStream out);
     private static native void setErr0(PrintStream err);
 
-    private static class CallerHolder {
+    private static class CallersHolder {
         // Remember callers of setSecurityManager() here so that warning
         // is only printed once for each different caller
-        final static Map<String, Boolean> callersOfSSM
+        final static Map<String, Boolean> callers
             = Collections.synchronizedMap(new WeakHashMap<>());
     }
 
@@ -394,7 +394,7 @@ public final class System {
             } else {
                 source = callerClass.getName() + " (" + url + ")";
             }
-            if (CallerHolder.callersOfSSM.putIfAbsent(source, true) == null) {
+            if (CallersHolder.callers.putIfAbsent(source, true) == null) {
                 initialErrStream.printf("""
                         WARNING: A terminally deprecated method in java.lang.System has been called
                         WARNING: System::setSecurityManager has been called by %s
