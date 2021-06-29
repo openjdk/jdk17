@@ -947,16 +947,13 @@ public final class SunPKCS11 extends AuthProvider {
             return;
         }
         poller = new TokenPoller(this);
-        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-            Thread t = InnocuousThread.newSystemThread(
-                    "Poller " + getName(),
-                    poller);
-            assert t.getContextClassLoader() == null;
-            t.setDaemon(true);
-            t.setPriority(Thread.MIN_PRIORITY);
-            t.start();
-            return null;
-        });
+        Thread t = InnocuousThread.newSystemThread(
+                "Poller-" + getName(),
+                poller,
+                Thread.MIN_PRIORITY);
+        assert t.getContextClassLoader() == null;
+        t.setDaemon(true);
+        t.start();
 
     }
 
@@ -1026,20 +1023,14 @@ public final class SunPKCS11 extends AuthProvider {
     // create the cleaner thread, if not already active
     @SuppressWarnings("removal")
     private void createCleaner() {
-        if (cleaner != null) {
-            return;
-        }
         cleaner = new NativeResourceCleaner();
-        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
-            Thread t = InnocuousThread.newSystemThread(
-                    "Cleanup-SunPKCS11",
-                    cleaner);
-            assert t.getContextClassLoader() == null;
-            t.setDaemon(true);
-            t.setPriority(Thread.MIN_PRIORITY);
-            t.start();
-            return null;
-        });
+        Thread t = InnocuousThread.newSystemThread(
+                "Cleanup-SunPKCS11",
+                cleaner,
+                Thread.MIN_PRIORITY);
+        assert t.getContextClassLoader() == null;
+        t.setDaemon(true);
+        t.start();
     }
 
     // destroy the token. Called if we detect that it has been removed

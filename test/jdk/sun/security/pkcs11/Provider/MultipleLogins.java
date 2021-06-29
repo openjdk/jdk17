@@ -47,13 +47,14 @@ public class MultipleLogins {
 
     public static void main(String[] args) throws Exception {
         String nssConfig = PKCS11Test.getNssConfig();
+        if (nssConfig == null) {
+            // No test framework support yet. Ignore
+            System.out.println("No NSS config found. Skipping.");
+            return;
+        }
+
         for (int i =0; i < NUM_PROVIDERS; i++) {
             // loop to set up test without security manger
-            if (nssConfig == null) {
-                // No test framework support yet. Ignore
-                System.out.println("No NSS config found. Skipping.");
-                return;
-            }
             providers[i] = (SunPKCS11)PKCS11Test.newPKCS11Provider();
         }
 
@@ -128,10 +129,7 @@ public class MultipleLogins {
         final Permissions perms = new Permissions();
         SimplePolicy() {
             perms.add(new PropertyPermission("*", "read, write"));
-            perms.add(new RuntimePermission("accessClassInPackage.sun.*"));
-            perms.add(new RuntimePermission("accessClassInPackage.sun.security.pkcs11.*"));
             perms.add(new SecurityPermission("authProvider.*"));
-            perms.add(new SecurityPermission("clearProviderProperties.*"));
             perms.add(new SecurityPermission("insertProvider.*"));
             perms.add(new SecurityPermission("removeProvider.*"));
         }
@@ -141,7 +139,6 @@ public class MultipleLogins {
             return perms.implies(permission) ||
                     DEFAULT_POLICY.implies(domain, permission);
         }
-
     }
 
     public static class PasswordCallbackHandler implements CallbackHandler {
