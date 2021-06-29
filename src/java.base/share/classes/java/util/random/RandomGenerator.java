@@ -633,7 +633,8 @@ public interface RandomGenerator {
      * Returns a pseudorandomly chosen {@code int} value between zero
      * (inclusive) and the specified bound (exclusive).
      *
-     * @param bound the upper bound (exclusive) for the returned value. Must be positive.
+     * @param bound the upper bound (exclusive) for the returned value.
+     * Must be positive.
      *
      * @return a pseudorandomly chosen {@code int} value between
      *         zero (inclusive) and the bound (exclusive)
@@ -641,11 +642,11 @@ public interface RandomGenerator {
      * @throws IllegalArgumentException if {@code bound} is not positive
      *
      * @implSpec The default implementation checks that {@code bound} is a
-     * positive int. Then invokes {@code nextInt()}, limiting the result to
-     * be greater equal zero and less than {@code bound}. If {@code bound} is a
-     * power of two then limiting is a simple masking operation. Otherwise,
+     * positive {@code int}. Then invokes {@code nextInt()}, limiting the result
+     * to be greater equal zero and less than {@code bound}. If {@code bound}
+     * is a power of two then limiting is a simple masking operation. Otherwise,
      * the result is re-calculated by invoking {@code nextInt()} until the
-     * result is greater equal zero and less than {@code bound}.
+     * result is greater than or equal zero and less than {@code bound}.
      */
     default int nextInt(int bound) {
         RandomSupport.checkBound(bound);
@@ -667,12 +668,12 @@ public interface RandomGenerator {
      *         or equal to {@code bound}
      *
      * @implSpec The default implementation checks that {@code origin} and
-     * {@code bound} are positive ints. Then invokes {@code nextInt()}, limiting
-     * the result to be greater equal {@code origin} and less than {@code bound}.
-     * If {@code bound} is a power of two then limiting is a simple masking
-     * operation. Otherwise, the result is re-calculated  by invoking
-     * {@code nextInt()} until the result is greater equal {@code origin}
-     * and less than {@code bound}.
+     * {@code bound} are positive {@code ints}. Then invokes {@code nextInt()},
+     * limiting the result to be greater equal {@code origin} and less than
+     * {@code bound}. If {@code bound} is a power of two then limiting is a
+     * simple masking operation. Otherwise, the result is re-calculated  by
+     * invoking {@code nextInt()} until the result is greater than or equal
+     * {@code origin} and less than {@code bound}.
      */
     default int nextInt(int origin, int bound) {
         RandomSupport.checkRange(origin, bound);
@@ -691,7 +692,8 @@ public interface RandomGenerator {
      * Returns a pseudorandomly chosen {@code long} value between zero
      * (inclusive) and the specified bound (exclusive).
      *
-     * @param bound the upper bound (exclusive) for the returned value.  Must be positive.
+     * @param bound the upper bound (exclusive) for the returned value.
+     * Must be positive.
      *
      * @return a pseudorandomly chosen {@code long} value between
      *         zero (inclusive) and the bound (exclusive)
@@ -699,11 +701,12 @@ public interface RandomGenerator {
      * @throws IllegalArgumentException if {@code bound} is not positive
      *
      * @implSpec The default implementation checks that {@code bound} is a
-     * positive long. Then invokes {@code nextLong()}, limiting the result to
-     * be greater equal zero and less than {@code bound}. If {@code bound} is a
-     * power of two then limiting is a simple masking operation. Otherwise,
-     * the result is re-calculated by invoking {@code nextLong()} until the
-     * result is greater equal zero and less than {@code bound}.
+     * positive  {@code long}. Then invokes {@code nextLong()}, limiting the
+     * result to be greater equal zero and less than {@code bound}. If
+     * {@code bound} is a power of two then limiting is a simple masking
+     * operation. Otherwise, the result is re-calculated by invoking
+     * {@code nextLong()} until the result is greater than or equal zero and
+     * less than {@code bound}.
      */
     default long nextLong(long bound) {
         RandomSupport.checkBound(bound);
@@ -725,11 +728,11 @@ public interface RandomGenerator {
      *         or equal to {@code bound}
      *
      * @implSpec The default implementation checks that {@code origin} and
-     * {@code bound} are positive longs. Then invokes {@code nextLong()},
+     * {@code bound} are positive {@code longs}. Then invokes {@code nextLong()},
      * limiting the result to be greater equal {@code origin} and less than
      * {@code bound}. If {@code bound} is a power of two then limiting is a
      * simple masking operation. Otherwise, the result is re-calculated by
-     * invoking {@code nextLong()} until the result is greater equal
+     * invoking {@code nextLong()} until the result is greater than or equal
      * {@code origin} and less than {@code bound}.
      */
     default long nextLong(long origin, long bound) {
