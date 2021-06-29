@@ -643,7 +643,7 @@ public interface RandomGenerator {
      *
      * @implSpec The default implementation checks that {@code bound} is a
      * positive {@code int}. Then invokes {@code nextInt()}, limiting the result
-     * to be greater equal zero and less than {@code bound}. If {@code bound}
+     * to be greater than or equal zero and less than {@code bound}. If {@code bound}
      * is a power of two then limiting is a simple masking operation. Otherwise,
      * the result is re-calculated by invoking {@code nextInt()} until the
      * result is greater than or equal zero and less than {@code bound}.
@@ -669,8 +669,8 @@ public interface RandomGenerator {
      *
      * @implSpec The default implementation checks that {@code origin} and
      * {@code bound} are positive {@code ints}. Then invokes {@code nextInt()},
-     * limiting the result to be greater equal {@code origin} and less than
-     * {@code bound}. If {@code bound} is a power of two then limiting is a
+     * limiting the result to be greater that or equal {@code origin} and less
+     * than {@code bound}. If {@code bound} is a power of two then limiting is a
      * simple masking operation. Otherwise, the result is re-calculated  by
      * invoking {@code nextInt()} until the result is greater than or equal
      * {@code origin} and less than {@code bound}.
@@ -702,7 +702,7 @@ public interface RandomGenerator {
      *
      * @implSpec The default implementation checks that {@code bound} is a
      * positive  {@code long}. Then invokes {@code nextLong()}, limiting the
-     * result to be greater equal zero and less than {@code bound}. If
+     * result to be greater than or equal zero and less than {@code bound}. If
      * {@code bound} is a power of two then limiting is a simple masking
      * operation. Otherwise, the result is re-calculated by invoking
      * {@code nextLong()} until the result is greater than or equal zero and
@@ -729,8 +729,8 @@ public interface RandomGenerator {
      *
      * @implSpec The default implementation checks that {@code origin} and
      * {@code bound} are positive {@code longs}. Then invokes {@code nextLong()},
-     * limiting the result to be greater equal {@code origin} and less than
-     * {@code bound}. If {@code bound} is a power of two then limiting is a
+     * limiting the result to be greater than or equal {@code origin} and less
+     * than {@code bound}. If {@code bound} is a power of two then limiting is a
      * simple masking operation. Otherwise, the result is re-calculated by
      * invoking {@code nextLong()} until the result is greater than or equal
      * {@code origin} and less than {@code bound}.
