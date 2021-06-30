@@ -116,8 +116,7 @@ public class SwitchBootstraps {
     public static CallSite typeSwitch(MethodHandles.Lookup lookup,
                                       String invocationName,
                                       MethodType invocationType,
-                                      Object... labels) throws NullPointerException,
-                                                               IllegalArgumentException {
+                                      Object... labels) {
         if (invocationType.parameterCount() != 2
             || (!invocationType.returnType().equals(int.class))
             || invocationType.parameterType(0).isPrimitive()
@@ -224,8 +223,7 @@ public class SwitchBootstraps {
     public static CallSite enumSwitch(MethodHandles.Lookup lookup,
                                       String invocationName,
                                       MethodType invocationType,
-                                      Object... labels) throws NullPointerException,
-                                                               IllegalArgumentException {
+                                      Object... labels) {
         if (invocationType.parameterCount() != 2
             || (!invocationType.returnType().equals(int.class))
             || invocationType.parameterType(0).isPrimitive()
@@ -253,7 +251,8 @@ public class SwitchBootstraps {
         Class<?> labelClass = label.getClass();
         if (labelClass == Class.class) {
             if (label != enumClassTemplate) {
-                throw new IllegalArgumentException("illegal Class label: " + label);
+                throw new IllegalArgumentException("the Class label: " + label +
+                                                   ", expected the provided enum class: " + enumClassTemplate);
             }
             return label;
         } else if (labelClass == String.class) {
@@ -265,7 +264,8 @@ public class SwitchBootstraps {
                 return null;
             }
         } else {
-            throw new IllegalArgumentException("label with illegal type found: " + labelClass);
+            throw new IllegalArgumentException("label with illegal type found: " + labelClass +
+                                               ", expected label of type either String or Class");
         }
     }
 
