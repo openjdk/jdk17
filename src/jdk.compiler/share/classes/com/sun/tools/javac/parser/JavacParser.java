@@ -3081,9 +3081,10 @@ public class JavacParser implements Parser {
                 }
             } else {
                 JCModifiers mods = optFinal(0);
-                JCExpression e = term(EXPR | TYPE | NOLAMBDA);
+                int expectedMode = mods.flags != 0 || mods.annotations.nonEmpty() ? TYPE : EXPR | TYPE;
+                JCExpression e = term(expectedMode | NOLAMBDA);
 
-                if (token.kind == IDENTIFIER || mods.flags != 0 || mods.annotations.nonEmpty()) {
+                if (token.kind == IDENTIFIER && (lastmode & TYPE) != 0) {
                     checkSourceLevel(token.pos, Feature.PATTERN_SWITCH);
                     return parsePattern(patternPos, null, e, false);
                 } else {
