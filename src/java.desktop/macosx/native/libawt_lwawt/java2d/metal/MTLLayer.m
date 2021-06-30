@@ -85,7 +85,6 @@
     }
 
     if (self.nextDrawableCount != 0) {
-        [self stopDisplayLink];
         return;
     }
     @autoreleasepool {
