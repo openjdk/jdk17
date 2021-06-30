@@ -331,7 +331,7 @@ public final class System {
     private static class CallersHolder {
         // Remember callers of setSecurityManager() here so that warning
         // is only printed once for each different caller
-        final static Map<String, Boolean> callers
+        final static Map<Class<?>, Boolean> callers
             = Collections.synchronizedMap(new WeakHashMap<>());
     }
 
@@ -387,14 +387,14 @@ public final class System {
     public static void setSecurityManager(@SuppressWarnings("removal") SecurityManager sm) {
         if (allowSecurityManager()) {
             var callerClass = Reflection.getCallerClass();
-            URL url = codeSource(callerClass);
-            final String source;
-            if (url == null) {
-                source = callerClass.getName();
-            } else {
-                source = callerClass.getName() + " (" + url + ")";
-            }
-            if (CallersHolder.callers.putIfAbsent(source, true) == null) {
+            if (CallersHolder.callers.putIfAbsent(callerClass, true) == null) {
+                URL url = codeSource(callerClass);
+                final String source;
+                if (url == null) {
+                    source = callerClass.getName();
+                } else {
+                    source = callerClass.getName() + " (" + url + ")";
+                }
                 initialErrStream.printf("""
                         WARNING: A terminally deprecated method in java.lang.System has been called
                         WARNING: System::setSecurityManager has been called by %s
