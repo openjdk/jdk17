@@ -28,7 +28,7 @@
  * @requires vm.compMode == "Xmixed" & vm.flavor == "server"
  *
  * @run main/othervm
- *        -Xcomp -Xbatch
+ *        -Xcomp -XX:CompileCommand=quiet -XX:CompileCommand=compileonly,compiler.types.TestMethodHandleSpeculation::main
  *        compiler.types.TestMethodHandleSpeculation
  */
 
