@@ -24,6 +24,7 @@
 /*
  * @test
  * @bug 8182043
+ * @key headful
  * @summary Access to Windows Large Icons
  * @run main SystemIconTest
  */
