@@ -1148,13 +1148,10 @@ CallGenerator* CallGenerator::for_method_handle_inline(JVMState* jvms, ciMethod*
         // Cast receiver to its type.
         if (!target->is_static()) {
           Node* arg = kit.argument(0);
-          ciKlass* sig_klass = signature->accessing_klass();
           const TypeOopPtr* arg_type = arg->bottom_type()->isa_oopptr();
-          const Type*       sig_type = TypeOopPtr::make_from_klass(sig_klass);
+          const Type*       sig_type = TypeOopPtr::make_from_klass(signature->accessing_klass());
           if (arg_type != NULL && !arg_type->higher_equal(sig_type)) {
-            // Keep the speculative part, but do not join with interfaces
-            const Type* recv_type = sig_klass->is_interface() ?
-                    sig_type : arg_type->join_speculative(sig_type);
+            const Type* recv_type = arg_type->filter_speculative(sig_type); // keep speculative parts
             Node* cast_obj = gvn.transform(new CheckCastPPNode(kit.control(), arg, recv_type));
             kit.set_argument(0, cast_obj);
           }
@@ -1164,13 +1161,10 @@ CallGenerator* CallGenerator::for_method_handle_inline(JVMState* jvms, ciMethod*
           ciType* t = signature->type_at(i);
           if (t->is_klass()) {
             Node* arg = kit.argument(receiver_skip + j);
-            ciKlass* sig_klass = t->as_klass();
             const TypeOopPtr* arg_type = arg->bottom_type()->isa_oopptr();
-            const Type*       sig_type = TypeOopPtr::make_from_klass(sig_klass);
+            const Type*       sig_type = TypeOopPtr::make_from_klass(t->as_klass());
             if (arg_type != NULL && !arg_type->higher_equal(sig_type)) {
-              // Keep the speculative part, but do not join with interfaces
-              const Type* narrowed_arg_type = sig_klass->is_interface() ?
-                      sig_type : arg_type->join_speculative(sig_type);
+              const Type* narrowed_arg_type = arg_type->filter_speculative(sig_type); // keep speculative parts
               Node* cast_obj = gvn.transform(new CheckCastPPNode(kit.control(), arg, narrowed_arg_type));
               kit.set_argument(receiver_skip + j, cast_obj);
             }
