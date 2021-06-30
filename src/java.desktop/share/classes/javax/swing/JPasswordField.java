@@ -515,11 +515,11 @@ public class JPasswordField extends JTextField {
             } else {
                 // Treat the text displayed in the JPasswordField
                 // as one word and sentence.
-                char[] password = getPassword();
-                if (password == null ||
-                    index < 0 || index >= password.length) {
+                int length = getDocument().getLength();
+                if (index < 0 || index >= length) {
                     return null;
                 }
+                char[] password = new char[length];
                 Arrays.fill(password, getEchoChar());
                 return new String(password);
             }
@@ -624,11 +624,11 @@ public class JPasswordField extends JTextField {
             } else {
                 // Treat the text displayed in the JPasswordField
                 // as one word, sentence, line and attribute run
-                char[] password = getPassword();
-                if (password == null ||
-                    index < 0 || index >= password.length) {
+                int length = getDocument().getLength();
+                if (index < 0 || index >= length) {
                     return null;
                 }
+                char[] password = new char[length];
                 Arrays.fill(password, getEchoChar());
                 String text = new String(password);
                 return new AccessibleTextSequence(0, password.length - 1, text);
