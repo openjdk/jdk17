@@ -62,6 +62,8 @@ public class Switches {
         runStringWithConstant(this::testStringWithConstantExpression);
         runFallThrough(this::testFallThroughStatement);
         runFallThrough(this::testFallThroughExpression);
+        runFallThrough(this::testFallThrough2Statement);
+        runFallThrough(this::testFallThrough2Expression);
         npeTest(this::npeTestStatement);
         npeTest(this::npeTestExpression);
         exhaustiveStatementSane("");
@@ -333,6 +335,33 @@ public class Switches {
             case Integer o && o != null:
                 r = 1;
             default:
+                r = 2;
+                yield r;
+        };
+
+        return r;
+    }
+
+    Integer testFallThrough2Statement(Integer i) {
+        int r = 0;
+
+        switch (i) {
+            case Integer o && o != null:
+                r = 1;
+            case -1: r = 1;
+            case null, default:
+                r = 2;
+        }
+
+        return r;
+    }
+
+    Integer testFallThrough2Expression(Integer i) {
+        int r = switch (i) {
+            case Integer o && o != null:
+                r = 1;
+            case -1: r = 1;
+            case null, default:
                 r = 2;
                 yield r;
         };

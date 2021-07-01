@@ -1713,7 +1713,7 @@ public class Attr extends JCTree.Visitor {
                                 log.error(pat.pos(), Errors.DuplicateCaseLabel);
                             } else if (wasTotalPattern) {
                                 log.error(pat.pos(), Errors.PatternDominated);
-                            } else if (wasPattern && !wasTypePattern) {
+                            } else if (wasPattern && !wasTypePattern && !wasNonEmptyFallThrough) {
                                 log.error(pat.pos(), Errors.FlowsThroughFromPattern);
                             }
                             wasNullPattern = hasNullPattern = true;
@@ -1764,7 +1764,7 @@ public class Attr extends JCTree.Visitor {
                                     }
                                 }
                             }
-                            if (wasPattern) {
+                            if (wasPattern && !wasNonEmptyFallThrough) {
                                 log.error(pat.pos(), Errors.FlowsThroughFromPattern);
                             }
                             wasConstant = true;
