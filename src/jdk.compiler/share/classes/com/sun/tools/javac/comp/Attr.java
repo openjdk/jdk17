@@ -1675,10 +1675,15 @@ public class Attr extends JCTree.Visitor {
             boolean hasDefault = false;           // Is there a default label?
             boolean hasTotalPattern = false;      // Is there a total pattern?
             boolean hasNullPattern = false;       // Is there a null pattern?
+            boolean wasConstant = false;
+            boolean wasDefault = false;
+            boolean wasNullPattern = false;
+            boolean wasPattern = false;
+            boolean wasTypePattern = false;
+            boolean wasNonEmptyFallThrough = false;
             CaseTree.CaseKind caseKind = null;
             boolean wasError = false;
             MatchBindings prevBindings = null;
-            boolean prevCompletedNormally = false;
             for (List<JCCase> l = cases; l.nonEmpty(); l = l.tail) {
                 JCCase c = l.head;
                 if (caseKind == null) {
@@ -1696,64 +1701,74 @@ public class Attr extends JCTree.Visitor {
                         if (TreeInfo.isNull(expr)) {
                             preview.checkSourceLevel(expr.pos(), Feature.CASE_NULL);
                             if (hasNullPattern) {
-                                log.error(c.pos(), Errors.DuplicateCaseLabel);
+                                log.error(pat.pos(), Errors.DuplicateCaseLabel);
                             } else if (wasTotalPattern) {
-                                log.error(c.pos(), Errors.PatternDominated);
+                                log.error(pat.pos(), Errors.PatternDominated);
+                            } else if (wasPattern && !wasTypePattern) {
+                                log.error(pat.pos(), Errors.FlowsThroughFromPattern);
                             }
-                            hasNullPattern = true;
+                            wasNullPattern = hasNullPattern = true;
                             attribExpr(expr, switchEnv, seltype);
                             matchBindings = new MatchBindings(matchBindings.bindingsWhenTrue, matchBindings.bindingsWhenFalse, true);
-                        } else if (enumSwitch) {
-                            Symbol sym = enumConstant(expr, seltype);
-                            if (sym == null) {
-                                log.error(expr.pos(), Errors.EnumLabelMustBeUnqualifiedEnum);
-                            } else if (!labels.add(sym)) {
-                                log.error(c.pos(), Errors.DuplicateCaseLabel);
-                            } else {
-                                checkCaseLabelDominated(pat.pos(), coveredTypes, sym.type);
-                            }
-                        } else if (errorEnumSwitch) {
-                            //error recovery: the selector is erroneous, and all the case labels
-                            //are identifiers. This could be an enum switch - don't report resolve
-                            //error for the case label:
-                            var prevResolveHelper = rs.basicLogResolveHelper;
-                            try {
-                                rs.basicLogResolveHelper = rs.silentLogResolveHelper;
-                                attribExpr(pat, switchEnv, seltype);
-                            } finally {
-                                rs.basicLogResolveHelper = prevResolveHelper;
-                            }
                         } else {
-                            Type pattype = attribExpr(expr, switchEnv, seltype);
-                            if (!pattype.hasTag(ERROR)) {
-                                if (!stringSwitch && !types.isAssignable(seltype, syms.intType)) {
-                                    log.error(pat.pos(), Errors.ConstantLabelNotCompatible(pattype, seltype));
-                                }
-                                if (pattype.constValue() == null) {
-                                    log.error(expr.pos(),
-                                              (stringSwitch ? Errors.StringConstReq : Errors.ConstExprReq));
-                                } else if (!labels.add(pattype.constValue())) {
-                                    log.error(c.pos(), Errors.DuplicateCaseLabel);
+                            if (enumSwitch) {
+                                Symbol sym = enumConstant(expr, seltype);
+                                if (sym == null) {
+                                    log.error(expr.pos(), Errors.EnumLabelMustBeUnqualifiedEnum);
+                                } else if (!labels.add(sym)) {
+                                    log.error(pat.pos(), Errors.DuplicateCaseLabel);
                                 } else {
-                                    checkCaseLabelDominated(pat.pos(), coveredTypes, types.boxedTypeOrType(pattype));
+                                    checkCaseLabelDominated(pat.pos(), coveredTypes, sym.type);
+                                }
+                            } else if (errorEnumSwitch) {
+                                //error recovery: the selector is erroneous, and all the case labels
+                                //are identifiers. This could be an enum switch - don't report resolve
+                                //error for the case label:
+                                var prevResolveHelper = rs.basicLogResolveHelper;
+                                try {
+                                    rs.basicLogResolveHelper = rs.silentLogResolveHelper;
+                                    attribExpr(pat, switchEnv, seltype);
+                                } finally {
+                                    rs.basicLogResolveHelper = prevResolveHelper;
+                                }
+                            } else {
+                                Type pattype = attribExpr(expr, switchEnv, seltype);
+                                if (!pattype.hasTag(ERROR)) {
+                                    if (!stringSwitch && !types.isAssignable(seltype, syms.intType)) {
+                                        log.error(pat.pos(), Errors.ConstantLabelNotCompatible(pattype, seltype));
+                                    }
+                                    if (pattype.constValue() == null) {
+                                        log.error(expr.pos(),
+                                                  (stringSwitch ? Errors.StringConstReq : Errors.ConstExprReq));
+                                    } else if (!labels.add(pattype.constValue())) {
+                                        log.error(pat.pos(), Errors.DuplicateCaseLabel);
+                                    } else {
+                                        checkCaseLabelDominated(pat.pos(), coveredTypes, types.boxedTypeOrType(pattype));
+                                    }
                                 }
                             }
+                            if (wasPattern) {
+                                log.error(pat.pos(), Errors.FlowsThroughFromPattern);
+                            }
+                            wasConstant = true;
                         }
                     } else if (pat.hasTag(DEFAULTCASELABEL)) {
                         if (hasDefault) {
                             log.error(pat.pos(), Errors.DuplicateDefaultLabel);
                         } else if (hasTotalPattern) {
                             log.error(pat.pos(), Errors.TotalPatternAndDefault);
-                        } else if (matchBindings.bindingsWhenTrue.nonEmpty()) {
-                            //there was a pattern, and the execution flows into a default:
+                        } else if (wasPattern) {
                             log.error(pat.pos(), Errors.FlowsThroughFromPattern);
                         }
                         hasDefault = true;
+                        wasDefault = true;
                         matchBindings = MatchBindingsComputer.EMPTY;
                     } else {
-                        if (prevCompletedNormally) {
+                        wasTypePattern = pat.hasTag(BINDINGPATTERN);
+                        if (wasPattern || (!wasTypePattern && wasNullPattern) || (wasNonEmptyFallThrough && wasNullPattern) || wasConstant || wasDefault) {
                             log.error(pat.pos(), Errors.FlowsThroughToPattern);
                         }
+                        wasPattern = true;
                         //binding pattern
                         attribExpr(pat, switchEnv);
                         var primary = TreeInfo.primaryPatternType((JCPattern) pat);
@@ -1780,7 +1795,6 @@ public class Attr extends JCTree.Visitor {
                         }
                     }
                     currentBindings = matchBindingsComputer.switchCase(pat, currentBindings, matchBindings);
-                    prevCompletedNormally = !TreeInfo.isNull(pat);
                 }
                 Env<AttrContext> caseEnv =
                         bindingEnv(switchEnv, c, currentBindings.bindingsWhenTrue);
@@ -1792,11 +1806,17 @@ public class Attr extends JCTree.Visitor {
                 addVars(c.stats, switchEnv.info.scope);
 
                 boolean completesNormally = c.caseKind == CaseTree.CaseKind.STATEMENT ? flow.aliveAfter(caseEnv, c, make) : false;
+
+                if (c.stats.nonEmpty() && !completesNormally) {
+                    wasConstant = false;
+                    wasDefault = false;
+                    wasNullPattern = false;
+                    wasPattern = false;
+                    wasTypePattern = false;
+                }
+
+                wasNonEmptyFallThrough = c.stats.nonEmpty() && completesNormally;
                 prevBindings = completesNormally ? currentBindings : null;
-                prevCompletedNormally =
-                        completesNormally &&
-                        !(c.labels.size() == 1 &&
-                          TreeInfo.isNull(c.labels.head) && c.stats.isEmpty());
             }
             if (switchTree.hasTag(SWITCH)) {
                 ((JCSwitch) switchTree).hasTotalPattern = hasDefault || hasTotalPattern;
