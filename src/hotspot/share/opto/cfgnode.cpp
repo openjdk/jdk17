@@ -2034,7 +2034,7 @@ Node *PhiNode::Ideal(PhaseGVN *phase, bool can_reshape) {
 
   Node* opt = NULL;
   int true_path = is_diamond_phi();
-  if( true_path != 0 ) {
+  if (true_path != 0 && !(can_reshape && wait_for_region_igvn(phase))) {
     // Check for CMove'ing identity. If it would be unsafe,
     // handle it here. In the safe case, let Identity handle it.
     Node* unsafe_id = is_cmove_id(phase, true_path);
