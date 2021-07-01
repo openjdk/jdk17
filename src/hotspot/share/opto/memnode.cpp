@@ -3323,7 +3323,7 @@ void MemBarNode::remove(PhaseIterGVN *igvn) {
       leading->remove(igvn);
     }
   }
-  if (proj_out_or_null(TypeFunc::Memory) != NULL) { 
+  if (proj_out_or_null(TypeFunc::Memory) != NULL) {
     igvn->replace_node(proj_out(TypeFunc::Memory), in(TypeFunc::Memory));
   }
   if (proj_out_or_null(TypeFunc::Control) != NULL) {
