@@ -23,8 +23,8 @@
 
 /*
  * @test
- * @bug 8268549
- * @summary Verify error reporting on inherited tags
+ * @bug 8269722
+ * @summary NPE in HtmlDocletWriter, reporting errors on inherited tags
  * @library /tools/lib ../../lib
  * @modules jdk.javadoc/jdk.javadoc.internal.tool
  * @build toolbox.ToolBox javadoc.tester.*
