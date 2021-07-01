@@ -963,11 +963,11 @@ void PhaseMacroExpand::process_users_of_allocation(CallNode *alloc) {
         assert(init->outcnt() <= 2, "only a control and memory projection expected");
         Node *ctrl_proj = init->proj_out_or_null(TypeFunc::Control);
         if (ctrl_proj != NULL) {
-          _igvn.replace_node(ctrl_proj, init->in(TypeFunc::Control));
 #ifdef ASSERT
           Node* tmp = init->in(TypeFunc::Control);
           assert(tmp == _callprojs.fallthrough_catchproj, "allocation control projection");
 #endif
+          _igvn.replace_node(ctrl_proj, init->in(TypeFunc::Control));
         }
         Node *mem_proj = init->proj_out_or_null(TypeFunc::Memory);
         if (mem_proj != NULL) {
