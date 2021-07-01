@@ -24,7 +24,6 @@
 /*
  * @test
  * @bug 8182043
- * @key headful
  * @summary Access to Windows Large Icons
  * @run main SystemIconTest
  */
@@ -73,10 +72,6 @@ public class SystemIconTest {
 
     static void testSystemIcon(File file, boolean implComplete) {
         int[] sizes = new int[] {16, 32, 48, 64, 128};
-        if (!file.exists() || !file.canRead()) {
-            System.err.println("File " + file.getAbsolutePath() + " is inaccessible");
-            return;
-        }
 
         for (int size : sizes) {
             Icon i = fsv.getSystemIcon(file, size, size);
@@ -92,12 +87,13 @@ public class SystemIconTest {
             //JOptionPane.showMessageDialog(null, label);
 
             if (icon == null) {
-                throw new RuntimeException("icon is null!!!");
+                throw new RuntimeException(file.getAbsolutePath() + " icon is null!!!");
             }
 
             if (implComplete && icon.getIconWidth() != size) {
                 throw new RuntimeException("Wrong icon size " +
-                        icon.getIconWidth() + " when requested " + size);
+                        icon.getIconWidth() + " when requested " + size +
+                        " for file " + file.getAbsolutePath());
             }
 
             if (icon.getImage() instanceof MultiResolutionImage) {
@@ -105,11 +101,6 @@ public class SystemIconTest {
                 if (mri.getResolutionVariant(size, size) == null) {
                     throw new RuntimeException("There is no suitable variant for the size "
                             + size + " in the multi resolution icon " + file.getAbsolutePath());
-                }
-            } else {
-                if (implComplete) {
-                    throw new RuntimeException("icon for " +
-                     file.getAbsolutePath() + " is supposed to be multi-resolution but it is not");
                 }
             }
         }
