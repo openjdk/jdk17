@@ -1681,11 +1681,14 @@ public class Attr extends JCTree.Visitor {
             boolean hasDefault = false;           // Is there a default label?
             boolean hasTotalPattern = false;      // Is there a total pattern?
             boolean hasNullPattern = false;       // Is there a null pattern?
-            boolean wasConstant = false;
-            boolean wasDefault = false;
-            boolean wasNullPattern = false;
-            boolean wasPattern = false;
-            boolean wasTypePattern = false;
+            boolean wasConstant = false;          // Seen a constant in the same case label
+            boolean wasDefault = false;           // Seen a default in the same case label
+            boolean wasNullPattern = false;       // Seen a null pattern in the same case label,
+                                                  //or fall through from a null pattern
+            boolean wasPattern = false;           // Seen a pattern in the same case label
+                                                  //or fall through from a pattern
+            boolean wasTypePattern = false;       // Seen a pattern in the same case label
+                                                  //or fall through from a type pattern
             boolean wasNonEmptyFallThrough = false;
             CaseTree.CaseKind caseKind = null;
             boolean wasError = false;
@@ -1771,18 +1774,20 @@ public class Attr extends JCTree.Visitor {
                             log.error(pat.pos(), Errors.DuplicateDefaultLabel);
                         } else if (hasTotalPattern) {
                             log.error(pat.pos(), Errors.TotalPatternAndDefault);
-                        } else if (wasPattern) {
+                        } else if (wasPattern && !wasNonEmptyFallThrough) {
                             log.error(pat.pos(), Errors.FlowsThroughFromPattern);
                         }
                         hasDefault = true;
                         wasDefault = true;
                         matchBindings = MatchBindingsComputer.EMPTY;
                     } else {
-                        wasTypePattern = pat.hasTag(BINDINGPATTERN);
-                        if (wasPattern || (!wasTypePattern && wasNullPattern) || (wasNonEmptyFallThrough && wasNullPattern) || wasConstant || wasDefault) {
+                        boolean isTypePattern = pat.hasTag(BINDINGPATTERN);
+                        if (wasPattern || wasConstant || wasDefault ||
+                            (wasNullPattern && (!isTypePattern || wasNonEmptyFallThrough))) {
                             log.error(pat.pos(), Errors.FlowsThroughToPattern);
                         }
                         wasPattern = true;
+                        wasTypePattern = isTypePattern;
                         //binding pattern
                         attribExpr(pat, switchEnv);
                         var primary = TreeInfo.primaryPatternType((JCPattern) pat);
@@ -1821,12 +1826,12 @@ public class Attr extends JCTree.Visitor {
 
                 boolean completesNormally = c.caseKind == CaseTree.CaseKind.STATEMENT ? flow.aliveAfter(caseEnv, c, make) : false;
 
-                if (c.stats.nonEmpty() && !completesNormally) {
+                if (c.stats.nonEmpty()) {
                     wasConstant = false;
                     wasDefault = false;
-                    wasNullPattern = false;
-                    wasPattern = false;
-                    wasTypePattern = false;
+                    wasNullPattern &= completesNormally;
+                    wasPattern &= completesNormally;
+                    wasTypePattern &= completesNormally;
                 }
 
                 wasNonEmptyFallThrough = c.stats.nonEmpty() && completesNormally;
