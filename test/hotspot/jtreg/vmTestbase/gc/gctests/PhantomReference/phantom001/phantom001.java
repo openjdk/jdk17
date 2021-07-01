@@ -127,7 +127,7 @@ public class phantom001 extends ThreadedGCTest implements GarbageProducerAware, 
         private void eatMemory(int initialFactor) {
             GarbageUtils.eatMemory(getExecutionController(),
                                    garbageProducer,
-                                   initialFactor , 10, 0);
+                                   initialFactor, 10, 0);
         }
 
         public void run() {
