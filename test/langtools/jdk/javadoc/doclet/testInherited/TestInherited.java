@@ -56,7 +56,7 @@ public class TestInherited extends JavadocTester {
                          */
                         public void m(int i) { }
                     }
-                                
+
                     public static class Sub extends Base {
                         public void m(int i) { }
                     }
@@ -80,7 +80,7 @@ public class TestInherited extends JavadocTester {
                          */
                         public int m() { }
                     }
-                                
+
                     public static class Sub extends Base {
                         public int m() { }
                     }
