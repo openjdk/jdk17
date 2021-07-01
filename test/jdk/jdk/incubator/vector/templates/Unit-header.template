@@ -242,6 +242,21 @@ public class $vectorteststype$ extends AbstractVectorTest {
         }
     }
 
+    interface FMaskReductionOp {
+        int apply(boolean[] a, int idx);
+    }
+
+    static void assertMaskReductionArraysEquals(int[] r, boolean[] a, FMaskReductionOp f) {
+        int i = 0;
+        try {
+            for (; i < a.length; i += SPECIES.length()) {
+                Assert.assertEquals(r[i], f.apply(a, i));
+            }
+        } catch (AssertionError e) {
+            Assert.assertEquals(r[i], f.apply(a, i), "at index #" + i);
+        }
+    }
+
     static void assertInsertArraysEquals($type$[] r, $type$[] a, $type$ element, int index) {
         int i = 0;
         try {
@@ -1344,6 +1359,13 @@ public class $vectorteststype$ extends AbstractVectorTest {
         int length = BUFFER_REPS * vl;
         return new boolean[length];
     };
+
+#if[!Int]
+    static final IntFunction<int[]> ifr = (vl) -> {
+        int length = BUFFER_REPS * vl;
+        return new int[length];
+    };
+#end[!Int]
 
 #if[!Long]
     static final IntFunction<long[]> lfr = (vl) -> {
