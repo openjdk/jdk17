@@ -23,7 +23,7 @@
 
 /*
  * @test
- * @bug 8262891
+ * @bug 8262891 8269146
  * @summary Verify errors related to pattern switches.
  * @compile/fail/ref=SwitchErrors.out --enable-preview -source ${jdk.version} -XDrawDiagnostics -XDshould-stop.at=FLOW SwitchErrors.java
  * @compile/fail/ref=SwitchErrors-no-preview.out -XDrawDiagnostics -XDshould-stop.at=FLOW SwitchErrors.java
