@@ -1694,6 +1694,7 @@ public class JavacParser implements Parser {
      * method reference or a binary expression. To disambiguate, look for a
      * matching '&gt;' and see if the subsequent terminal is either '.' or '::'.
      */
+    @SuppressWarnings("fallthrough")
     ParensResult analyzeParens() {
         int depth = 0;
         boolean type = false;
