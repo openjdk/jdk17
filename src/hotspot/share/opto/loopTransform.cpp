@@ -1993,7 +1993,8 @@ void PhaseIdealLoop::do_unroll(IdealLoopTree *loop, Node_List &old_new, bool adj
     if (!is_canonical_loop_entry(loop_head)) {
       return;
     }
-    opaq = loop_head->skip_predicates()->in(0)->in(1)->in(1)->in(2);
+    Node *cmp = loop_head->skip_predicates()->in(0)->in(1)->in(1);
+    opaq = get_opaque_from_cmp(cmp);
     // Zero-trip test uses an 'opaque' node which is not shared.
     assert(opaq->outcnt() == 1 && opaq->in(1) == limit, "");
   }
@@ -2615,7 +2616,8 @@ int PhaseIdealLoop::do_range_check(IdealLoopTree *loop, Node_List &old_new) {
   // Need to find the main-loop zero-trip guard
   Node *ctrl = cl->skip_predicates();
   Node *iffm = ctrl->in(0);
-  Node *opqzm = iffm->in(1)->in(1)->in(2);
+  Node *cmpzm = iffm->in(1)->in(1);
+  Node *opqzm = get_opaque_from_cmp(cmpzm);
   assert(opqzm->in(1) == main_limit, "do not understand situation");
 
   // Find the pre-loop limit; we will expand its iterations to
