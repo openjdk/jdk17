@@ -2077,7 +2077,6 @@ public class JavacParser implements Parser {
             return t;
         }
     }
-
     List<JCExpression> typeArgumentsOpt() {
         return typeArgumentsOpt(TYPE);
     }
@@ -3074,7 +3073,8 @@ public class JavacParser implements Parser {
                 lookahead++;
             }
             JCModifiers mods = optFinal(0);
-            boolean pattern = mods.flags != 0 || mods.annotations.nonEmpty() || analyzePattern(lookahead) == PatternResult.PATTERN;
+            boolean pattern = mods.flags != 0 || mods.annotations.nonEmpty() ||
+                              analyzePattern(lookahead) == PatternResult.PATTERN;
             if (pattern) {
                 checkSourceLevel(token.pos, Feature.PATTERN_SWITCH);
                 return parsePattern(patternPos, mods, null, false);
