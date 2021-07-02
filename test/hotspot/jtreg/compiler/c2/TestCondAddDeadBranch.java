@@ -106,7 +106,7 @@ public class TestCondAddDeadBranch {
         System.out.println("s i31 i32 = " + s + "," + i31 + "," + i32);
         System.out.println("i33 i34 i35 = " + i33 + "," + i34 + "," + i35);
     }
-    
+
     public static void main(String[] strArr) {
         TestCondAddDeadBranch _instance = new TestCondAddDeadBranch();
         for (int i = 0; i < 10; i++ ) {
