@@ -3863,9 +3863,6 @@ void C2_MacroAssembler::vector_mask_operation(int opc, Register dst, XMMRegister
   vpsubb(xtmp, xtmp, mask, vec_enc);
   evpmovb2m(ktmp, xtmp, vec_enc);
   kmovql(tmp, ktmp);
-  if (masklen < 64) {
-    andq(tmp, (((jlong)1 << masklen) - 1));
-  }
   switch(opc) {
     case Op_VectorMaskTrueCount:
       popcntq(dst, tmp);

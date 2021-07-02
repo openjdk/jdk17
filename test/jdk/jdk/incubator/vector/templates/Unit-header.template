@@ -1360,13 +1360,6 @@ public class $vectorteststype$ extends AbstractVectorTest {
         return new boolean[length];
     };
 
-#if[!Int]
-    static final IntFunction<int[]> ifr = (vl) -> {
-        int length = BUFFER_REPS * vl;
-        return new int[length];
-    };
-#end[!Int]
-
 #if[!Long]
     static final IntFunction<long[]> lfr = (vl) -> {
         int length = BUFFER_REPS * vl;

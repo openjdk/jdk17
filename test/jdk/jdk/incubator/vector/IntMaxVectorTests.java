@@ -1097,7 +1097,6 @@ public class IntMaxVectorTests extends AbstractVectorTest {
         return new boolean[length];
     };
 
-
     static final IntFunction<long[]> lfr = (vl) -> {
         int length = BUFFER_REPS * vl;
         return new long[length];
@@ -5216,7 +5215,7 @@ public class IntMaxVectorTests extends AbstractVectorTest {
     @Test(dataProvider = "maskProvider")
     static void maskTrueCountIntMaxVectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
-        int[] r = fr.apply(SPECIES.length());
+        int[] r = new int[a.length];
 
         for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
             for (int i = 0; i < a.length; i += SPECIES.length()) {
@@ -5241,7 +5240,7 @@ public class IntMaxVectorTests extends AbstractVectorTest {
     @Test(dataProvider = "maskProvider")
     static void maskLastTrueIntMaxVectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
-        int[] r = fr.apply(SPECIES.length());
+        int[] r = new int[a.length];
 
         for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
             for (int i = 0; i < a.length; i += SPECIES.length()) {
@@ -5266,7 +5265,7 @@ public class IntMaxVectorTests extends AbstractVectorTest {
     @Test(dataProvider = "maskProvider")
     static void maskFirstTrueIntMaxVectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
-        int[] r = fr.apply(SPECIES.length());
+        int[] r = new int[a.length];
 
         for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
             for (int i = 0; i < a.length; i += SPECIES.length()) {

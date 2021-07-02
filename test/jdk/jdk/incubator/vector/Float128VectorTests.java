@@ -1278,11 +1278,6 @@ public class Float128VectorTests extends AbstractVectorTest {
         return new boolean[length];
     };
 
-    static final IntFunction<int[]> ifr = (vl) -> {
-        int length = BUFFER_REPS * vl;
-        return new int[length];
-    };
-
     static final IntFunction<long[]> lfr = (vl) -> {
         int length = BUFFER_REPS * vl;
         return new long[length];
@@ -4790,7 +4785,7 @@ public class Float128VectorTests extends AbstractVectorTest {
     @Test(dataProvider = "maskProvider")
     static void maskTrueCountFloat128VectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
-        int[] r = ifr.apply(SPECIES.length());
+        int[] r = new int[a.length];
 
         for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
             for (int i = 0; i < a.length; i += SPECIES.length()) {
@@ -4815,7 +4810,7 @@ public class Float128VectorTests extends AbstractVectorTest {
     @Test(dataProvider = "maskProvider")
     static void maskLastTrueFloat128VectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
-        int[] r = ifr.apply(SPECIES.length());
+        int[] r = new int[a.length];
 
         for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
             for (int i = 0; i < a.length; i += SPECIES.length()) {
@@ -4840,7 +4835,7 @@ public class Float128VectorTests extends AbstractVectorTest {
     @Test(dataProvider = "maskProvider")
     static void maskFirstTrueFloat128VectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
-        int[] r = ifr.apply(SPECIES.length());
+        int[] r = new int[a.length];
 
         for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
             for (int i = 0; i < a.length; i += SPECIES.length()) {

@@ -1092,7 +1092,6 @@ public class Int256VectorTests extends AbstractVectorTest {
         return new boolean[length];
     };
 
-
     static final IntFunction<long[]> lfr = (vl) -> {
         int length = BUFFER_REPS * vl;
         return new long[length];
@@ -5211,7 +5210,7 @@ public class Int256VectorTests extends AbstractVectorTest {
     @Test(dataProvider = "maskProvider")
     static void maskTrueCountInt256VectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
-        int[] r = fr.apply(SPECIES.length());
+        int[] r = new int[a.length];
 
         for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
             for (int i = 0; i < a.length; i += SPECIES.length()) {
@@ -5236,7 +5235,7 @@ public class Int256VectorTests extends AbstractVectorTest {
     @Test(dataProvider = "maskProvider")
     static void maskLastTrueInt256VectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
-        int[] r = fr.apply(SPECIES.length());
+        int[] r = new int[a.length];
 
         for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
             for (int i = 0; i < a.length; i += SPECIES.length()) {
@@ -5261,7 +5260,7 @@ public class Int256VectorTests extends AbstractVectorTest {
     @Test(dataProvider = "maskProvider")
     static void maskFirstTrueInt256VectorTestsSmokeTest(IntFunction<boolean[]> fa) {
         boolean[] a = fa.apply(SPECIES.length());
-        int[] r = fr.apply(SPECIES.length());
+        int[] r = new int[a.length];
 
         for (int ic = 0; ic < INVOC_COUNT * INVOC_COUNT; ic++) {
             for (int i = 0; i < a.length; i += SPECIES.length()) {
