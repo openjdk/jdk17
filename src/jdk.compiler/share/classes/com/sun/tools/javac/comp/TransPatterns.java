@@ -386,6 +386,7 @@ public class TransPatterns extends TreeTranslator {
                     hasNullCase = true;
                 }
             }
+            selector = translate(selector);
             statements.append(make.at(tree.pos).VarDef(temp, !hasNullCase ? attr.makeNullCheck(selector)
                                                                           : selector));
             VarSymbol index = new VarSymbol(Flags.SYNTHETIC,

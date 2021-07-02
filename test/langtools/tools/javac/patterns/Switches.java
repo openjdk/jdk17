@@ -28,7 +28,7 @@ import java.util.function.Function;
 
 /*
  * @test
- * @bug 8262891 8268333 8268896 8269802
+ * @bug 8262891 8268333 8268896 8269802 8269808
  * @summary Check behavior of pattern switches.
  * @compile --enable-preview -source ${jdk.version} Switches.java
  * @run main/othervm --enable-preview Switches
@@ -71,6 +71,7 @@ public class Switches {
         switchNestingTest(this::switchNestingStatementExpression);
         switchNestingTest(this::switchNestingExpressionStatement);
         switchNestingTest(this::switchNestingExpressionExpression);
+        switchNestingTest(this::switchNestingIfSwitch);
     }
 
     void run(Function<Object, Integer> mapper) {
@@ -458,6 +459,31 @@ public class Switches {
                     default -> "other, other";
                 };
         };
+    }
+
+    String switchNestingIfSwitch(Object o1, Object o2) {
+        BiFunction<Object, Object, String> f = (n1, n2) -> {
+            if (o1 instanceof CharSequence cs) {
+                return switch (cs) {
+                    case String s1 ->
+                        switch (o2) {
+                            case String s2 -> "string, string";
+                            default -> "string, other";
+                        };
+                    default ->
+                        switch (o2) {
+                            case String s2 -> "other, string";
+                            default -> "other, other";
+                        };
+                };
+            } else {
+                return switch (o2) {
+                            case String s2 -> "other, string";
+                            default -> "other, other";
+                        };
+            }
+        };
+        return f.apply(o1, o2);
     }
 
     //verify that for cases like:
