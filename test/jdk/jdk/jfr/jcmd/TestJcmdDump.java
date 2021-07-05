@@ -110,12 +110,7 @@ public class TestJcmdDump {
             List<String> params = buildParameters(pathToGCRoots, name, recording);
             System.out.println(params);
             OutputAnalyzer output = ProcessTools.executeProcess(new ProcessBuilder(params));
-            System.out.println("---------------- stdout ----------------");
-            System.out.println(output.getStdout());
-            System.out.println("---------------- stderr ----------------");
-            System.out.println(output.getStderr());
-            System.out.println("----------------------------------------");
-            System.out.println();
+            output.reportDiagnosticSummary();
             JcmdAsserts.assertRecordingDumpedToFile(output, recording);
             int rootCount = 0;
             int oldObjectCount = 0;
