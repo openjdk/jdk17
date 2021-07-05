@@ -1217,8 +1217,8 @@ void PhaseIdealLoop::ensure_zero_trip_guard_proj(Node* node, bool is_main_loop) 
   assert(zer_bol != NULL && zer_bol->is_Bool(), "must be Bool");
   Node* zer_cmp = zer_bol->in(1);
   assert(zer_cmp != NULL && zer_cmp->Opcode() == Op_CmpI, "must be CmpI");
-  // For the main loop, the opaque node is the second input to zer_cmp, for the post loop it's the first input node
-  Node* zer_opaq = zer_cmp->in(is_main_loop ? 2 : 1);
+  // For the main loop, the opaque node might at any input to zer_cmp, for the post loop it's the first input node
+  Node* zer_opaq = is_main_loop ? get_opaque_from_cmp(zer_cmp) : zer_cmp->in(1);
   assert(zer_opaq != NULL && zer_opaq->Opcode() == Op_Opaque1, "must be Opaque1");
 }
 #endif
@@ -3148,7 +3148,8 @@ static CountedLoopNode* locate_pre_from_main(CountedLoopNode* main_loop) {
 void IdealLoopTree::remove_main_post_loops(CountedLoopNode *cl, PhaseIdealLoop *phase) {
   CountedLoopEndNode* pre_end = cl->loopexit();
   Node* pre_cmp = pre_end->cmp_node();
-  if (pre_cmp->in(2)->Opcode() != Op_Opaque1) {
+  Node* pre_cmp_opaq = PhaseIdealLoop::get_opaque_from_cmp(pre_cmp);
+  if (pre_cmp_opaq != NULL) {
     // Only safe to remove the main loop if the compiler optimized it
     // out based on an unknown number of iterations
     return;
@@ -3173,11 +3174,12 @@ void IdealLoopTree::remove_main_post_loops(CountedLoopNode *cl, PhaseIdealLoop *
   Node* main_iff = main_head->skip_predicates()->in(0);
 
   // Remove the Opaque1Node of the pre loop and make it execute all iterations
-  phase->_igvn.replace_input_of(pre_cmp, 2, pre_cmp->in(2)->in(2));
+  phase->_igvn.replace_input_of(pre_cmp, pre_cmp->in(1) == pre_cmp_opaq ? 1 : 2, pre_cmp_opaq->in(2));
   // Remove the Opaque1Node of the main loop so it can be optimized out
   Node* main_cmp = main_iff->in(1)->in(1);
-  assert(main_cmp->in(2)->Opcode() == Op_Opaque1, "main loop has no opaque node?");
-  phase->_igvn.replace_input_of(main_cmp, 2, main_cmp->in(2)->in(1));
+  Node* opaq = PhaseIdealLoop::get_opaque_from_cmp(main_cmp);
+  assert(opaq != NULL, "main loop has no opaque node?");
+  phase->_igvn.replace_input_of(main_cmp, main_cmp->in(1) == opaq ? 1 : 2, opaq->in(1));
 }
 
 //------------------------------do_remove_empty_loop---------------------------
