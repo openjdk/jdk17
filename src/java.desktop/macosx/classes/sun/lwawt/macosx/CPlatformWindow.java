@@ -334,6 +334,10 @@ public class CPlatformWindow extends CFRetainedResource implements PlatformWindo
 
         responder = createPlatformResponder();
         contentView.initialize(peer, responder);
+        boolean isTranslucent = peer != null && peer.isTranslucent();
+        if (!isTranslucent) {
+            contentView.setWindowLayerOpaque(true);
+        }
 
         Rectangle bounds;
         if (!IS(DECORATED, styleBits)) {
