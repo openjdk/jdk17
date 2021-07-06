@@ -123,7 +123,7 @@ int AsyncLogWriter::write() {
     AsyncLogLocker locker;
 
     _buffer.pop_all(&logs);
-    dequeued = static_cast<int>(logs.size());
+    dequeued = logs.size();
     // append meta-messages of dropped counters
     AsyncLogMapIterator dropped_counters_iter(logs);
     _stats.iterate(&dropped_counters_iter);
@@ -160,9 +160,7 @@ void AsyncLogWriter::run() {
     _sem.wait();
 
     int n = write();
-    // correct the value of _sem.
-    // pre-decrement as we already performed the first wait
-    while (--n > 0) {
+    for (int i = n - 1; i > 0; --i) {
       _sem.wait();
     }
   }
