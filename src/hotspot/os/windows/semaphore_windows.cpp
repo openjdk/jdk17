@@ -39,7 +39,7 @@ WindowsSemaphore::~WindowsSemaphore() {
   ::CloseHandle(_semaphore);
 }
 
-void WindowsSemaphore::signal(uint count) {
+void WindowsSemaphore::signal(uint count, bool ignore_overflow) {
   if (count > 0) {
     BOOL ret = ::ReleaseSemaphore(_semaphore, count, NULL);
 

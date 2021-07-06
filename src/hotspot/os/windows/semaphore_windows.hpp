@@ -39,7 +39,7 @@ class WindowsSemaphore : public CHeapObj<mtInternal> {
   WindowsSemaphore(uint value = 0);
   ~WindowsSemaphore();
 
-  void signal(uint count = 1);
+  void signal(uint count = 1, bool ignore_overflow = false);
 
   void wait();
 

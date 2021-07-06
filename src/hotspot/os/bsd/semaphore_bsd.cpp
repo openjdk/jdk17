@@ -50,7 +50,7 @@ OSXSemaphore::~OSXSemaphore() {
   semaphore_destroy(mach_task_self(), _semaphore);
 }
 
-void OSXSemaphore::signal(uint count) {
+void OSXSemaphore::signal(uint count, bool ignore_overflow) {
   for (uint i = 0; i < count; i++) {
     kern_return_t ret = semaphore_signal(_semaphore);
 

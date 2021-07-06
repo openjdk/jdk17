@@ -50,11 +50,12 @@ PosixSemaphore::~PosixSemaphore() {
   assert_with_errno(ret == 0, "sem_destroy failed");
 }
 
-void PosixSemaphore::signal(uint count) {
+void PosixSemaphore::signal(uint count, bool ignore_overflow) {
   for (uint i = 0; i < count; i++) {
     int ret = sem_post(&_semaphore);
 
-    assert_with_errno(ret == 0, "sem_post failed");
+    assert_with_errno(ret == 0 || (ignore_overflow && (errno == EOVERFLOW || errno == ERANGE)),
+                     "sem_post failed");
   }
 }
 
