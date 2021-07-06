@@ -152,7 +152,7 @@ class AsyncLogWriter : public NonJavaThread {
 
   AsyncLogWriter();
   void enqueue_locked(const AsyncLogMessage& msg);
-  void write();
+  int write();
   void run() override;
   void pre_run() override {
     NonJavaThread::pre_run();

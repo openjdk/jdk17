@@ -109,7 +109,7 @@ class AsyncLogMapIterator {
   }
 };
 
-void AsyncLogWriter::write() {
+int AsyncLogWriter::write() {
   // Use kind of copy-and-swap idiom here.
   // Empty 'logs' swaps the content with _buffer.
   // Along with logs destruction, all processed messages are deleted.
@@ -117,11 +117,13 @@ void AsyncLogWriter::write() {
   // The operation 'pop_all()' is done in O(1). All I/O jobs are then performed without
   // lock protection. This guarantees I/O jobs don't block logsites.
   AsyncLogBuffer logs;
+  int dequeued  = 0;
 
   { // critical region
     AsyncLogLocker locker;
 
     _buffer.pop_all(&logs);
+    dequeued = logs.size();
     // append meta-messages of dropped counters
     AsyncLogMapIterator dropped_counters_iter(logs);
     _stats.iterate(&dropped_counters_iter);
@@ -148,6 +150,7 @@ void AsyncLogWriter::write() {
     assert(req == 1, "AsyncLogWriter::flush() is NOT MT-safe!");
     _flush_sem.signal(req);
   }
+  return dequeued;
 }
 
 void AsyncLogWriter::run() {
@@ -155,7 +158,11 @@ void AsyncLogWriter::run() {
     // The value of a semphore cannot be negative. Therefore, the current thread falls asleep
     // when its value is zero. It will be waken up when new messages are enqueued.
     _sem.wait();
-    write();
+
+    int n = write();
+    for (int i = n - 1; i > 0; --i) {
+      _sem.wait();
+    }
   }
 }
 
