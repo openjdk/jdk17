@@ -42,6 +42,7 @@ import org.testng.annotations.Test;
  * @summary AArch64: 'bad AD file' in some vector conversion tests
  * @modules jdk.incubator.vector
  * @run testng/othervm -XX:-TieredCompilation compiler.vectorapi.VectorCastShape128Test
+ * @run testng/othervm -XX:-TieredCompilation -XX:+UnlockDiagnosticVMOptions -XX:+UseKNLSetting compiler.vectorapi.VectorCastShape128Test
  */
 
 
