@@ -202,7 +202,7 @@ public class SwitchBootstraps {
      * the method of the call site return the length of the {@code labels} array.
      *
      * @param lookup Represents a lookup context with the accessibility
-     *               privileges of the caller.  When used with {@code invokedynamic},
+     *               privileges of the caller. When used with {@code invokedynamic},
      *               this is stacked automatically by the VM.
      * @param invocationName unused
      * @param invocationType The invocation type of the {@code CallSite} with two parameters,
@@ -213,8 +213,8 @@ public class SwitchBootstraps {
      *
      * @throws NullPointerException if any argument is {@code null}
      * @throws IllegalArgumentException if any element in the labels array is null, if the
-     * invocation type is not a method type of first parameter of an enum type,
-     * second parameter of type {@code int} and with {@code int} as its return type,
+     * invocation type is not a method type whose first parameter type is an enum type,
+     * second parameter of type {@code int} and whose return type is {@code int},
      * or if {@code labels} contains an element that is not of type {@code String} or
      * {@code Class} of the target enum type.
      * @jvms 4.4.6 The CONSTANT_NameAndType_info Structure
