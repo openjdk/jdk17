@@ -37,7 +37,7 @@ import static java.lang.annotation.ElementType.TYPE;
  *
  * Note this internal annotation is handled specially by the javac compiler.
  * To work properly with {@code --release older-release}, it requires special
- * handline in {@code make/langtools/src/classes/build/tools/symbolgenerator/CreateSymbols.java}
+ * handling in {@code make/langtools/src/classes/build/tools/symbolgenerator/CreateSymbols.java}
  * and {@code src/jdk.compiler/share/classes/com/sun/tools/javac/jvm/ClassReader.java}.
  *
  * @since 16
