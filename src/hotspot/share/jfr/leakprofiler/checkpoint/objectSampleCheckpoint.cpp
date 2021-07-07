@@ -91,6 +91,15 @@ void ObjectSampleCheckpoint::on_thread_exit(JavaThread* jt) {
   }
 }
 
+void ObjectSampleCheckpoint::clear() {
+  assert(SafepointSynchronize::is_at_safepoint(), "invariant");
+  if (unloaded_thread_id_set != NULL) {
+    delete unloaded_thread_id_set;
+    unloaded_thread_id_set = NULL;
+  }
+  assert(unloaded_thread_id_set == NULL, "invariant");
+}
+
 template <typename Processor>
 static void do_samples(ObjectSample* sample, const ObjectSample* end, Processor& processor) {
   assert(sample != NULL, "invariant");
