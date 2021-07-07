@@ -359,7 +359,7 @@ public class TransPatterns extends TreeTranslator {
             LoadableConstant[] staticArgValues =
                     cases.stream()
                          .flatMap(c -> c.labels.stream())
-                         .map(l -> toLoadableConstant(l))
+                         .map(l -> toLoadableConstant(l, seltype))
                          .filter(c -> c != null)
                          .toArray(s -> new LoadableConstant[s]);
 
@@ -481,9 +481,14 @@ public class TransPatterns extends TreeTranslator {
         return types.boxedTypeOrType(types.erasure(TreeInfo.primaryPatternType(p).type()));
     }
 
-    private LoadableConstant toLoadableConstant(JCCaseLabel l) {
+    private LoadableConstant toLoadableConstant(JCCaseLabel l, Type selector) {
         if (l.isPattern()) {
-            return (LoadableConstant) principalType((JCPattern) l);
+            Type principalType = principalType((JCPattern) l);
+            if (types.isSubtype(selector, principalType)) {
+                return (LoadableConstant) selector;
+            } else {
+                return (LoadableConstant) principalType;
+            }
         } else if (l.isExpression() && !TreeInfo.isNull((JCExpression) l)) {
             if ((l.type.tsym.flags_field & Flags.ENUM) != 0) {
                 return LoadableConstant.String(((JCIdent) l).name.toString());
