@@ -50,7 +50,12 @@ class Semaphore : public CHeapObj<mtSynchronizer> {
   Semaphore(uint value = 0) : _impl(value) {}
   ~Semaphore() {}
 
-  void signal(uint count = 1) { _impl.signal(count); }
+  void signal(uint count = 1) { _impl.signal(count, false /* ignore_overflow */); }
+
+  // Ignore error of overflow
+  void signal_overflow(uint count = 1) {
+    _impl.signal(count, true /* ignore_overflow */);
+  }
 
   void wait()                 { _impl.wait(); }
 

@@ -107,23 +107,6 @@ public:
   char* message() const { return _message; }
 };
 
-// The only difference between this and Semaphore is that
-// it ignores errno ERANGE and EOVERFLOW.
-class AsyncLogSemaphore : public CHeapObj<mtSynchronizer> {
-  SemaphoreImpl _impl;
-
-  NONCOPYABLE(AsyncLogSemaphore);
-
- public:
-  AsyncLogSemaphore(uint value = 0) : _impl(value) {}
-
-  void signal(uint count = 1) {
-    _impl.signal(count, true/* ignore_overflow*/);
-  }
-
-  void wait() { _impl.wait(); }
-};
-
 typedef LinkedListDeque<AsyncLogMessage, mtLogging> AsyncLogBuffer;
 typedef KVHashtable<LogFileOutput*, uint32_t, mtLogging> AsyncLogMap;
 
@@ -156,8 +139,8 @@ class AsyncLogWriter : public NonJavaThread {
   Semaphore _lock;
   // _sem is a semaphore whose value denotes how many messages have been enqueued.
   // It decreases in AsyncLogWriter::run().
-  // It will ignore the error checking inside of _sem.signal() for overflowing.
-  AsyncLogSemaphore _sem;
+  // It will ignore the error of overflow
+  Semaphore _sem;
   Semaphore _flush_sem;
 
   volatile bool _initialized;
