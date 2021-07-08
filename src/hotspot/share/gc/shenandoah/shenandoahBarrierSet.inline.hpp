@@ -138,7 +138,7 @@ inline oop ShenandoahBarrierSet::load_reference_barrier(oop obj, T* load_addr) {
 
 template <class T>
 inline oop ShenandoahBarrierSet::load_reference_barrier(DecoratorSet decorators, oop obj, T* load_addr) {
-  assert((decorators & ON_UNKNOWN_OOP_REF) != 0, "no unknown accesses");
+  assert((decorators & ON_UNKNOWN_OOP_REF) == 0, "no unknown accesses");
 
   if (obj == NULL) {
     return NULL;
