@@ -1802,7 +1802,9 @@ public class Attr extends JCTree.Visitor {
                 prevBindings = c.caseKind == CaseTree.CaseKind.STATEMENT && c.completesNormally ? currentBindings
                                                                                                 : null;
             }
-            chk.checkSwitchCaseStructure(cases);
+            if (patternSwitch) {
+                chk.checkSwitchCaseStructure(cases);
+            }
             if (switchTree.hasTag(SWITCH)) {
                 ((JCSwitch) switchTree).hasTotalPattern = hasDefault || hasTotalPattern;
                 ((JCSwitch) switchTree).patternSwitch = patternSwitch;
