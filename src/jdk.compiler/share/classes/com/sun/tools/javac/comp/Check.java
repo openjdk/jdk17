@@ -25,7 +25,6 @@
 
 package com.sun.tools.javac.comp;
 
-import com.sun.source.tree.CaseTree;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -34,6 +33,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.NestingKind;
 import javax.tools.JavaFileManager;
 
+import com.sun.source.tree.CaseTree;
 import com.sun.tools.javac.code.*;
 import com.sun.tools.javac.code.Attribute.Compound;
 import com.sun.tools.javac.code.Directive.ExportsDirective;
@@ -4271,6 +4271,12 @@ public class Check {
         }
     }
 
+    /**
+     * Verify the case labels conform to the constraints. Checks constraints related
+     * combinations of patterns and other labels.
+     *
+     * @param cases the cases that should be checked.
+     */
     void checkSwitchCaseStructure(List<JCCase> cases) {
         boolean wasConstant = false;          // Seen a constant in the same case label
         boolean wasDefault = false;           // Seen a default in the same case label
