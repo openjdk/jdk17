@@ -27,6 +27,7 @@
 #include "gc/shared/oopStorage.hpp"
 #include "gc/shared/oopStorageSet.hpp"
 #include "jfr/jfrEvents.hpp"
+#include "jfr/leakprofiler/checkpoint/objectSampleCheckpoint.hpp"
 #include "jfr/leakprofiler/sampling/objectSample.hpp"
 #include "jfr/leakprofiler/sampling/objectSampler.hpp"
 #include "jfr/leakprofiler/sampling/sampleList.hpp"
@@ -108,6 +109,7 @@ bool ObjectSampler::create(size_t size) {
   assert(SafepointSynchronize::is_at_safepoint(), "invariant");
   assert(_oop_storage != NULL, "should be already created");
   assert(_instance == NULL, "invariant");
+  ObjectSampleCheckpoint::clear();
   _instance = new ObjectSampler(size);
   return _instance != NULL;
 }

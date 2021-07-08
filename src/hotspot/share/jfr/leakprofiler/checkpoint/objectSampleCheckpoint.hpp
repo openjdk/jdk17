@@ -41,9 +41,9 @@ class Thread;
 
 class ObjectSampleCheckpoint : AllStatic {
   friend class EventEmitter;
+  friend class ObjectSampler;
   friend class PathToGcRootsOperation;
   friend class StackTraceBlobInstaller;
-  friend class StartOperation;
  private:
   static void add_to_leakp_set(const InstanceKlass* ik, traceid method_id);
   static int save_mark_words(const ObjectSampler* sampler, ObjectSampleMarker& marker, bool emit_all);
