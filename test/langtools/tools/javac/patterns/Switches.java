@@ -53,9 +53,11 @@ public class Switches {
         runEnumTest(this::testEnumWithGuards1);
         runEnumTest(this::testEnumWithGuards2);
         runEnumTest(this::testEnumWithGuards3);
+        runEnumTest(this::testEnumWithGuards4);
         runEnumTest(this::testEnumWithGuardsExpression1);
         runEnumTest(this::testEnumWithGuardsExpression2);
         runEnumTest(this::testEnumWithGuardsExpression3);
+        runEnumTest(this::testEnumWithGuardsExpression4);
         runEnumTest(this::testStringWithGuards1);
         runEnumTest(this::testStringWithGuardsExpression1);
         runEnumTest(this::testIntegerWithGuards1);
@@ -291,6 +293,26 @@ public class Switches {
         };
     }
 
+    String testEnumWithGuards4(E e) {
+        switch (e) {
+            case A: return "a";
+            case B: return "b";
+            case Runnable x && "C".equals(x.toString()): return "C";
+            case C: return "broken";
+            case null, E x: return String.valueOf(x);
+        }
+    }
+
+    String testEnumWithGuardsExpression4(E e) {
+        return switch (e) {
+            case A -> "a";
+            case B -> "b";
+            case Runnable x && "C".equals(x.toString()) -> "C";
+            case C -> "broken";
+            case null, E x -> String.valueOf(x);
+        };
+    }
+
     String testStringWithGuards1(E e) {
         switch (e != null ? e.name() : null) {
             case "A": return "a";
@@ -385,7 +407,9 @@ public class Switches {
         }
     }
 
-    public enum E {
+    public enum E implements Runnable {
         A, B, C;
+
+        @Override public void run() {}
     }
 }
