@@ -673,7 +673,6 @@ public class Flow {
                     handleConstantCaseLabel(constants, pat);
                 }
                 scanStats(c.stats);
-                c.completesNormally = alive != Liveness.DEAD;
                 if (alive != Liveness.DEAD && c.caseKind == JCCase.RULE) {
                     scanSyntheticBreak(make, tree);
                     alive = Liveness.DEAD;
@@ -721,7 +720,6 @@ public class Flow {
                                   Errors.SwitchExpressionCompletesNormally);
                     }
                 }
-                c.completesNormally = alive != Liveness.DEAD;
             }
             if (!tree.hasTotalPattern && !TreeInfo.isErrorEnumSwitch(tree.selector, tree.cases) &&
                 !isExhaustive(tree.selector.type, constants)) {

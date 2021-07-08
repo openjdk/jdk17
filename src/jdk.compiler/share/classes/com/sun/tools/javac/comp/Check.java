@@ -25,6 +25,7 @@
 
 package com.sun.tools.javac.comp;
 
+import com.sun.source.tree.CaseTree;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -4270,4 +4271,60 @@ public class Check {
         }
     }
 
+    void checkSwitchCaseStructure(List<JCCase> cases) {
+        boolean wasConstant = false;          // Seen a constant in the same case label
+        boolean wasDefault = false;           // Seen a default in the same case label
+        boolean wasNullPattern = false;       // Seen a null pattern in the same case label,
+                                              //or fall through from a null pattern
+        boolean wasPattern = false;           // Seen a pattern in the same case label
+                                              //or fall through from a pattern
+        boolean wasTypePattern = false;       // Seen a pattern in the same case label
+                                              //or fall through from a type pattern
+        boolean wasNonEmptyFallThrough = false;
+        for (List<JCCase> l = cases; l.nonEmpty(); l = l.tail) {
+            JCCase c = l.head;
+            for (JCCaseLabel pat : c.labels) {
+                if (pat.isExpression()) {
+                    JCExpression expr = (JCExpression) pat;
+                    if (TreeInfo.isNull(expr)) {
+                        if (wasPattern && !wasTypePattern && !wasNonEmptyFallThrough) {
+                            log.error(pat.pos(), Errors.FlowsThroughFromPattern);
+                        }
+                        wasNullPattern = true;
+                    } else {
+                        if (wasPattern && !wasNonEmptyFallThrough) {
+                            log.error(pat.pos(), Errors.FlowsThroughFromPattern);
+                        }
+                        wasConstant = true;
+                    }
+                } else if (pat.hasTag(DEFAULTCASELABEL)) {
+                    if (wasPattern && !wasNonEmptyFallThrough) {
+                        log.error(pat.pos(), Errors.FlowsThroughFromPattern);
+                    }
+                    wasDefault = true;
+                } else {
+                    boolean isTypePattern = pat.hasTag(BINDINGPATTERN);
+                    if (wasPattern || wasConstant || wasDefault ||
+                        (wasNullPattern && (!isTypePattern || wasNonEmptyFallThrough))) {
+                        log.error(pat.pos(), Errors.FlowsThroughToPattern);
+                    }
+                    wasPattern = true;
+                    wasTypePattern = isTypePattern;
+                }
+            }
+
+            boolean completesNormally = c.caseKind == CaseTree.CaseKind.STATEMENT ? c.completesNormally
+                                                                                  : false;
+
+            if (c.stats.nonEmpty()) {
+                wasConstant = false;
+                wasDefault = false;
+                wasNullPattern &= completesNormally;
+                wasPattern &= completesNormally;
+                wasTypePattern &= completesNormally;
+            }
+
+            wasNonEmptyFallThrough = c.stats.nonEmpty() && completesNormally;
+        }
+    }
 }
