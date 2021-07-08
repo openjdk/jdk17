@@ -39,13 +39,21 @@ WindowsSemaphore::~WindowsSemaphore() {
   ::CloseHandle(_semaphore);
 }
 
-void WindowsSemaphore::signal(uint count, bool ignore_overflow) {
+bool WindowsSemaphore::signal(uint count, bool ignore_overflow) {
+  bool succeed = true;
+
   if (count > 0) {
     BOOL ret = ::ReleaseSemaphore(_semaphore, count, NULL);
     DWORD err = GetLastError();
-    assert(ret != 0 || (ignore_overflow && ERROR_TOO_MANY_POSTS == err),
-          "ReleaseSemaphore failed with error code: %lu", err);
+
+    if (ignore_overflow && ret == 0) {
+      assert(err == ERROR_TOO_MANY_POSTS, "ReleaseSemaphore failed due to overflow");
+      succeed = false;
+    } else {
+      assert(ret != 0, "ReleaseSemaphore failed with error code: %lu", err);
+    }
   }
+  return succeed;
 }
 
 void WindowsSemaphore::wait() {

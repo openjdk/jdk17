@@ -51,7 +51,7 @@ void AsyncLogWriter::enqueue_locked(const AsyncLogMessage& msg) {
   }
 
   _buffer.push_back(msg);
-  _sem.signal_overflow();
+  _sem.signal(1, true);
 }
 
 void AsyncLogWriter::enqueue(LogFileOutput& output, const LogDecorations& decorations, const char* msg) {
@@ -198,7 +198,7 @@ void AsyncLogWriter::flush() {
 
       // Push directly in-case we are at logical max capacity, as this must not get dropped.
       _instance->_buffer.push_back(token);
-      _instance->_sem.signal_overflow();
+      _instance->_sem.signal(1, true);
     }
 
     _instance->_flush_sem.wait();

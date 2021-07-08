@@ -39,7 +39,7 @@ class PosixSemaphore : public CHeapObj<mtInternal> {
   PosixSemaphore(uint value = 0);
   ~PosixSemaphore();
 
-  void signal(uint count = 1, bool ignore_overflow = false);
+  bool signal(uint count = 1, bool ignore_overflow = false);
 
   void wait();
 
