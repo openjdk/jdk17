@@ -104,6 +104,13 @@ public:
   template <DecoratorSet decorators, class T>
   inline oop load_reference_barrier(oop obj, T* load_addr);
 
+  // Variant for cases where access strength needs to be resolved at run-time.
+  template <class T>
+  inline oop load_reference_barrier(DecoratorSet decorators, oop obj, T* load_addr);
+
+  template <typename T>
+  inline oop cmpxchg_barrier(T* addr, oop compare_value, oop new_value) const;
+
 private:
   template <class T>
   inline void arraycopy_marking(T* src, T* dst, size_t count);
