@@ -62,19 +62,18 @@ public class DynamicCallSiteDescTest extends SymbolicDescTest {
                     "",
                     MethodTypeDesc.ofDescriptor("()I")
             );
-            throw new AssertionError("IllegalArgumentException expected");
+            fail("IllegalArgumentException expected");
         } catch (IllegalArgumentException iae) {
             // good
         }
 
-        AssertionError ae = new AssertionError("NullPointerException expected");
         try {
             DynamicCallSiteDesc.of(
                     null,
                     "getTarget",
                     MethodTypeDesc.ofDescriptor("()I")
             );
-            throw ae;
+            fail("NullPointerException expected");
         } catch (NullPointerException npe) {
             // good
         }
@@ -85,7 +84,7 @@ public class DynamicCallSiteDescTest extends SymbolicDescTest {
                     null,
                     MethodTypeDesc.ofDescriptor("()I")
             );
-            throw ae;
+            fail("NullPointerException expected");
         } catch (NullPointerException npe) {
             // good
         }
@@ -96,7 +95,7 @@ public class DynamicCallSiteDescTest extends SymbolicDescTest {
                     "getTarget",
                     null
             );
-            throw ae;
+            fail("NullPointerException expected");
         } catch (NullPointerException npe) {
             // good
         }
@@ -108,7 +107,7 @@ public class DynamicCallSiteDescTest extends SymbolicDescTest {
                     MethodTypeDesc.ofDescriptor("()I"),
                     null
             );
-            throw ae;
+            fail("NullPointerException expected");
         } catch (NullPointerException npe) {
             // good
         }
@@ -119,7 +118,7 @@ public class DynamicCallSiteDescTest extends SymbolicDescTest {
                     MethodTypeDesc.ofDescriptor("()I"),
                     new ConstantDesc[]{ null }
             );
-            throw ae;
+            fail("NullPointerException expected");
         } catch (NullPointerException npe) {
             // good
         }
@@ -135,17 +134,16 @@ public class DynamicCallSiteDescTest extends SymbolicDescTest {
             MethodTypeDesc.ofDescriptor("()I")
         );
 
-        AssertionError ae = new AssertionError("NullPointerException expected");
         try {
             desc.withArgs(null);
-            throw ae;
+            fail("NullPointerException expected");
         } catch (NullPointerException npe) {
             // good
         }
 
         try {
             desc.withArgs(new ConstantDesc[]{ null });
-            throw ae;
+            fail("NullPointerException expected");
         } catch (NullPointerException npe) {
             // good
         }
@@ -161,17 +159,16 @@ public class DynamicCallSiteDescTest extends SymbolicDescTest {
                 MethodTypeDesc.ofDescriptor("()I")
         );
 
-        AssertionError ae = new AssertionError("NullPointerException expected");
         try {
             desc.withNameAndType(null, MethodTypeDesc.ofDescriptor("()I"));
-            throw ae;
+            fail("NullPointerException expected");
         } catch (NullPointerException npe) {
             // good
         }
 
         try {
             desc.withNameAndType("bootstrap", null);
-            throw ae;
+            fail("NullPointerException expected");
         } catch (NullPointerException npe) {
             // good
         }
