@@ -3144,7 +3144,9 @@ JvmtiEnv::RawMonitorEnter(JvmtiRawMonitor * rmonitor) {
     // in thread.cpp.
     JvmtiPendingMonitors::enter(rmonitor);
   } else {
-    rmonitor->raw_enter(Thread::current());
+    Thread* thread = Thread::current();
+    MACOS_AARCH64_ONLY(ThreadWXEnable __wx(WXWrite, thread));
+    rmonitor->raw_enter(thread);
   }
   return JVMTI_ERROR_NONE;
 } /* end RawMonitorEnter */
@@ -3163,6 +3165,7 @@ JvmtiEnv::RawMonitorExit(JvmtiRawMonitor * rmonitor) {
     }
   } else {
     Thread* thread = Thread::current();
+    MACOS_AARCH64_ONLY(ThreadWXEnable __wx(WXWrite, thread));
     int r = rmonitor->raw_exit(thread);
     if (r == JvmtiRawMonitor::M_ILLEGAL_MONITOR_STATE) {
       err = JVMTI_ERROR_NOT_MONITOR_OWNER;
@@ -3176,6 +3179,7 @@ JvmtiEnv::RawMonitorExit(JvmtiRawMonitor * rmonitor) {
 jvmtiError
 JvmtiEnv::RawMonitorWait(JvmtiRawMonitor * rmonitor, jlong millis) {
   Thread* thread = Thread::current();
+  MACOS_AARCH64_ONLY(ThreadWXEnable __wx(WXWrite, thread));
   int r = rmonitor->raw_wait(millis, thread);
 
   switch (r) {
@@ -3193,6 +3197,7 @@ JvmtiEnv::RawMonitorWait(JvmtiRawMonitor * rmonitor, jlong millis) {
 jvmtiError
 JvmtiEnv::RawMonitorNotify(JvmtiRawMonitor * rmonitor) {
   Thread* thread = Thread::current();
+  MACOS_AARCH64_ONLY(ThreadWXEnable __wx(WXWrite, thread));
   int r = rmonitor->raw_notify(thread);
 
   if (r == JvmtiRawMonitor::M_ILLEGAL_MONITOR_STATE) {
@@ -3206,6 +3211,7 @@ JvmtiEnv::RawMonitorNotify(JvmtiRawMonitor * rmonitor) {
 jvmtiError
 JvmtiEnv::RawMonitorNotifyAll(JvmtiRawMonitor * rmonitor) {
   Thread* thread = Thread::current();
+  MACOS_AARCH64_ONLY(ThreadWXEnable __wx(WXWrite, thread));
   int r = rmonitor->raw_notifyAll(thread);
 
   if (r == JvmtiRawMonitor::M_ILLEGAL_MONITOR_STATE) {
