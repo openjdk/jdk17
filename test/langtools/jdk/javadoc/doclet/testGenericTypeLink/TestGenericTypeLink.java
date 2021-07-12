@@ -141,6 +141,17 @@ public class TestGenericTypeLink extends JavadocTester {
                     </ul>
                     </dd>
                     </dl>""");
+
+        checkOutput("pkg1/C.html", true,
+                """
+                    Description copied from class:&nbsp;<code><a href="A.html#overriddenMethod()">A<\
+                    /a></code></span></div>
+                    <div class="block">Here's a generic link: <code><a href="A.html" title="class in\
+                     pkg1">A</a>&lt;<a href="http://example.com/docs/api/java.base/java/lang/Object.\
+                    html" title="class or interface in java.lang" class="external-link">Object</a>,<\
+                    wbr><a href="http://example.com/docs/api/java.base/java/lang/RuntimeException.ht\
+                    ml" title="class or interface in java.lang" class="external-link">RuntimeExcepti\
+                    on</a>&gt;.<a href="A.Inner.html" title="class in pkg1">Inner</a>""");
     }
 
     /**

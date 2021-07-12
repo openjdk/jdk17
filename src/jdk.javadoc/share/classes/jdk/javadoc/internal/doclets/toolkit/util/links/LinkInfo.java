@@ -32,6 +32,7 @@ import javax.lang.model.type.TypeMirror;
 
 import jdk.javadoc.internal.doclets.toolkit.BaseConfiguration;
 import jdk.javadoc.internal.doclets.toolkit.Content;
+import jdk.javadoc.internal.doclets.toolkit.util.Utils;
 
 /**
  *  Encapsulates information about a link.
@@ -116,31 +117,6 @@ public abstract class LinkInfo {
     public abstract boolean includeTypeParameterLinks();
 
     /**
-     * Checks whether enclosing types of inner classes should be rendered as separate
-     * links instead of generating a single link for the class with the full class name
-     * (including the name of the enclosing class) as link label.
-     *
-     * @param type the type being linked
-     * @return true if enclosing types (and their type arguments) should be rendered as
-     * separate links
-     */
-    public boolean linkEnclosingTypes(DeclaredType type) {
-        // Only render enclosing types as separate links if they have type arguments that
-        // should be linked. The rationale is that an enclosing class itself is easy to reach
-        // from the documentation of an inner class, so rendering it as separate link would
-        // add little benefit but add considerable noise, while type arguments may not
-        // otherwise be reachable from the documentation of the inner class.
-        TypeMirror enc = type.getEnclosingType();
-        while (enc instanceof DeclaredType declaredType) {
-            if (!declaredType.getTypeArguments().isEmpty()) {
-                return true;
-            }
-            enc = declaredType.getEnclosingType();
-        }
-        return false;
-    }
-
-    /**
      * Return the label for this class link.
      *
      * @param configuration the current configuration of the doclet.
@@ -151,7 +127,8 @@ public abstract class LinkInfo {
             return label;
         } else if (isLinkable()) {
             Content tlabel = newContent();
-            tlabel.add(type instanceof DeclaredType dt && linkEnclosingTypes(dt)
+            Utils utils = configuration.utils;
+            tlabel.add(type instanceof DeclaredType dt && utils.isGenericType(dt.getEnclosingType())
                     // If enclosing type is rendered as separate links only use own class name
                     ? typeElement.getSimpleName().toString()
                     : configuration.utils.getSimpleName(typeElement));

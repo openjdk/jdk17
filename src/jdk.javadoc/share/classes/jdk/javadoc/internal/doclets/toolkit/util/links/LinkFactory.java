@@ -166,14 +166,15 @@ public abstract class LinkFactory {
 
                 @Override
                 public Content visitDeclared(DeclaredType type, LinkInfo linkInfo) {
-                    if (linkInfo.linkEnclosingTypes(type)) {
-                        TypeMirror enc = type.getEnclosingType();
-                        if (enc instanceof DeclaredType dt) {
-                            setEnclosingTypeLinkInfo(linkInfo, dt);
-                            visitDeclared(dt, linkInfo);
-                            link.add(".");
-                            setEnclosingTypeLinkInfo(linkInfo, type);
-                        }
+                    TypeMirror enc = type.getEnclosingType();
+                    if (enc instanceof DeclaredType dt && utils.isGenericType(dt)) {
+                        // If an enclosing type has type parameters render them as separate links as
+                        // otherwise this information is lost. On the other hand, plain enclosing types
+                        // are not linked separately as they are easy to reach from the nested type.
+                        setEnclosingTypeLinkInfo(linkInfo, dt);
+                        visitDeclared(dt, linkInfo);
+                        link.add(".");
+                        setEnclosingTypeLinkInfo(linkInfo, type);
                     }
                     link.add(getTypeAnnotationLinks(linkInfo));
                     linkInfo.typeElement = utils.asTypeElement(type);
