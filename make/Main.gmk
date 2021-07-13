@@ -857,7 +857,7 @@ else
   # virtual target.
   jdk.jdwp.agent-libs: jdk.jdwp.agent-gensrc
 
-  # jdk.jfr-gensrc uses TOOL_JFR_GEN from buildtools-hotspot
+  # jdk.jfr-gendata uses TOOL_JFR_GEN from buildtools-hotspot
   jdk.jfr-gendata: buildtools-hotspot
 
   # The swing beans need to have java base properly generated to avoid errors
