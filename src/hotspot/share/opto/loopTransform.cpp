@@ -2933,7 +2933,9 @@ bool PhaseIdealLoop::multi_version_post_loops(IdealLoopTree *rce_loop, IdealLoop
   }
 
   // Find RCE'd post loop so that we can stage its guard.
-  if (legacy_cl->is_canonical_loop_entry() == NULL) return multi_version_succeeded;
+  if (legacy_cl->is_canonical_loop_entry() == NULL) {
+    return multi_version_succeeded;
+  }
   Node* ctrl = legacy_cl->in(LoopNode::EntryControl);
   Node* iffm = ctrl->in(0);
 
