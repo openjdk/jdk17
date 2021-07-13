@@ -61,11 +61,12 @@ $(eval $(call SetupJavaCompilation, COMPILE_CREATE_SYMBOLS, \
         $(COMPILECREATESYMBOLS_ADD_EXPORTS), \
 ))
 
+GENERATE_SYMBOLS_FROM_JDK_VERSION := 11
 JDK_JAVADOC_DIR := $(JDK_OUTPUTDIR)/modules/jdk.javadoc
 ELEMENT_LISTS_PKG := jdk/javadoc/internal/doclets/toolkit/resources/releases
 ELEMENT_LISTS_DIR := $(JDK_JAVADOC_DIR)/$(ELEMENT_LISTS_PKG)
 
-$(JDK_JAVADOC_DIR)/_element_lists: \
+$(JDK_JAVADOC_DIR)/_element_lists.marker: \
     $(COMPILE_CREATE_SYMBOLS) \
     $(wildcard $(TOPDIR)/make/data/symbols/*) \
     $(MODULE_INFOS)
@@ -81,7 +82,7 @@ $(JDK_JAVADOC_DIR)/_element_lists: \
 	        build-javadoc-data \
 	        $(CT_DATA_DESCRIPTION) \
 	        $(ELEMENT_LISTS_DIR) \
-	        11 \
+	        $(GENERATE_SYMBOLS_FROM_JDK_VERSION) \
 	)
         # Generate element-list file for the current JDK version
 	$(call ExecuteWithLog, $@_current, \
@@ -101,13 +102,13 @@ $(JDK_JAVADOC_DIR)/_element_lists: \
 INTERIM_JDK_JAVADOC_DIR := $(BUILDTOOLS_OUTPUTDIR)/interim_langtools_modules/jdk.javadoc.interim
 INTERIM_ELEMENT_LISTS_DIR := $(INTERIM_JDK_JAVADOC_DIR)/$(ELEMENT_LISTS_PKG)
 
-$(INTERIM_JDK_JAVADOC_DIR)/_element_lists: $(JDK_JAVADOC_DIR)/_element_lists
-	$(RM) -r $(INTERIM_ELEMENT_LISTS_DIR)
-	$(MKDIR) -p $(INTERIM_ELEMENT_LISTS_DIR)
+$(INTERIM_JDK_JAVADOC_DIR)/_element_lists.marker: $(JDK_JAVADOC_DIR)/_element_lists.marker
+	$(call MakeDir, $(INTERIM_ELEMENT_LISTS_DIR))
+	$(RM) -r $(INTERIM_ELEMENT_LISTS_DIR)/*
 	$(CP) -R $(ELEMENT_LISTS_DIR)/* $(INTERIM_ELEMENT_LISTS_DIR)/
 	$(TOUCH) $@
 
 ################################################################################
 
-TARGETS += $(JDK_JAVADOC_DIR)/_element_lists \
-    $(INTERIM_JDK_JAVADOC_DIR)/_element_lists
+TARGETS += $(JDK_JAVADOC_DIR)/_element_lists.marker \
+    $(INTERIM_JDK_JAVADOC_DIR)/_element_lists.marker
