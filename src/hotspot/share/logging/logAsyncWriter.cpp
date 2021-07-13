@@ -33,11 +33,11 @@ class AsyncLogWriter::AsyncLogLocker : public StackObj {
  public:
   AsyncLogLocker() {
     assert(_instance != nullptr, "AsyncLogWriter::_lock is unavailable");
-    _instance->_lock.wait();
+    _instance->_lock.lock();
   }
 
   ~AsyncLogLocker() {
-    _instance->_lock.signal();
+    _instance->_lock.unlock();
   }
 };
 
@@ -53,7 +53,7 @@ void AsyncLogWriter::enqueue_locked(const AsyncLogMessage& msg) {
 
   _buffer.push_back(msg);
   _data_available = true;
-  _cv.notify();
+  _lock.notify();
 }
 
 void AsyncLogWriter::enqueue(LogFileOutput& output, const LogDecorations& decorations, const char* msg) {
@@ -77,7 +77,7 @@ void AsyncLogWriter::enqueue(LogFileOutput& output, LogMessageBuffer::Iterator m
 }
 
 AsyncLogWriter::AsyncLogWriter()
-  : _lock(1), _flush_sem(0), _cv(), _data_available(false),
+  : _flush_sem(0), _lock(), _data_available(false),
     _initialized(false),
     _stats(17 /*table_size*/) {
   if (os::create_thread(this, os::asynclog_thread)) {
@@ -159,9 +159,7 @@ void AsyncLogWriter::run() {
       AsyncLogLocker locker;
 
       while (!_data_available) {
-        _lock.signal();
-        _cv.wait(0/* no timeout */);
-        _lock.wait();
+        _lock.wait(0/* no timeout */);
       }
     }
 
@@ -209,7 +207,7 @@ void AsyncLogWriter::flush() {
       // Push directly in-case we are at logical max capacity, as this must not get dropped.
       _instance->_buffer.push_back(token);
       _instance->_data_available = true;
-      _instance->_cv.notify();
+      _instance->_lock.notify();
     }
 
     _instance->_flush_sem.wait();

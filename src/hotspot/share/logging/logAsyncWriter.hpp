@@ -135,10 +135,8 @@ class AsyncLogWriter : public NonJavaThread {
   class AsyncLogLocker;
 
   static AsyncLogWriter* _instance;
-  // _lock(1) denotes a critional region.
-  Semaphore _lock;
   Semaphore _flush_sem;
-  os::PlatformMonitor _cv;
+  os::PlatformMonitor _lock;
   bool _data_available;
   volatile bool _initialized;
   AsyncLogMap _stats; // statistics for dropped messages
