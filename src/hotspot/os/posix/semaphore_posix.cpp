@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -50,21 +50,12 @@ PosixSemaphore::~PosixSemaphore() {
   assert_with_errno(ret == 0, "sem_destroy failed");
 }
 
-bool PosixSemaphore::signal(uint count, bool ignore_overflow) {
-  bool succeed = true;
-
+void PosixSemaphore::signal(uint count) {
   for (uint i = 0; i < count; i++) {
     int ret = sem_post(&_semaphore);
 
-    if (ignore_overflow && ret != 0) {
-      assert_with_errno(errno == EOVERFLOW || errno == ERANGE,
-                        "semaphore overflow detected");
-      ret = false;
-    } else {
-      assert_with_errno(ret == 0, "sem_post failed");
-    }
+    assert_with_errno(ret == 0, "sem_post failed");
   }
-  return succeed;
 }
 
 void PosixSemaphore::wait() {

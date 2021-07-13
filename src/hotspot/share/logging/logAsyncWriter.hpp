@@ -137,12 +137,9 @@ class AsyncLogWriter : public NonJavaThread {
   static AsyncLogWriter* _instance;
   // _lock(1) denotes a critional region.
   Semaphore _lock;
-  // _sem is a semaphore whose value denotes how many messages have been enqueued.
-  // It decreases in AsyncLogWriter::run().
-  // It will ignore the error of overflow
-  Semaphore _sem;
   Semaphore _flush_sem;
-
+  os::PlatformMonitor _cv;
+  bool _data_available;
   volatile bool _initialized;
   AsyncLogMap _stats; // statistics for dropped messages
   AsyncLogBuffer _buffer;

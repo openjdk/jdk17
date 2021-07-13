@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2020, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -50,15 +50,12 @@ OSXSemaphore::~OSXSemaphore() {
   semaphore_destroy(mach_task_self(), _semaphore);
 }
 
-bool OSXSemaphore::signal(uint count, bool ignore_overflow) {
-  // Semaphore of Darwin-XNU just wraps around its value and returns KERN_SUCCESS.
-  // https://github.com/apple/darwin-xnu/blob/main/osfmk/kern/sync_sema.c#L400
+void OSXSemaphore::signal(uint count) {
   for (uint i = 0; i < count; i++) {
     kern_return_t ret = semaphore_signal(_semaphore);
 
     assert(ret == KERN_SUCCESS, "Failed to signal semaphore");
   }
-  return true;
 }
 
 void OSXSemaphore::wait() {

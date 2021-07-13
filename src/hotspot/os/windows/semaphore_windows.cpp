@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -39,21 +39,12 @@ WindowsSemaphore::~WindowsSemaphore() {
   ::CloseHandle(_semaphore);
 }
 
-bool WindowsSemaphore::signal(uint count, bool ignore_overflow) {
-  bool succeed = true;
-
+void WindowsSemaphore::signal(uint count) {
   if (count > 0) {
     BOOL ret = ::ReleaseSemaphore(_semaphore, count, NULL);
-    DWORD err = GetLastError();
 
-    if (ignore_overflow && ret == 0) {
-      assert(err == ERROR_TOO_MANY_POSTS, "ReleaseSemaphore failed due to overflow");
-      succeed = false;
-    } else {
-      assert(ret != 0, "ReleaseSemaphore failed with error code: %lu", err);
-    }
+    assert(ret != 0, "ReleaseSemaphore failed with error code: %lu", GetLastError());
   }
-  return succeed;
 }
 
 void WindowsSemaphore::wait() {

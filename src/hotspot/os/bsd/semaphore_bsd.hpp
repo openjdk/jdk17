@@ -45,7 +45,7 @@ class OSXSemaphore : public CHeapObj<mtInternal>{
   OSXSemaphore(uint value = 0);
   ~OSXSemaphore();
 
-  bool signal(uint count = 1, bool ignore_overflow = false);
+  void signal(uint count = 1);
 
   void wait();
 
