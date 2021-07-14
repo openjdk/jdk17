@@ -136,6 +136,7 @@ class AsyncLogWriter : public NonJavaThread {
 
   static AsyncLogWriter* _instance;
   Semaphore _flush_sem;
+  // Can't use a Monitor here as we need a low-level API that can be used without Thread::current().
   os::PlatformMonitor _lock;
   bool _data_available;
   volatile bool _initialized;
