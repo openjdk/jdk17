@@ -102,7 +102,7 @@ public class ReinitDigest extends PKCS11Test {
         if (!md1.getAlgorithm().equals(md2.getAlgorithm())) {
             throw new RuntimeException("Algorithm name should equal");
         }
-        if (md1.getProvider().equals(md2.getProvider())) {
+        if (md1.getProvider().getName().equals(md2.getProvider().getName())) {
             throw new RuntimeException("Provider name should be different");
         }
     }
