@@ -4942,9 +4942,11 @@ Node* CountedLoopNode::is_canonical_loop_entry() {
   if (cmpzm == NULL || !cmpzm->is_Cmp()) {
     return NULL;
   }
-  // compares can get conditionally flipped
 
-  int input = is_main_loop() ? 2 : 1;
+  uint input = is_main_loop() ? 2 : 1;
+  if (input >= cmpzm->req() || cmpzm->in(input) == NULL) {
+    return NULL;
+  }
   bool res = cmpzm->in(input)->Opcode() == Op_Opaque1;
 #ifdef ASSERT
   bool found_opaque = false;
