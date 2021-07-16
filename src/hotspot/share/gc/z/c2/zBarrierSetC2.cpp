@@ -296,6 +296,13 @@ void ZBarrierSetC2::clone_at_expansion(PhaseMacroExpand* phase, ArrayCopyNode* a
     Node* dest_offset = ac->in(ArrayCopyNode::DestPos);
     Node* length = ac->in(ArrayCopyNode::Length);
 
+    if (bt == T_OBJECT) {
+      // BarrierSetC2::arraycopy_payload_base_offset 8-byte aligns the offset.
+      // Make sure the offset points to the first element in the array when cloning
+      // object arrays. Otherwise, load barriers are applied to parts of the header.
+      src_offset = phase->longcon(arrayOopDesc::base_offset_in_bytes(T_OBJECT));
+      dest_offset = src_offset;
+    }
     Node* payload_src = phase->basic_plus_adr(src, src_offset);
     Node* payload_dst = phase->basic_plus_adr(dest, dest_offset);
 
