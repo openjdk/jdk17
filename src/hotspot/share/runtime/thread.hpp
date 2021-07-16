@@ -1423,6 +1423,8 @@ class JavaThread: public Thread {
  public:
   // Returns the running thread as a JavaThread
   static inline JavaThread* current();
+  // Returns the current thread as a JavaThread, or NULL if not attached
+  static inline JavaThread* current_or_null();
 
   // Returns the active Java thread.  Do not use this if you know you are calling
   // from a JavaThread, as it's slower than JavaThread::current.  If called from
@@ -1591,6 +1593,11 @@ public:
 // Inline implementation of JavaThread::current
 inline JavaThread* JavaThread::current() {
   return Thread::current()->as_Java_thread();
+}
+
+inline JavaThread* JavaThread::current_or_null() {
+  Thread* current = Thread::current_or_null();
+  return current != nullptr ? current->as_Java_thread() : nullptr;
 }
 
 inline JavaThread* Thread::as_Java_thread() {

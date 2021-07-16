@@ -49,7 +49,7 @@ private:
 
   static void handle_uncaught_exception(oop exception);
   static JavaThread* maybe_attach_and_get_thread(bool* should_detach);
-  static void detach_thread(Thread* thread);
+  static void detach_current_thread();
 
   static JavaThread* on_entry(OptimizedEntryBlob::FrameData* context);
   static void on_exit(OptimizedEntryBlob::FrameData* context);

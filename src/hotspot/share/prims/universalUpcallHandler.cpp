@@ -52,22 +52,22 @@ void ProgrammableUpcallHandler::upcall_helper(JavaThread* thread, jobject rec, a
 }
 
 JavaThread* ProgrammableUpcallHandler::maybe_attach_and_get_thread(bool* should_detach) {
-  Thread* thread = Thread::current_or_null();
+  JavaThread* thread = JavaThread::current_or_null();
   if (thread == nullptr) {
     JavaVM_ *vm = (JavaVM *)(&main_vm);
     JNIEnv* p_env = nullptr; // unused
     jint result = vm->functions->AttachCurrentThread(vm, (void**) &p_env, nullptr);
     guarantee(result == JNI_OK, "Could not attach thread for upcall. JNI error code: %d", result);
     *should_detach = true;
-    thread = Thread::current();
-    assert(!thread->as_Java_thread()->has_last_Java_frame(), "newly-attached thread not expected to have last Java frame");
+    thread = JavaThread::current();
+    assert(!thread->has_last_Java_frame(), "newly-attached thread not expected to have last Java frame");
   } else {
     *should_detach = false;
   }
-  return thread->as_Java_thread();
+  return thread;
 }
 
-void ProgrammableUpcallHandler::detach_thread(Thread* thread) {
+void ProgrammableUpcallHandler::detach_current_thread() {
   JavaVM_ *vm = (JavaVM *)(&main_vm);
   vm->functions->DetachCurrentThread(vm);
 }
@@ -135,7 +135,7 @@ void ProgrammableUpcallHandler::on_exit(OptimizedEntryBlob::FrameData* context) 
 
   debug_only(thread->dec_java_call_counter());
 
-  // Old thread-local info. has been restored. We are not back in native code.
+  // Old thread-local info. has been restored. We are now back in native code.
   ThreadStateTransition::transition_from_java(thread, _thread_in_native);
 
   thread->frame_anchor()->copy(&context->jfa);
@@ -147,7 +147,7 @@ void ProgrammableUpcallHandler::on_exit(OptimizedEntryBlob::FrameData* context) 
   assert(!thread->has_pending_exception(), "Upcall can not throw an exception");
 
   if (context->should_detach) {
-    detach_thread(thread);
+    detach_current_thread();
   }
 }
 
@@ -157,11 +157,11 @@ void ProgrammableUpcallHandler::attach_thread_and_do_upcall(jobject rec, address
 
   {
     MACOS_AARCH64_ONLY(ThreadWXEnable wx(WXWrite, thread));
-    upcall_helper(thread->as_Java_thread(), rec, buff);
+    upcall_helper(thread, rec, buff);
   }
 
   if (should_detach) {
-    detach_thread(thread);
+    detach_current_thread();
   }
 }
 
