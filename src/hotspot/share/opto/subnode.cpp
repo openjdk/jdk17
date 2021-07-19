@@ -1396,6 +1396,18 @@ static bool is_counted_loop_cmp(Node *cmp) {
          n->in(0)->as_CountedLoop()->phi() == n;
 }
 
+static bool is_phi_has_opaque1(Node* n) {
+  if (n->is_Phi()) {
+    for (uint i = 1; i < n->req(); i++) {
+      Node* in = n->in(i);
+      if (in != NULL && in->is_Opaque1()) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 //------------------------------Ideal------------------------------------------
 Node *BoolNode::Ideal(PhaseGVN *phase, bool can_reshape) {
   // Change "bool tst (cmp con x)" into "bool ~tst (cmp x con)".
@@ -1418,7 +1430,9 @@ Node *BoolNode::Ideal(PhaseGVN *phase, bool can_reshape) {
   // Move constants to the right of compare's to canonicalize.
   // Do not muck with Opaque1 nodes, as this indicates a loop
   // guard that cannot change shape.
-  if( con->is_Con() && !cmp2->is_Con() && op2 != Op_Opaque1 &&
+  // Also skip when cmp2 is phi has Opaque1 input, loop guard might
+  // split in split_if.
+  if( con->is_Con() && !cmp2->is_Con() && op2 != Op_Opaque1 && !is_phi_has_opaque1(cmp2) &&
       // Because of NaN's, CmpD and CmpF are not commutative
       cop != Op_CmpD && cop != Op_CmpF &&
       // Protect against swapping inputs to a compare when it is used by a

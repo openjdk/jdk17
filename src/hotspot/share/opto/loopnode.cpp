@@ -4941,16 +4941,8 @@ bool PhaseIdealLoop::is_canonical_loop_entry(CountedLoopNode* cl) {
   if (cmpzm == NULL || !cmpzm->is_Cmp()) {
     return false;
   }
-  // compares can get conditionally flipped
-  bool found_opaque = false;
-  for (uint i = 1; i < cmpzm->req(); i++) {
-    Node* opnd = cmpzm->in(i);
-    if (opnd && opnd->Opcode() == Op_Opaque1) {
-      found_opaque = true;
-      break;
-    }
-  }
-  if (!found_opaque) {
+  Node* opaque1 = cmpzm->in(2);
+  if (opaque1 == NULL || !opaque1->is_Opaque1()) {
     return false;
   }
   return true;
