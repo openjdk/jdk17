@@ -86,6 +86,11 @@ public class UnicodeReader {
     private boolean wasBackslash;
 
     /**
+     * true if the last character was derived from an unicode escape sequence.
+     */
+    private boolean wasUnicodeEscape;
+
+    /**
      * Log for error reporting.
      */
     private final Log log;
@@ -105,6 +110,7 @@ public class UnicodeReader {
         this.character = '\0';
         this.codepoint = 0;
         this.wasBackslash = false;
+        this.wasUnicodeEscape = false;
         this.log = sf.log;
 
         nextCodePoint();
@@ -152,6 +158,10 @@ public class UnicodeReader {
      * Fetches the next 16-bit character from the buffer. If an unicode escape
      * is detected then converts the unicode escape to a character.
      */
+    /**
+     * Fetches the next 16-bit character from the buffer. If an unicode escape
+     * is detected then converts the unicode escape to a character.
+     */
     private void nextUnicodeInputCharacter() {
         // Position to next codepoint.
         position += width;
@@ -161,17 +171,17 @@ public class UnicodeReader {
         // Fetch next character.
         nextCodeUnit();
 
-        // If second backslash is detected.
-        if (wasBackslash) {
-            // Treat like a normal character (not part of unicode escape.)
+        if (character != '\\' || (wasBackslash && !wasUnicodeEscape)) {
             wasBackslash = false;
-        } else if (character == '\\') {
-            // May be an unicode escape.
+        } else {
+            // Is a backslash and may be an unicode escape.
             switch (unicodeEscape()) {
-                case BACKSLASH -> wasBackslash = true;
-                case VALID_ESCAPE -> wasBackslash = character == '\\';
+                case BACKSLASH -> wasUnicodeEscape = false;
+                case VALID_ESCAPE -> wasUnicodeEscape = true;
                 case BROKEN_ESCAPE -> nextUnicodeInputCharacter(); //skip broken unicode escapes
             }
+
+            wasBackslash = !wasBackslash;
         }
 
         // Codepoint and character match if not surrogate.
@@ -297,6 +307,7 @@ public class UnicodeReader {
         position = pos;
         width = 0;
         wasBackslash = false;
+        wasUnicodeEscape = false;
         nextCodePoint();
     }
 

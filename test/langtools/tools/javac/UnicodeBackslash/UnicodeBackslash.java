@@ -25,10 +25,10 @@
  * @test
  * @bug 8269150
  * @summary Unicode \ u 0 0 5 C not treated as an escaping backslash
- * @run main T8269150
+ * @run main UnicodeBackslash
  */
 
-public class T8269150 {
+public class UnicodeBackslash {
     public static void main(String... args) {
         String source = """
             \\]
@@ -52,6 +52,7 @@ public class T8269150 {
             """;
 
         if (!source.equals(expected)) {
+            System.err.println("Expected:\n" +  expected);
             throw new RuntimeException("Unicode escapes not handled correctly");
         }
     }
