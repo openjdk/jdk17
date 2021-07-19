@@ -932,7 +932,6 @@ public:
   PhaseIterGVN &igvn() const { return _igvn; }
 
   static bool is_canonical_loop_entry(CountedLoopNode* cl);
-  static Node* get_opaque_from_cmp(Node* cmp);
 
   bool has_node( Node* n ) const {
     guarantee(n != NULL, "No Node.");

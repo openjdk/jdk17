@@ -4941,21 +4941,19 @@ bool PhaseIdealLoop::is_canonical_loop_entry(CountedLoopNode* cl) {
   if (cmpzm == NULL || !cmpzm->is_Cmp()) {
     return false;
   }
-  if (get_opaque_from_cmp(cmpzm) == NULL) {
+  // compares can get conditionally flipped
+  bool found_opaque = false;
+  for (uint i = 1; i < cmpzm->req(); i++) {
+    Node* opnd = cmpzm->in(i);
+    if (opnd && opnd->Opcode() == Op_Opaque1) {
+      found_opaque = true;
+      break;
+    }
+  }
+  if (!found_opaque) {
     return false;
   }
   return true;
-}
-
-Node* PhaseIdealLoop::get_opaque_from_cmp(Node* cmp) {
-  // compares can get conditionally flipped
-  for (uint i = 1; i < cmp->req(); i++) {
-    Node* opnd = cmp->in(i);
-    if (opnd && opnd->Opcode() == Op_Opaque1) {
-      return opnd;
-    }
-  }
-  return NULL;
 }
 
 //------------------------------get_late_ctrl----------------------------------
