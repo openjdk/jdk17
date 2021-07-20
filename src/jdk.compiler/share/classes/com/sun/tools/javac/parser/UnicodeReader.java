@@ -171,17 +171,22 @@ public class UnicodeReader {
         // Fetch next character.
         nextCodeUnit();
 
-        if (character != '\\' || (wasBackslash && !wasUnicodeEscape)) {
-            wasBackslash = false;
-        } else {
+        if (character == '\\' && (!wasBackslash || wasUnicodeEscape)) {
             // Is a backslash and may be an unicode escape.
             switch (unicodeEscape()) {
-                case BACKSLASH -> wasUnicodeEscape = false;
-                case VALID_ESCAPE -> wasUnicodeEscape = true;
+                case BACKSLASH -> {
+                    wasUnicodeEscape = false;
+                    wasBackslash = !wasBackslash;
+                }
+                case VALID_ESCAPE -> {
+                    wasUnicodeEscape = true;
+                    wasBackslash = character == '\\' && !wasBackslash;
+                }
                 case BROKEN_ESCAPE -> nextUnicodeInputCharacter(); //skip broken unicode escapes
             }
-
-            wasBackslash = !wasBackslash;
+        } else {
+            wasBackslash = false;
+            wasUnicodeEscape = false;
         }
 
         // Codepoint and character match if not surrogate.

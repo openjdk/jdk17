@@ -29,32 +29,43 @@
  */
 
 public class UnicodeBackslash {
-    public static void main(String... args) {
-        String source = """
-            \\]
-            \u005C\]
-            \\u005C]
-            \\\u005D
-            \u005C\u005C]
-            \u005C\\u005D
-            \\u005C\u005D
-            \u005C\u005C\u005D
-            """;
-        String expected = """
-            \\]
-            \\]
-            \\u005C]
-            \\]
-            \\u005C]
-            \\]
-            \\u005C]
-            \\u005C]
-            """;
+    static boolean failed = false;
+    static int counter = 0;
 
-        if (!source.equals(expected)) {
-            System.err.println("Expected:\n" +  expected);
+    public static void main(String... args) {
+        //   source                           expected
+        test("\\]",                           "\\]");
+        test("\u005C\]",                      "\\]");
+        test("\\u005C]",                      "\\u005C]");
+        test("\u005C\u005C]",                 "\\]");
+
+        test("\\\\]",                         "\\\\]");
+        test("\u005C\\\]",                    "\\\\]");
+        test("\\u005C\\]",                    "\\u005C\\]");
+        test("\u005C\u005C\\]",               "\\\\]");
+        test("\\\u005C\]",                    "\\\\]");
+        test("\u005C\\u005C\]",               "\\\\]");
+        test("\\u005C\u005C\]",               "\\u005C\\]");
+        test("\u005C\u005C\u005C\]",          "\\\\]");
+        test("\\\\u005C]",                    "\\\\u005C]");
+        test("\u005C\\\u005C]",               "\\\\u005C]");
+        test("\\u005C\\u005C]",               "\\u005C\\u005C]");
+        test("\u005C\u005C\\u005C]",          "\\\\u005C]");
+        test("\\\u005C\u005C]",               "\\\\]");
+        test("\u005C\\u005C\u005C]",          "\\\\]");
+        test("\\u005C\u005C\u005C]",          "\\u005C\\]");
+        test("\u005C\u005C\u005C\u005C]",     "\\\\]");
+
+        if (failed) {
             throw new RuntimeException("Unicode escapes not handled correctly");
         }
     }
-}
 
+    static void test(String source, String expected) {
+        counter++;
+        if (!source.equals(expected)) {
+            System.err.println(counter + ": expected: " +  expected + ", found: " + source);
+            failed = true;
+        }
+    }
+}
