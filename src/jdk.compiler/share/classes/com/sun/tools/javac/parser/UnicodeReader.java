@@ -158,10 +158,6 @@ public class UnicodeReader {
      * Fetches the next 16-bit character from the buffer. If an unicode escape
      * is detected then converts the unicode escape to a character.
      */
-    /**
-     * Fetches the next 16-bit character from the buffer. If an unicode escape
-     * is detected then converts the unicode escape to a character.
-     */
     private void nextUnicodeInputCharacter() {
         // Position to next codepoint.
         position += width;
