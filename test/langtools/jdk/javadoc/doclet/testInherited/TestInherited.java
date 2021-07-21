@@ -23,7 +23,7 @@
 
 /*
  * @test
- * @bug 8269722
+ * @bug 8269722 8270866
  * @summary NPE in HtmlDocletWriter, reporting errors on inherited tags
  * @library /tools/lib ../../lib
  * @modules jdk.javadoc/jdk.javadoc.internal.tool
@@ -90,6 +90,35 @@ public class TestInherited extends JavadocTester {
         javadoc("-d", base.resolve("out").toString(),
                 "-Xdoclint:-missing",
                 src.resolve("BadReturn.java").toString());
+        checkExit(Exit.OK);
+    }
+
+    @Test
+    public void testBadInheritedReference(Path base) throws Exception {
+        Path src = base.resolve("src");
+        tb.writeJavaFiles(src, """
+                public class BadReference {
+                    public interface Intf {
+                        /**
+                         * {@link NonExistingClass}
+                         */
+                        public void m();
+                    }
+
+                    public static class Impl1 implements Intf {
+                        public void m() { }
+                    }
+                    
+                    public static class Impl2 implements Intf {
+                        /** {@inheritDoc} */
+                        public void m() { }
+                    }
+                }
+                """);
+
+        javadoc("-d", base.resolve("out").toString(),
+                "-Xdoclint:-reference",
+                src.resolve("BadReference.java").toString());
         checkExit(Exit.OK);
     }
 }
