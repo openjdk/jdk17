@@ -300,6 +300,10 @@ void ZBarrierSetC2::clone_at_expansion(PhaseMacroExpand* phase, ArrayCopyNode* a
       // BarrierSetC2::arraycopy_payload_base_offset 8-byte aligns the offset.
       // Make sure the offset points to the first element in the array when cloning
       // object arrays. Otherwise, load barriers are applied to parts of the header.
+      assert(src_offset == dest_offset, "should be equal");
+      assert((src_offset->get_long() == arrayOopDesc::base_offset_in_bytes(T_OBJECT) && UseCompressedClassPointers) ||
+             (src_offset->get_long() == arrayOopDesc::length_offset_in_bytes() && !UseCompressedClassPointers),
+             "unexpected offset for object array clone");
       src_offset = phase->longcon(arrayOopDesc::base_offset_in_bytes(T_OBJECT));
       dest_offset = src_offset;
     }
