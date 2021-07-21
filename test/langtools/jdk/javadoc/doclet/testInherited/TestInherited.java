@@ -108,7 +108,7 @@ public class TestInherited extends JavadocTester {
                     public static class Impl1 implements Intf {
                         public void m() { }
                     }
-                    
+
                     public static class Impl2 implements Intf {
                         /** {@inheritDoc} */
                         public void m() { }
