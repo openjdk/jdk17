@@ -25,7 +25,7 @@
 /*
  * @test SuspendBlocked
  * @bug 8270085
- * @library /testlibrary /test/lib
+ * @library /test/lib
  * @build SuspendBlocked
  * @run driver jdk.test.lib.helpers.ClassFileInstaller sun.hotspot.WhiteBox
  * @run main/othervm -Xbootclasspath/a:. -XX:+UnlockDiagnosticVMOptions -XX:+WhiteBoxAPI SuspendBlocked
