@@ -66,9 +66,8 @@ bool SafepointMechanism::should_process_no_suspend(JavaThread* thread) {
   if (global_poll() || thread->handshake_state()->has_a_non_suspend_operation()) {
     return true;
   } else {
-    // The poll is armed for a suspend request but we don't want to process it now. Since
-    // a safepoint operation could have executed while the thread was safepoint safe we
-    // need to possibly fix the thread's oops and first few frames before returning.
+    // We ignore suspend requests if any and just check before returning if we need
+    // to fix the thread's oops and first few frames due to a possible safepoint.
     StackWatermarkSet::on_safepoint(thread);
     update_poll_values(thread);
     OrderAccess::cross_modify_fence();
