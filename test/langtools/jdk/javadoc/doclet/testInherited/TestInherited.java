@@ -67,6 +67,14 @@ public class TestInherited extends JavadocTester {
                 "-Xdoclint:-missing", "-XDdoe",
                 src.resolve("BadParam.java").toString());
         checkExit(Exit.OK);
+        checkOutput("BadParam.Base.html", true, """
+                <dt>Parameters:</dt>
+                <dd><code>i</code> - a &lt; b</dd>
+                """);
+        checkOutput("BadParam.Sub.html", true, """
+                <dt>Parameters:</dt>
+                <dd><code>i</code> - a &lt; b</dd>
+                """);
     }
 
     @Test
@@ -91,6 +99,14 @@ public class TestInherited extends JavadocTester {
                 "-Xdoclint:-missing",
                 src.resolve("BadReturn.java").toString());
         checkExit(Exit.OK);
+        checkOutput("BadReturn.Base.html", true, """
+                <dt>Returns:</dt>
+                <dd>a &lt; b</dd>
+                """);
+        checkOutput("BadReturn.Sub.html", true, """
+                <dt>Returns:</dt>
+                <dd>a &lt; b</dd>
+                """);
     }
 
     @Test
@@ -130,5 +146,17 @@ public class TestInherited extends JavadocTester {
                 "-Xdoclint:-reference",
                 src.resolve("BadReference.java").toString());
         checkExit(Exit.OK);
+        checkOutput("BadReference.Intf.html", true, """
+                <div class="block"><code>NonExistingClass</code></div>
+                """);
+        checkOutput("BadReference.Impl1.html", true, """
+                <div class="block"><code>NonExistingClass</code></div>
+                """);
+        checkOutput("BadReference.Impl2.html", true, """
+                <div class="block"><code>NonExistingClass</code></div>
+                """);
+        checkOutput("BadReference.Impl3.html", true, """
+                <div class="block"><code>NonExistingClass</code></div>
+                """);
     }
 }
