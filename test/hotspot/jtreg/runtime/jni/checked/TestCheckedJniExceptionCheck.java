@@ -155,6 +155,7 @@ public class TestCheckedJniExceptionCheck {
 
     // Check warnings appear where they should, with start/end statements in output...
     static void checkOuputForCorrectWarnings(OutputAnalyzer oa) throws RuntimeException {
+        oa.shouldHaveExitValue(0);
         List<String> lines = oa.asLines();
         int expectedWarnings = 0;
         int warningCount = 0;
