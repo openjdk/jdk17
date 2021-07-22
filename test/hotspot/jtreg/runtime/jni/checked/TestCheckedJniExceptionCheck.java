@@ -189,6 +189,9 @@ public class TestCheckedJniExceptionCheck {
                 expectedWarnings = 0;
             }
         }
+        if (!testStartLine) {
+            throw new RuntimeException("Missing test start line after " + lineNo + " lines");
+        }
         /*
         System.out.println("Output looks good...");
         oa.reportDiagnosticSummary();
