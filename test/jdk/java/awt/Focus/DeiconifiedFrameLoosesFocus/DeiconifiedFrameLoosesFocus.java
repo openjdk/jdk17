@@ -79,10 +79,12 @@ public class DeiconifiedFrameLoosesFocus {
         frame.setExtendedState(Frame.ICONIFIED);
 
         Util.waitForIdle(robot);
+        robot.delay(200);
 
         frame.setExtendedState(Frame.NORMAL);
 
         Util.waitForIdle(robot);
+        robot.delay(200);
 
         if (!frame.isFocused()) {
             throw new TestFailedException("the Frame didn't regain focus after restoring!");
