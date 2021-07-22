@@ -175,12 +175,10 @@ public class TestCheckedJniExceptionCheck {
                     oa.reportDiagnosticSummary();
                     throw new RuntimeException("Unexpected warning at line " + lineNo);
                 }
-            }
-            else if (line.startsWith(EXPECT_WARNING_START)) {
+            } else if (line.startsWith(EXPECT_WARNING_START)) {
                 String countStr = line.substring(EXPECT_WARNING_START.length() + 1);
                 expectedWarnings = Integer.parseInt(countStr);
-            }
-            else if (line.startsWith(EXPECT_WARNING_END)) {
+            } else if (line.startsWith(EXPECT_WARNING_END)) {
                 if (warningCount != expectedWarnings) {
                     oa.reportDiagnosticSummary();
                     throw new RuntimeException("Missing warning at line " + lineNo);
