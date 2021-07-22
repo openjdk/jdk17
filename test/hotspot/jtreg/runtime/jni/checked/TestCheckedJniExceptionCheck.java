@@ -30,6 +30,7 @@
  */
 
 import java.util.List;
+import jdk.test.lib.Utils;
 import jdk.test.lib.process.ProcessTools;
 import jdk.test.lib.process.OutputAnalyzer;
 
