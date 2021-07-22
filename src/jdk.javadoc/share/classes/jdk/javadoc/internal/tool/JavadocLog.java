@@ -518,9 +518,6 @@ public class JavadocLog extends Log implements Reporter {
      * @return the diagnostic position
      */
     private DiagnosticPosition getDiagnosticPosition(DocTreePath path) {
-        if (path == null || path.getTreePath() == null) {
-            return null;
-        }
         DocSourcePositions posns = getSourcePositions();
         CompilationUnitTree compUnit = path.getTreePath().getCompilationUnit();
         int start = (int) posns.getStartPosition(compUnit, path.getDocComment(), path.getLeaf());
@@ -536,9 +533,6 @@ public class JavadocLog extends Log implements Reporter {
      * @return the diagnostic position
      */
     private DiagnosticPosition getDiagnosticPosition(Element element) {
-        if (element == null) {
-            return null;
-        }
         ToolEnvironment toolEnv = getToolEnv();
         DocSourcePositions posns = getSourcePositions();
         TreePath tp = toolEnv.elementToTreePath.get(element);
@@ -621,9 +615,6 @@ public class JavadocLog extends Log implements Reporter {
      * @return the diagnostic source
      */
     private DiagnosticSource getDiagnosticSource(DocTreePath path) {
-        if (path == null || path.getTreePath() == null) {
-            return null;
-        }
         return getDiagnosticSource(path.getTreePath().getCompilationUnit().getSourceFile());
     }
 
@@ -635,9 +626,6 @@ public class JavadocLog extends Log implements Reporter {
      * @return the diagnostic source
      */
     private DiagnosticSource getDiagnosticSource(Element element) {
-        if (element == null) {
-            return null;
-        }
         TreePath tp = getToolEnv().elementToTreePath.get(element);
         return tp == null ? DiagnosticSource.NO_SOURCE
                 : getDiagnosticSource(tp.getCompilationUnit().getSourceFile());

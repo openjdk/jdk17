@@ -685,7 +685,12 @@ public class CommentHelper {
         } else if (path == null || dcTree == null || dtree == null) {
             return null;
         }
-        return DocTreePath.getPath(path, dcTree, dtree);
+        DocTreePath dtPath = DocTreePath.getPath(path, dcTree, dtree);
+        if (dtPath == null && overriddenElement != null) {
+            // The overriding element has a doc tree, but it doesn't contain what we're looking for.
+            return configuration.utils.getCommentHelper(overriddenElement).getDocTreePath(dtree);
+        }
+        return dtPath;
     }
 
     public Element getOverriddenElement() {

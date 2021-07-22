@@ -110,7 +110,17 @@ public class TestInherited extends JavadocTester {
                     }
 
                     public static class Impl2 implements Intf {
-                        /** {@inheritDoc} */
+                        /**
+                         * {@inheritDoc}
+                         */
+                        public void m() { }
+                    }
+
+                    // subclass has doc comment but inherits main description
+                    public static class Impl3 implements Intf {
+                        /**
+                         * @since 1
+                         */
                         public void m() { }
                     }
                 }
