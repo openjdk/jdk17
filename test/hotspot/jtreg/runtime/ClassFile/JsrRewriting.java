@@ -74,6 +74,7 @@ public class JsrRewriting {
             className);
 
         output = new OutputAnalyzer(pb.start());
+        output.shouldNotHaveExitValue(0);
         String[] expectedMsgs = {
             "java.lang.LinkageError",
             "java.lang.NoSuchMethodError",
