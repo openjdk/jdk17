@@ -43,7 +43,11 @@ public class DeiconifiedFrameLoosesFocus {
     public static void main(String[] args) {
         DeiconifiedFrameLoosesFocus app = new DeiconifiedFrameLoosesFocus();
         app.init();
-        app.start();
+        try {
+            app.start();
+        } finally {
+            frame.dispose();
+        }
     }
 
     public void init() {
