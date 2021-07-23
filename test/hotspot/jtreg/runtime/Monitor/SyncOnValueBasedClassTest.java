@@ -95,6 +95,7 @@ public class SyncOnValueBasedClassTest {
         for (int i = 0; i < logTests.length; i++) {
             ProcessBuilder pb = ProcessTools.createJavaProcessBuilder(logTests[i]);
             OutputAnalyzer output = ProcessTools.executeProcess(pb);
+            output.shouldHaveExitValue(0);
             checkOutput(output);
         }
     }
