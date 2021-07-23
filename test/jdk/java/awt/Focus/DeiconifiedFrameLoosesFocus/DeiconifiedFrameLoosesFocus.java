@@ -31,7 +31,9 @@
   @run        main DeiconifiedFrameLoosesFocus
 */
 
-import java.awt.*;
+import java.awt.Frame;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import test.java.awt.regtesthelpers.Util;
 
 public class DeiconifiedFrameLoosesFocus {
@@ -61,6 +63,7 @@ public class DeiconifiedFrameLoosesFocus {
         frame.setVisible(true);
 
         Util.waitForIdle(robot);
+        robot.delay(1000);
 
         if (!frame.isFocused()) {
             Util.clickOnTitle(frame, robot);
@@ -79,12 +82,12 @@ public class DeiconifiedFrameLoosesFocus {
         frame.setExtendedState(Frame.ICONIFIED);
 
         Util.waitForIdle(robot);
-        robot.delay(200);
+        robot.delay(500);
 
         frame.setExtendedState(Frame.NORMAL);
 
         Util.waitForIdle(robot);
-        robot.delay(200);
+        robot.delay(500);
 
         if (!frame.isFocused()) {
             throw new TestFailedException("the Frame didn't regain focus after restoring!");
