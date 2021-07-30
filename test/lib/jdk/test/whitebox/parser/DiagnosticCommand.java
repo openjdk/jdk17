@@ -21,7 +21,7 @@
  * questions.
  */
 
-package sun.hotspot.parser;
+package jdk.test.whitebox.parser;
 
 public class DiagnosticCommand {
 

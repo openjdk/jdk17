@@ -21,13 +21,13 @@
  * questions.
  */
 
-package sun.hotspot.code;
+package jdk.test.whitebox.code;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.util.EnumSet;
 
-import sun.hotspot.WhiteBox;
+import jdk.test.whitebox.WhiteBox;
 
 public enum BlobType {
     // Execution level 1 and 4 (non-profiled) nmethods (including native nmethods)

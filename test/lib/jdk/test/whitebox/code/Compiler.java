@@ -21,10 +21,10 @@
  * questions.
  */
 
-package sun.hotspot.code;
+package jdk.test.whitebox.code;
 
 import java.lang.reflect.Executable;
-import sun.hotspot.WhiteBox;
+import jdk.test.whitebox.WhiteBox;
 
 /**
  * API to obtain information about enabled JIT compilers

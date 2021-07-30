@@ -21,9 +21,9 @@
  * questions.
  */
 
-package sun.hotspot.gc;
+package jdk.test.whitebox.gc;
 
-import sun.hotspot.WhiteBox;
+import jdk.test.whitebox.WhiteBox;
 
 /**
  * API to obtain information about selected and supported Garbage Collectors

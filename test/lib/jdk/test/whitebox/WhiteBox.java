@@ -21,7 +21,7 @@
  * questions.
  */
 
-package sun.hotspot;
+package jdk.test.whitebox;
 
 import java.lang.management.MemoryUsage;
 import java.lang.reflect.Executable;
@@ -32,7 +32,7 @@ import java.util.function.Function;
 import java.security.BasicPermission;
 import java.util.Objects;
 
-import sun.hotspot.parser.DiagnosticCommand;
+import jdk.test.whitebox.parser.DiagnosticCommand;
 
 public class WhiteBox {
   @SuppressWarnings("serial")
@@ -415,7 +415,7 @@ public class WhiteBox {
   public native long maxMetaspaceAllocationSize();
 
   // Don't use these methods directly
-  // Use sun.hotspot.gc.GC class instead.
+  // Use jdk.test.whitebox.gc.GC class instead.
   public native boolean isGCSupported(int name);
   public native boolean isGCSupportedByJVMCICompiler(int name);
   public native boolean isGCSelected(int name);

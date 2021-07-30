@@ -21,9 +21,9 @@
  * questions.
  */
 
-package sun.hotspot.code;
+package jdk.test.whitebox.code;
 
-import sun.hotspot.WhiteBox;
+import jdk.test.whitebox.WhiteBox;
 
 public class CodeBlob {
   private static final WhiteBox WB = WhiteBox.getWhiteBox();
