@@ -39,6 +39,7 @@ import sun.hotspot.WhiteBox;
  * and option -XX:+WhiteBoxAPI should be explicitly
  * specified on command line.
  */
+@Deprecated
 public class CPUInfo {
 
     private static final List<String> features;

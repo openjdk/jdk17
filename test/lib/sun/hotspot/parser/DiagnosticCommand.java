@@ -23,6 +23,7 @@
 
 package sun.hotspot.parser;
 
+@Deprecated
 public class DiagnosticCommand {
 
     public enum DiagnosticArgumentType {
