@@ -32,7 +32,7 @@ import java.util.function.Function;
 import java.security.BasicPermission;
 import java.util.Objects;
 
-import sun.hotspot.parser.DiagnosticCommand;
+import jdk.test.whitebox.parser.DiagnosticCommand;
 
 @Deprecated
 public class WhiteBox {
