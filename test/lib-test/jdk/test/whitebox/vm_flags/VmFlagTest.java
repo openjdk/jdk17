@@ -23,7 +23,7 @@
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import sun.hotspot.WhiteBox;
+import jdk.test.whitebox.WhiteBox;
 import sun.management.*;
 import com.sun.management.*;
 import jdk.test.lib.Asserts;

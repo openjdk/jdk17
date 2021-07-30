@@ -22,22 +22,20 @@
  */
 
 /*
- * @test UintxTest
- * @bug 8028756
+ * @test SizeTTest
+ * @bug 8054823
  * @library /test/lib
  * @modules java.base/jdk.internal.misc
  *          java.management/sun.management
- * @build sun.hotspot.WhiteBox
- * @run driver jdk.test.lib.helpers.ClassFileInstaller sun.hotspot.WhiteBox
- * @run main/othervm/timeout=600 -Xbootclasspath/a:. -XX:+UnlockDiagnosticVMOptions -XX:+WhiteBoxAPI UintxTest
- * @summary testing of WB::set/getUintxVMFlag()
- * @author igor.ignatyev@oracle.com
+ * @build jdk.test.whitebox.WhiteBox
+ * @run driver jdk.test.lib.helpers.ClassFileInstaller jdk.test.whitebox.WhiteBox
+ * @run main/othervm/timeout=600 -Xbootclasspath/a:. -XX:+UnlockDiagnosticVMOptions -XX:+WhiteBoxAPI -XX:+UnlockExperimentalVMOptions SizeTTest
+ * @summary testing of WB::set/getSizeTVMFlag()
  */
 import jdk.test.lib.Platform;
 
-public class UintxTest {
-    private static final String FLAG_NAME = "VerifyGCStartAt";
-    private static final String FLAG_DEBUG_NAME = "CodeCacheMinimumUseSpace";
+public class SizeTTest {
+    private static final String FLAG_NAME = "ArrayAllocatorMallocLimit";
     private static final Long[] TESTS = {0L, 100L, (long) Integer.MAX_VALUE,
         (1L << 32L) - 1L, 1L << 32L};
     private static final Long[] EXPECTED_64 = TESTS;
@@ -47,9 +45,7 @@ public class UintxTest {
     public static void main(String[] args) throws Exception {
         VmFlagTest.runTest(FLAG_NAME, TESTS,
             Platform.is64bit() ? EXPECTED_64 : EXPECTED_32,
-            VmFlagTest.WHITE_BOX::setUintxVMFlag,
-            VmFlagTest.WHITE_BOX::getUintxVMFlag);
-        VmFlagTest.runTest(FLAG_DEBUG_NAME, VmFlagTest.WHITE_BOX::getUintxVMFlag);
+            VmFlagTest.WHITE_BOX::setSizeTVMFlag,
+            VmFlagTest.WHITE_BOX::getSizeTVMFlag);
     }
 }
-

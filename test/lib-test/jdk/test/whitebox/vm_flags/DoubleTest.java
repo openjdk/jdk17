@@ -22,28 +22,26 @@
  */
 
 /*
- * @test StringTest
+ * @test DoubleTest
  * @bug 8028756
  * @library /test/lib
  * @modules java.base/jdk.internal.misc
  * @modules java.management/sun.management
- * @build sun.hotspot.WhiteBox
- * @run driver jdk.test.lib.helpers.ClassFileInstaller sun.hotspot.WhiteBox
- * @run main/othervm/timeout=600 -Xbootclasspath/a:. -XX:+UnlockDiagnosticVMOptions -XX:+WhiteBoxAPI StringTest
- * @summary testing of WB::set/getStringVMFlag()
+ * @build jdk.test.whitebox.WhiteBox
+ * @run driver jdk.test.lib.helpers.ClassFileInstaller jdk.test.whitebox.WhiteBox
+ * @run main/othervm/timeout=600 -Xbootclasspath/a:. -XX:+UnlockDiagnosticVMOptions -XX:+WhiteBoxAPI DoubleTest
+ * @summary testing of WB::set/getDoubleVMFlag()
  * @author igor.ignatyev@oracle.com
  */
 
-public class StringTest {
-    private static final String FLAG_NAME = "CompileOnly";
-    private static final String FLAG_DEBUG_NAME = "SuppressErrorAt";
-    private static final String[] TESTS = {"StringTest::*", ""};
+public class DoubleTest {
+    private static final String FLAG_NAME = "CompileThresholdScaling";
+    private static final Double[] TESTS = {0d, -0d, 1d, Double.MAX_VALUE};
 
     public static void main(String[] args) throws Exception {
         VmFlagTest.runTest(FLAG_NAME, TESTS,
-            VmFlagTest.WHITE_BOX::setStringVMFlag,
-            VmFlagTest.WHITE_BOX::getStringVMFlag);
-        VmFlagTest.runTest(FLAG_DEBUG_NAME, VmFlagTest.WHITE_BOX::getStringVMFlag);
+            VmFlagTest.WHITE_BOX::setDoubleVMFlag,
+            VmFlagTest.WHITE_BOX::getDoubleVMFlag);
     }
 }
 
