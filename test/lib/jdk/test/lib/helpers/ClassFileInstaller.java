@@ -109,7 +109,7 @@ public class ClassFileInstaller {
         boolean seenNewWbInner = false;
         boolean seenOldWb = false;
         boolean seenOldWbInner = false;
-        final String newWb = "jdk.test.whitebox/WhiteBox";
+        final String newWb = "jdk.test.whitebox.WhiteBox";
         final String newWbInner = newWb + "$WhiteBoxPermission";
         final String oldWb = "sun.hotspot.WhiteBox";
         final String oldWbInner = oldWb + "$WhiteBoxPermission";
