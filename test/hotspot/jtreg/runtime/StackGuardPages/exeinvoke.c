@@ -68,8 +68,17 @@ static void handler(int sig, siginfo_t *si, void *unused) {
   longjmp(context, 1);
 }
 
+static char* altstack = NULL;
+
 void set_signal_handler() {
-  static char altstack[SIGSTKSZ];
+  if (altstack == NULL) {
+    // Dynamically allocated incase SIGSTKSZ is not constant
+    altstack = malloc(SIGSTKSZ);
+    if (altstack == NULL) {
+      fprintf(stderr, "Test ERROR. Unable to malloc altstack space\n");
+      exit(7);
+    }
+  }
 
   stack_t ss = {
     .ss_size = SIGSTKSZ,
