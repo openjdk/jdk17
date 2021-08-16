@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -72,7 +72,7 @@ static char* altstack = NULL;
 
 void set_signal_handler() {
   if (altstack == NULL) {
-    // Dynamically allocated incase SIGSTKSZ is not constant
+    // Dynamically allocated in case SIGSTKSZ is not constant
     altstack = malloc(SIGSTKSZ);
     if (altstack == NULL) {
       fprintf(stderr, "Test ERROR. Unable to malloc altstack space\n");
